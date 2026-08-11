@@ -71,14 +71,22 @@ export function Info() {
 
         <div className="sm:col-span-2">
           <span className="text-xs text-inkSecondary font-semibold block mb-2">Horários de culto</span>
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-2.5">
             {form.horarios.map((h, i) => (
-              <div key={i} className="flex gap-2">
-                <input className={`${inputCls} w-[110px] flex-none`} value={h.dia} onChange={(e) => atualizarHorario(i, 'dia', e.target.value)} placeholder="Domingo" />
-                <input className={`${inputCls} flex-1 min-w-0`} value={h.horario} onChange={(e) => atualizarHorario(i, 'horario', e.target.value)} placeholder="18h — Culto de Celebração" />
-                <button type="button" onClick={() => removerHorario(i)} className="w-[30px] h-[30px] rounded-lg border border-border flex items-center justify-center text-inkSecondary flex-none">
-                  <IconTrash className="icon w-3 h-3" />
-                </button>
+              <div key={i} className="flex flex-col sm:flex-row gap-2 sm:items-end bg-surface2 border border-border rounded-xl p-2.5">
+                <div className="w-full sm:w-[150px] sm:flex-none min-w-0">
+                  <span className="text-[10.5px] text-muted font-semibold block mb-1">Dia</span>
+                  <input className={inputCls} value={h.dia} onChange={(e) => atualizarHorario(i, 'dia', e.target.value)} placeholder="Domingo" />
+                </div>
+                <div className="flex gap-2 items-end w-full min-w-0">
+                  <div className="flex-1 min-w-0">
+                    <span className="text-[10.5px] text-muted font-semibold block mb-1">Horário</span>
+                    <input className={inputCls} value={h.horario} onChange={(e) => atualizarHorario(i, 'horario', e.target.value)} placeholder="18h — Culto de Celebração" />
+                  </div>
+                  <button type="button" onClick={() => removerHorario(i)} className="w-[38px] h-[38px] rounded-lg border border-border flex items-center justify-center text-inkSecondary flex-none">
+                    <IconTrash className="icon w-3 h-3" />
+                  </button>
+                </div>
               </div>
             ))}
           </div>
