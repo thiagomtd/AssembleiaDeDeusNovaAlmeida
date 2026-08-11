@@ -18,7 +18,7 @@ export type Acao =
  */
 export async function registrarAuditoria(
   event: APIGatewayProxyEventV2WithJWTAuthorizer,
-  params: { acao: Acao; entidadeId: string; detalhes?: string; motivo?: string },
+  params: { acao: Acao; entidadeId: string; detalhes?: string; motivo?: string; anexoKey?: string },
 ): Promise<void> {
   try {
     const agora = new Date();
@@ -36,6 +36,7 @@ export async function registrarAuditoria(
           entidadeId: params.entidadeId,
           detalhes: params.detalhes ?? '',
           motivo: params.motivo ?? '',
+          anexoKey: params.anexoKey ?? '',
           ator: getSub(event) ?? 'desconhecido',
           atorTelefone: getPhone(event) ?? '',
         },

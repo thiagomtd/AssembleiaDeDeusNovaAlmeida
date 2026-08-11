@@ -39,9 +39,9 @@ export function Membros() {
 
   useEffect(carregar, []);
 
-  const remover = async (motivo: string) => {
+  const remover = async (motivo: string, anexoKey?: string) => {
     if (!alvoRemover) return;
-    await api.del(`/members/${alvoRemover.memberId}`, { motivo });
+    await api.del(`/members/${alvoRemover.memberId}`, { motivo, anexoKey });
     setAlvoRemover(null);
     carregar();
   };

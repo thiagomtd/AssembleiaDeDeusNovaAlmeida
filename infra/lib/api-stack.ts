@@ -22,6 +22,7 @@ export interface ApiStackProps extends cdk.StackProps {
   campanhasTable: dynamodb.Table;
   auditoriaTable: dynamodb.Table;
   cultoMediaBucket: s3.Bucket;
+  auditoriaAnexosBucket: s3.Bucket;
   frontendDistributionDomain: string;
 }
 
@@ -40,6 +41,7 @@ export class ApiStack extends cdk.Stack {
       TABLE_CAMPANHAS: props.campanhasTable.tableName,
       TABLE_AUDITORIA: props.auditoriaTable.tableName,
       BUCKET_CULTO_MEDIA: props.cultoMediaBucket.bucketName,
+      BUCKET_AUDITORIA_ANEXOS: props.auditoriaAnexosBucket.bucketName,
       USER_POOL_ID: props.userPool.userPoolId,
     };
 
@@ -131,8 +133,11 @@ export class ApiStack extends cdk.Stack {
 
     // ---------- auditoria (LGPD) ----------
     const auditoriaList = fn('AuditoriaListFn', 'auditoria/list.ts');
+    const auditoriaAnexoPresign = fn('AuditoriaAnexoPresignFn', 'auditoria/anexo-presign.ts');
     props.auditoriaTable.grantReadData(auditoriaList);
     props.membersTable.grantReadData(auditoriaList);
+    props.auditoriaAnexosBucket.grantRead(auditoriaList);
+    props.auditoriaAnexosBucket.grantPut(auditoriaAnexoPresign);
 
     // ---------- portal do membro: meus dados (LGPD) ----------
     const meDados = fn('MeDadosFn', 'me/dados.ts');
@@ -225,6 +230,7 @@ export class ApiStack extends cdk.Stack {
     route('/me/contribuicoes', [apigw.HttpMethod.GET], priv(meContribuicoes));
     route('/me/dados', [apigw.HttpMethod.GET], priv(meDados));
     route('/auditoria', [apigw.HttpMethod.GET], priv(auditoriaList));
+    route('/auditoria/anexo/presign', [apigw.HttpMethod.POST], priv(auditoriaAnexoPresign));
 
     route('/campanhas', [apigw.HttpMethod.GET], priv(campanhasList));
     route('/campanhas', [apigw.HttpMethod.POST], priv(campanhasCreate));

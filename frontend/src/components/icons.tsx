@@ -156,6 +156,11 @@ export const IconTarget = ({ className = base }: Props) => (
     <circle cx="12" cy="12" r="1" fill="currentColor" stroke="none" />
   </svg>
 );
+export const IconPaperclip = ({ className = base }: Props) => (
+  <svg className={className} viewBox="0 0 24 24">
+    <path d="M7 12.5l6.5-6.5a3 3 0 0 1 4.24 4.24L10.5 17.5a5 5 0 0 1-7.07-7.07L11 3" />
+  </svg>
+);
 export const IconGift = ({ className = base }: Props) => (
   <svg className={className} viewBox="0 0 24 24">
     <rect x="4" y="10" width="16" height="10" rx="1.3" />

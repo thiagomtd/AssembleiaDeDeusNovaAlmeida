@@ -14,7 +14,7 @@ export const handler: APIGatewayProxyHandlerV2WithJWTAuthorizer = async (
   const transactionId = event.pathParameters?.id;
   if (!mesAno || !transactionId) return badRequest('Parâmetros mes e id são obrigatórios na URL.');
 
-  const { motivo } = JSON.parse(event.body || '{}');
+  const { motivo, anexoKey } = JSON.parse(event.body || '{}');
   if (!motivo || typeof motivo !== 'string' || !motivo.trim()) {
     return badRequest('Informe o motivo desta exclusão.');
   }
@@ -53,6 +53,7 @@ export const handler: APIGatewayProxyHandlerV2WithJWTAuthorizer = async (
       entidadeId: transactionId,
       detalhes: `${existing.Item.tipo} de R$ ${existing.Item.valor} (${existing.Item.categoria})`,
       motivo,
+      anexoKey,
     });
 
     return noContent();

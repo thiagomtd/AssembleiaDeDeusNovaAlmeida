@@ -102,18 +102,18 @@ export function Cultos() {
     }
   };
 
-  const confirmarRemoverMidia = async (motivo: string) => {
+  const confirmarRemoverMidia = async (motivo: string, anexoKey?: string) => {
     if (!alvoRemoverMidia) return;
     const { cultoId, mediaId } = alvoRemoverMidia;
-    await api.del(`/cultos/${cultoId}/midia/${mediaId}`, { motivo });
+    await api.del(`/cultos/${cultoId}/midia/${mediaId}`, { motivo, anexoKey });
     setMidia((m) => m.filter((x) => x.mediaId !== mediaId));
     setAlvoRemoverMidia(null);
     carregar();
   };
 
-  const confirmarRemoverCulto = async (motivo: string) => {
+  const confirmarRemoverCulto = async (motivo: string, anexoKey?: string) => {
     if (!alvoRemoverCulto) return;
-    await api.del(`/cultos/${alvoRemoverCulto.cultoId}`, { motivo });
+    await api.del(`/cultos/${alvoRemoverCulto.cultoId}`, { motivo, anexoKey });
     if (expandido === alvoRemoverCulto.cultoId) setExpandido(null);
     setAlvoRemoverCulto(null);
     carregar();

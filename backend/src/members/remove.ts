@@ -13,7 +13,7 @@ export const handler: APIGatewayProxyHandlerV2WithJWTAuthorizer = async (
   const memberId = event.pathParameters?.id;
   if (!memberId) return badRequest('Parâmetro id ausente na URL.');
 
-  const { motivo } = JSON.parse(event.body || '{}');
+  const { motivo, anexoKey } = JSON.parse(event.body || '{}');
   if (!motivo || typeof motivo !== 'string' || !motivo.trim()) {
     return badRequest('Informe o motivo desta exclusão.');
   }
@@ -25,7 +25,7 @@ export const handler: APIGatewayProxyHandlerV2WithJWTAuthorizer = async (
     await deleteCognitoUser(existing.Item.telefone);
     await ddb.send(new DeleteCommand({ TableName: Tables.members, Key: { memberId } }));
 
-    await registrarAuditoria(event, { acao: 'membro.remover', entidadeId: memberId, detalhes: existing.Item.nome, motivo });
+    await registrarAuditoria(event, { acao: 'membro.remover', entidadeId: memberId, detalhes: existing.Item.nome, motivo, anexoKey });
 
     return noContent();
   } catch (err) {

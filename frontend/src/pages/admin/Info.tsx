@@ -1,6 +1,7 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import { api } from '../../lib/api';
 import { Card, Button, Field, inputCls } from '../../components/ui';
+import { ConfirmDialog } from '../../components/ConfirmDialog';
 import { IconPlus, IconTrash } from '../../components/icons';
 
 interface Horario { dia: string; horario: string }
@@ -13,10 +14,9 @@ interface ChurchInfo {
 
 export function Info() {
   const [form, setForm] = useState<ChurchInfo>({ textoInstitucional: '', endereco: '', mapaEmbedUrl: '', horarios: [] });
-  const [salvando, setSalvando] = useState(false);
   const [salvo, setSalvo] = useState(false);
-  const [motivo, setMotivo] = useState('');
   const [erro, setErro] = useState('');
+  const [confirmando, setConfirmando] = useState(false);
 
   useEffect(() => {
     api.get<ChurchInfo>('/church-info').then((r) =>
@@ -39,29 +39,27 @@ export function Info() {
   const removerHorario = (i: number) => setForm((f) => ({ ...f, horarios: f.horarios.filter((_, idx) => idx !== i) }));
   const adicionarHorario = () => setForm((f) => ({ ...f, horarios: [...f.horarios, { dia: '', horario: '' }] }));
 
-  const salvar = async (e: FormEvent) => {
+  const abrirConfirmacao = (e: FormEvent) => {
     e.preventDefault();
     setErro('');
-    if (!motivo.trim()) {
-      setErro('Informe o motivo desta alteração.');
-      return;
-    }
-    setSalvando(true);
     setSalvo(false);
+    setConfirmando(true);
+  };
+
+  const salvar = async (motivo: string, anexoKey?: string) => {
     try {
-      await api.put('/church-info', { ...form, motivo: motivo.trim() });
+      await api.put('/church-info', { ...form, motivo, anexoKey });
       setSalvo(true);
-      setMotivo('');
+      setConfirmando(false);
     } catch (err: any) {
+      setConfirmando(false);
       setErro(err?.message || 'Não foi possível salvar as alterações.');
-    } finally {
-      setSalvando(false);
     }
   };
 
   return (
     <Card>
-      <form onSubmit={salvar} className="grid sm:grid-cols-2 gap-3.5 p-4.5">
+      <form onSubmit={abrirConfirmacao} className="grid sm:grid-cols-2 gap-3.5 p-4.5">
         <div className="sm:col-span-2">
           <Field label="Texto institucional">
             <textarea
@@ -105,27 +103,22 @@ export function Info() {
           </Button>
         </div>
 
-        <div className="sm:col-span-2">
-          <Field label="Motivo da alteração (obrigatório)" hint="Fica registrado na auditoria.">
-            <textarea
-              required
-              rows={2}
-              className={inputCls}
-              value={motivo}
-              onChange={(e) => setMotivo(e.target.value)}
-              placeholder="Explique o motivo desta alteração"
-            />
-          </Field>
-        </div>
-
         <div className="sm:col-span-2 flex items-center gap-3">
-          <Button type="submit" variant="gold" disabled={salvando}>
-            {salvando ? 'Salvando...' : 'Salvar alterações'}
+          <Button type="submit" variant="gold">
+            Salvar alterações
           </Button>
           {salvo && <span className="text-income text-xs font-semibold">Salvo com sucesso.</span>}
           {erro && <span className="text-expense text-xs font-semibold">{erro}</span>}
         </div>
       </form>
+
+      <ConfirmDialog
+        aberto={confirmando}
+        titulo="Confirmar alteração"
+        mensagem="Você está prestes a salvar alterações nas informações institucionais."
+        onCancelar={() => setConfirmando(false)}
+        onConfirmar={salvar}
+      />
     </Card>
   );
 }

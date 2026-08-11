@@ -35,9 +35,9 @@ export function Lancamentos() {
 
   useEffect(carregar, [mesAno]);
 
-  const remover = async (motivo: string) => {
+  const remover = async (motivo: string, anexoKey?: string) => {
     if (!alvoRemover) return;
-    await api.del(`/transactions/${alvoRemover.mesAno}/${alvoRemover.transactionId}`, { motivo });
+    await api.del(`/transactions/${alvoRemover.mesAno}/${alvoRemover.transactionId}`, { motivo, anexoKey });
     setAlvoRemover(null);
     carregar();
   };

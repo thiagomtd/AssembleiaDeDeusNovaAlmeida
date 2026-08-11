@@ -6,6 +6,7 @@ export const s3 = new S3Client({});
 export const Buckets = {
   photos: process.env.BUCKET_PHOTOS as string,
   cultoMedia: process.env.BUCKET_CULTO_MEDIA as string,
+  auditoriaAnexos: process.env.BUCKET_AUDITORIA_ANEXOS as string,
 };
 
 export async function presignPut(bucket: string, key: string, contentType: string, expiresInSeconds = 300) {

@@ -21,7 +21,7 @@ export const handler: APIGatewayProxyHandlerV2WithJWTAuthorizer = async (
     if (!existing.Item) return notFound('Lançamento não encontrado.');
 
     const body = JSON.parse(event.body || '{}');
-    const { tipo, valor, categoria, descricao, data, membroId, membroNome, campanhaId, campanhaTitulo, motivo } = body;
+    const { tipo, valor, categoria, descricao, data, membroId, membroNome, campanhaId, campanhaTitulo, motivo, anexoKey } = body;
 
     if (tipo !== 'entrada' && tipo !== 'saida') return badRequest('Campo tipo deve ser "entrada" ou "saida".');
     if (typeof valor !== 'number' || valor <= 0) return badRequest('Campo valor deve ser um número positivo.');
@@ -103,6 +103,7 @@ export const handler: APIGatewayProxyHandlerV2WithJWTAuthorizer = async (
       entidadeId: transactionId,
       detalhes: `${tipo} de R$ ${valor} (${categoria ?? existing.Item.categoria})`,
       motivo,
+      anexoKey,
     });
 
     return ok(updated);

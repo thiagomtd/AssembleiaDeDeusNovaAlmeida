@@ -14,7 +14,7 @@ export const handler: APIGatewayProxyHandlerV2WithJWTAuthorizer = async (
   const mediaId = event.pathParameters?.mediaId;
   if (!cultoId || !mediaId) return badRequest('Parâmetros id e mediaId são obrigatórios na URL.');
 
-  const { motivo } = JSON.parse(event.body || '{}');
+  const { motivo, anexoKey } = JSON.parse(event.body || '{}');
   if (!motivo || typeof motivo !== 'string' || !motivo.trim()) {
     return badRequest('Informe o motivo desta exclusão.');
   }
@@ -31,6 +31,7 @@ export const handler: APIGatewayProxyHandlerV2WithJWTAuthorizer = async (
       entidadeId: mediaId,
       detalhes: `${existing.Item.tipo} no culto ${cultoId}`,
       motivo,
+      anexoKey,
     });
 
     return noContent();

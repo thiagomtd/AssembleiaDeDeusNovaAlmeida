@@ -20,7 +20,7 @@ export const handler: APIGatewayProxyHandlerV2WithJWTAuthorizer = async (
     if (!existing.Item) return notFound('Campanha não encontrada.');
 
     const body = JSON.parse(event.body || '{}');
-    const { titulo, descricao, meta, dataFim, ativa, motivo } = body;
+    const { titulo, descricao, meta, dataFim, ativa, motivo, anexoKey } = body;
 
     if (!titulo || typeof titulo !== 'string') return badRequest('Campo titulo é obrigatório.');
     if (typeof meta !== 'number' || meta <= 0) return badRequest('Campo meta deve ser um número positivo.');
@@ -40,7 +40,7 @@ export const handler: APIGatewayProxyHandlerV2WithJWTAuthorizer = async (
 
     await ddb.send(new PutCommand({ TableName: Tables.campanhas, Item: updated }));
 
-    await registrarAuditoria(event, { acao: 'campanha.editar', entidadeId: campanhaId, detalhes: titulo, motivo });
+    await registrarAuditoria(event, { acao: 'campanha.editar', entidadeId: campanhaId, detalhes: titulo, motivo, anexoKey });
 
     return ok(updated);
   } catch (err) {

@@ -18,7 +18,7 @@ export const handler: APIGatewayProxyHandlerV2WithJWTAuthorizer = async (
     if (!existing.Item) return notFound('Membro não encontrado.');
 
     const body = JSON.parse(event.body || '{}');
-    const { nome, dataNascimento, dataAssociacao, status, grupo, motivo } = body;
+    const { nome, dataNascimento, dataAssociacao, status, grupo, motivo, anexoKey } = body;
     if (!motivo || typeof motivo !== 'string' || !motivo.trim()) {
       return badRequest('Informe o motivo desta alteração.');
     }
@@ -56,6 +56,7 @@ export const handler: APIGatewayProxyHandlerV2WithJWTAuthorizer = async (
       entidadeId: memberId,
       detalhes: `${res.Attributes?.nome} (grupo: ${grupoFinal}, status: ${statusFinal})`,
       motivo,
+      anexoKey,
     });
 
     return ok(res.Attributes);

@@ -2,6 +2,7 @@ import { useEffect, useState, type FormEvent } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { api } from '../../lib/api';
 import { Card, Button, Field, inputCls } from '../../components/ui';
+import { ConfirmDialog } from '../../components/ConfirmDialog';
 import { IconChevronLeft } from '../../components/icons';
 
 interface Campanha {
@@ -22,9 +23,8 @@ export function EditarCampanha() {
 
   const [campanha, setCampanha] = useState<Campanha | null>(campanhaDoState ?? null);
   const [carregando, setCarregando] = useState(!campanhaDoState);
-  const [salvando, setSalvando] = useState(false);
   const [erro, setErro] = useState('');
-  const [motivo, setMotivo] = useState('');
+  const [confirmando, setConfirmando] = useState(false);
 
   useEffect(() => {
     if (campanhaDoState) return;
@@ -34,7 +34,7 @@ export function EditarCampanha() {
       .finally(() => setCarregando(false));
   }, [id, campanhaDoState]);
 
-  const salvar = async (e: FormEvent) => {
+  const validarEAbrirConfirmacao = (e: FormEvent) => {
     e.preventDefault();
     if (!campanha) return;
     setErro('');
@@ -46,11 +46,11 @@ export function EditarCampanha() {
       setErro('Informe uma meta válida.');
       return;
     }
-    if (!motivo.trim()) {
-      setErro('Informe o motivo desta alteração.');
-      return;
-    }
-    setSalvando(true);
+    setConfirmando(true);
+  };
+
+  const salvar = async (motivo: string, anexoKey?: string) => {
+    if (!campanha) return;
     try {
       await api.put(`/campanhas/${campanha.campanhaId}`, {
         titulo: campanha.titulo,
@@ -58,13 +58,13 @@ export function EditarCampanha() {
         meta: Number(campanha.meta),
         dataFim: campanha.dataFim,
         ativa: campanha.ativa,
-        motivo: motivo.trim(),
+        motivo,
+        anexoKey,
       });
       navigate('/admin/campanhas');
     } catch (err: any) {
+      setConfirmando(false);
       setErro(err?.message || 'Não foi possível salvar as alterações.');
-    } finally {
-      setSalvando(false);
     }
   };
 
@@ -81,7 +81,7 @@ export function EditarCampanha() {
       </button>
 
       <Card>
-        <form onSubmit={salvar}>
+        <form onSubmit={validarEAbrirConfirmacao}>
           <div className="grid sm:grid-cols-2 gap-3.5 p-4.5">
             <div className="sm:col-span-2">
               <Field label="Título">
@@ -132,24 +132,12 @@ export function EditarCampanha() {
                 <option value="encerrada">Encerrada</option>
               </select>
             </Field>
-            <div className="sm:col-span-2">
-              <Field label="Motivo da alteração (obrigatório)" hint="Fica registrado na auditoria.">
-                <textarea
-                  required
-                  rows={2}
-                  className={inputCls}
-                  value={motivo}
-                  onChange={(e) => setMotivo(e.target.value)}
-                  placeholder="Explique o motivo desta alteração"
-                />
-              </Field>
-            </div>
           </div>
           <div className="px-4.5 pb-4.5 flex flex-col gap-3.5">
             {erro && <p className="text-expense text-xs">{erro}</p>}
             <div className="flex flex-col sm:flex-row gap-2.5">
-              <Button type="submit" variant="gold" disabled={salvando} className="justify-center">
-                {salvando ? 'Salvando...' : 'Salvar alterações'}
+              <Button type="submit" variant="gold" className="justify-center">
+                Salvar alterações
               </Button>
               <Button type="button" variant="secondary" onClick={() => navigate('/admin/campanhas')} className="justify-center">
                 Cancelar
@@ -158,6 +146,14 @@ export function EditarCampanha() {
           </div>
         </form>
       </Card>
+
+      <ConfirmDialog
+        aberto={confirmando}
+        titulo="Confirmar alteração"
+        mensagem={`Você está prestes a salvar alterações na campanha "${campanha.titulo}".`}
+        onCancelar={() => setConfirmando(false)}
+        onConfirmar={salvar}
+      />
     </div>
   );
 }

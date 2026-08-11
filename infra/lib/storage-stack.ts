@@ -8,6 +8,7 @@ export class StorageStack extends cdk.Stack {
   public readonly frontendBucket: s3.Bucket;
   public readonly frontendDistribution: cloudfront.Distribution;
   public readonly cultoMediaBucket: s3.Bucket;
+  public readonly auditoriaAnexosBucket: s3.Bucket;
 
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
@@ -58,9 +59,27 @@ export class StorageStack extends cdk.Stack {
       ],
     });
 
+    // --- Anexos da trilha de auditoria (S3 privado, SEM CloudFront) ---
+    // Comprovante opcional anexado ao motivo de uma edição/exclusão — só acessível via
+    // URL pré-assinada, gerada só para quem já tem acesso à tela de Auditoria (admin).
+    this.auditoriaAnexosBucket = new s3.Bucket(this, 'AuditoriaAnexosBucket', {
+      removalPolicy: cdk.RemovalPolicy.DESTROY,
+      autoDeleteObjects: true,
+      blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
+      encryption: s3.BucketEncryption.S3_MANAGED,
+      cors: [
+        {
+          allowedMethods: [s3.HttpMethods.PUT, s3.HttpMethods.GET],
+          allowedOrigins: ['*'],
+          allowedHeaders: ['*'],
+        },
+      ],
+    });
+
     new cdk.CfnOutput(this, 'FrontendBucketName', { value: this.frontendBucket.bucketName });
     new cdk.CfnOutput(this, 'FrontendDistributionId', { value: this.frontendDistribution.distributionId });
     new cdk.CfnOutput(this, 'FrontendUrl', { value: `https://${this.frontendDistribution.distributionDomainName}` });
     new cdk.CfnOutput(this, 'CultoMediaBucketName', { value: this.cultoMediaBucket.bucketName });
+    new cdk.CfnOutput(this, 'AuditoriaAnexosBucketName', { value: this.auditoriaAnexosBucket.bucketName });
   }
 }

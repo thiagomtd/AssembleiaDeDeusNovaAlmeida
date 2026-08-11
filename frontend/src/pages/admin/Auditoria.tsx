@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { api } from '../../lib/api';
 import { Card, Pill } from '../../components/ui';
 import { MonthPicker } from '../../components/MonthPicker';
+import { IconPaperclip } from '../../components/icons';
 
 interface Entrada {
   timestampId: string;
@@ -11,6 +12,7 @@ interface Entrada {
   detalhes: string;
   motivo: string;
   atorNome: string;
+  anexoUrl: string | null;
 }
 
 const ACAO_LABEL: Record<string, string> = {
@@ -64,7 +66,7 @@ export function Auditoria() {
           <table className="w-full text-[13.5px]">
             <thead>
               <tr>
-                {['Data/hora', 'Ação', 'Quem fez', 'Detalhes', 'Motivo'].map((h) => (
+                {['Data/hora', 'Ação', 'Quem fez', 'Detalhes', 'Motivo', 'Anexo'].map((h) => (
                   <th key={h} className="text-left text-[10.5px] uppercase tracking-wider text-muted font-bold px-3 py-2.5 border-b border-border whitespace-nowrap">
                     {h}
                   </th>
@@ -83,11 +85,25 @@ export function Auditoria() {
                   <td className="px-3 py-2.5 border-b border-border text-ink">{e.atorNome}</td>
                   <td className="px-3 py-2.5 border-b border-border text-inkSecondary">{e.detalhes}</td>
                   <td className="px-3 py-2.5 border-b border-border text-inkSecondary max-w-[240px]">{e.motivo || '—'}</td>
+                  <td className="px-3 py-2.5 border-b border-border">
+                    {e.anexoUrl ? (
+                      <a
+                        href={e.anexoUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center gap-1 text-accentStrong hover:underline text-[12.5px]"
+                      >
+                        <IconPaperclip className="icon w-3.5 h-3.5" /> Ver
+                      </a>
+                    ) : (
+                      <span className="text-muted">—</span>
+                    )}
+                  </td>
                 </tr>
               ))}
               {!carregando && itens.length === 0 && (
                 <tr>
-                  <td colSpan={5} className="px-3 py-8 text-center text-muted">
+                  <td colSpan={6} className="px-3 py-8 text-center text-muted">
                     Nenhuma ação registrada neste mês.
                   </td>
                 </tr>

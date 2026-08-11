@@ -32,9 +32,9 @@ export function Campanhas() {
 
   useEffect(carregar, []);
 
-  const remover = async (motivo: string) => {
+  const remover = async (motivo: string, anexoKey?: string) => {
     if (!alvoRemover) return;
-    await api.del(`/campanhas/${alvoRemover.campanhaId}`, { motivo });
+    await api.del(`/campanhas/${alvoRemover.campanhaId}`, { motivo, anexoKey });
     setAlvoRemover(null);
     carregar();
   };

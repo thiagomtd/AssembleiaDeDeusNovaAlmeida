@@ -2,6 +2,7 @@ import type { APIGatewayProxyEventV2WithJWTAuthorizer, APIGatewayProxyHandlerV2W
 import { QueryCommand } from '@aws-sdk/lib-dynamodb';
 import { ddb, Tables } from '../common/ddb';
 import { isAdmin } from '../common/auth';
+import { presignGet, Buckets } from '../common/s3';
 import { ok, badRequest, forbidden, serverError } from '../common/response';
 
 // Só a diretoria (admin) vê a trilha de auditoria — ela cobre ações de todos os
@@ -41,15 +42,20 @@ export const handler: APIGatewayProxyHandlerV2WithJWTAuthorizer = async (
       nomesPorSub.set(ator, (membro.Items?.[0]?.nome as string) ?? item.atorTelefone ?? 'Desconhecido');
     }
 
-    const resultado = itens.map((item) => ({
-      timestampId: item.timestampId,
-      timestamp: item.timestamp,
-      acao: item.acao,
-      entidadeId: item.entidadeId,
-      detalhes: item.detalhes,
-      motivo: item.motivo ?? '',
-      atorNome: nomesPorSub.get(item.ator as string) ?? 'Desconhecido',
-    }));
+    const resultado = await Promise.all(
+      itens.map(async (item) => ({
+        timestampId: item.timestampId,
+        timestamp: item.timestamp,
+        acao: item.acao,
+        entidadeId: item.entidadeId,
+        detalhes: item.detalhes,
+        motivo: item.motivo ?? '',
+        atorNome: nomesPorSub.get(item.ator as string) ?? 'Desconhecido',
+        anexoUrl: item.anexoKey
+          ? await presignGet(Buckets.auditoriaAnexos, item.anexoKey as string, 300)
+          : null,
+      })),
+    );
 
     return ok(resultado);
   } catch (err) {
