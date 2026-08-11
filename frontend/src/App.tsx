@@ -24,6 +24,7 @@ import { NovoMembro } from './pages/admin/NovoMembro';
 import { EditarMembro } from './pages/admin/EditarMembro';
 import { Lancamentos } from './pages/admin/Lancamentos';
 import { NovoLancamento } from './pages/admin/NovoLancamento';
+import { EditarLancamento } from './pages/admin/EditarLancamento';
 import { Cultos } from './pages/admin/Cultos';
 import { Info } from './pages/admin/Info';
 
@@ -69,6 +70,7 @@ export function App() {
           <Route path="membros/:id/editar" element={<RequireGroup roles={['admin']}><EditarMembro /></RequireGroup>} />
           <Route path="lancamentos" element={<RequireGroup roles={['admin', 'tesouraria']}><Lancamentos /></RequireGroup>} />
           <Route path="lancamentos/novo" element={<RequireGroup roles={['admin', 'tesouraria']}><NovoLancamento /></RequireGroup>} />
+          <Route path="lancamentos/:mes/:id/editar" element={<RequireGroup roles={['admin', 'tesouraria']}><EditarLancamento /></RequireGroup>} />
           <Route path="campanhas" element={<RequireGroup roles={['admin', 'tesouraria']}><AdminCampanhas /></RequireGroup>} />
           <Route path="campanhas/nova" element={<RequireGroup roles={['admin', 'tesouraria']}><NovaCampanha /></RequireGroup>} />
           <Route path="campanhas/:id/editar" element={<RequireGroup roles={['admin', 'tesouraria']}><EditarCampanha /></RequireGroup>} />

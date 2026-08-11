@@ -2,6 +2,7 @@ import type { APIGatewayProxyEventV2WithJWTAuthorizer, APIGatewayProxyHandlerV2W
 import { PutCommand } from '@aws-sdk/lib-dynamodb';
 import { ddb, Tables } from '../common/ddb';
 import { podeGerenciarMidia } from '../common/auth';
+import { registrarAuditoria } from '../common/audit';
 import { badRequest, forbidden, ok, serverError } from '../common/response';
 
 export const handler: APIGatewayProxyHandlerV2WithJWTAuthorizer = async (
@@ -27,6 +28,9 @@ export const handler: APIGatewayProxyHandlerV2WithJWTAuthorizer = async (
       createdAt: new Date().toISOString(),
     };
     await ddb.send(new PutCommand({ TableName: Tables.midia, Item: item }));
+
+    await registrarAuditoria(event, { acao: 'midia.criar', entidadeId: mediaId, detalhes: `${tipo} no culto ${cultoId}` });
+
     return ok(item, 201);
   } catch (err) {
     return serverError(err);

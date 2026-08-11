@@ -3,6 +3,7 @@ import { DeleteCommand, GetCommand } from '@aws-sdk/lib-dynamodb';
 import { ddb, Tables } from '../common/ddb';
 import { podeGerenciarMidia } from '../common/auth';
 import { deleteObject, Buckets } from '../common/s3';
+import { registrarAuditoria } from '../common/audit';
 import { badRequest, forbidden, noContent, notFound, serverError } from '../common/response';
 
 export const handler: APIGatewayProxyHandlerV2WithJWTAuthorizer = async (
@@ -19,6 +20,13 @@ export const handler: APIGatewayProxyHandlerV2WithJWTAuthorizer = async (
 
     await deleteObject(Buckets.cultoMedia, existing.Item.s3Key);
     await ddb.send(new DeleteCommand({ TableName: Tables.midia, Key: { cultoId, mediaId } }));
+
+    await registrarAuditoria(event, {
+      acao: 'midia.remover',
+      entidadeId: mediaId,
+      detalhes: `${existing.Item.tipo} no culto ${cultoId}`,
+    });
+
     return noContent();
   } catch (err) {
     return serverError(err);

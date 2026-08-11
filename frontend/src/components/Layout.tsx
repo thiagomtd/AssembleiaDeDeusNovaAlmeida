@@ -1,20 +1,85 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Emblem, IconMenu, IconX } from './icons';
+import { Emblem, IconMenu, IconX, IconChevronDown } from './icons';
 import { Button } from './ui';
 
-const navItems = [
-  { to: '/', label: 'Início', role: null as null | 'member' | 'admin' },
-  { to: '/entradas-saidas', label: 'Entradas e Saídas', role: 'member' as const },
-  { to: '/dizimistas', label: 'Dizimistas do Mês', role: 'member' as const },
-  { to: '/aniversariantes', label: 'Aniversariantes', role: 'member' as const },
-  { to: '/midia', label: 'Mídia do Culto', role: 'member' as const },
-  { to: '/relatorios', label: 'Relatórios', role: 'member' as const },
-  { to: '/meu-extrato', label: 'Meu Extrato', role: 'member' as const },
-  { to: '/campanhas', label: 'Campanhas', role: 'member' as const },
-  { to: '/admin', label: 'Administração', role: 'admin' as const },
-];
+interface NavLeaf {
+  to: string;
+  label: string;
+}
+interface NavGroup {
+  label: string;
+  items: NavLeaf[];
+}
+
+const financeiro: NavGroup = {
+  label: 'Financeiro',
+  items: [
+    { to: '/entradas-saidas', label: 'Entradas e Saídas' },
+    { to: '/dizimistas', label: 'Dizimistas do Mês' },
+    { to: '/relatorios', label: 'Relatórios' },
+    { to: '/meu-extrato', label: 'Meu Extrato' },
+    { to: '/campanhas', label: 'Campanhas' },
+  ],
+};
+
+const comunidade: NavGroup = {
+  label: 'Comunidade',
+  items: [
+    { to: '/aniversariantes', label: 'Aniversariantes' },
+    { to: '/midia', label: 'Mídia do Culto' },
+  ],
+};
+
+const memberGroups = [financeiro, comunidade];
+
+function NavDropdown({ group, openLabel, setOpenLabel }: { group: NavGroup; openLabel: string | null; setOpenLabel: (l: string | null) => void }) {
+  const location = useLocation();
+  const ref = useRef<HTMLDivElement>(null);
+  const isOpen = openLabel === group.label;
+  const isActiveGroup = group.items.some((i) => location.pathname.startsWith(i.to));
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const onClickOutside = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpenLabel(null);
+    };
+    document.addEventListener('mousedown', onClickOutside);
+    return () => document.removeEventListener('mousedown', onClickOutside);
+  }, [isOpen, setOpenLabel]);
+
+  return (
+    <div ref={ref} className="relative flex-none">
+      <button
+        type="button"
+        onClick={() => setOpenLabel(isOpen ? null : group.label)}
+        className={`flex items-center gap-1 whitespace-nowrap px-2.5 py-2 text-[13.5px] border-b-2 transition-colors ${
+          isOpen || isActiveGroup ? 'text-ink border-accent font-semibold' : 'text-inkSecondary border-transparent hover:text-ink'
+        }`}
+      >
+        {group.label}
+        <IconChevronDown className={`icon w-3 h-3 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+      </button>
+      {isOpen && (
+        <div className="absolute left-0 top-full mt-1 min-w-[180px] bg-surface border border-border rounded-xl shadow-card overflow-hidden py-1 z-30">
+          {group.items.map((item) => (
+            <NavLink
+              key={item.to}
+              to={item.to}
+              onClick={() => setOpenLabel(null)}
+              className={({ isActive }) =>
+                `block px-3.5 py-2.5 text-[13px] ${isActive ? 'bg-surface2 text-ink font-semibold' : 'text-inkSecondary hover:bg-surface2 hover:text-ink'}`
+              }
+            >
+              {item.label}
+            </NavLink>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
 
 export function Layout() {
   const { isMember, isAdmin, isMidia, isTesouraria, isAuthenticated, telefone, nome, signOut } = useAuth();
@@ -22,26 +87,22 @@ export function Layout() {
   const navigate = useNavigate();
   const location = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [openGroup, setOpenGroup] = useState<string | null>(null);
 
-  useEffect(() => setMenuOpen(false), [location.pathname]);
+  useEffect(() => {
+    setMenuOpen(false);
+    setOpenGroup(null);
+  }, [location.pathname]);
 
-  const canSee = (role: null | 'member' | 'admin') => {
-    if (role === null) return true;
-    // "Administração" no menu aparece para quem tem qualquer responsabilidade
-    // de gestão (diretoria, mídia ou tesouraria) — cada uma vê só as suas abas lá dentro.
-    if (role === 'admin') return isAdmin || isMidia || isTesouraria;
-    return isMember;
-  };
+  const podeVerAdmin = isAdmin || isMidia || isTesouraria;
 
   const handleSignOut = async () => {
     await signOut();
     navigate('/');
   };
 
-  const visibleItems = navItems.filter((item) => canSee(item.role));
-
   const navLinkCls = ({ isActive }: { isActive: boolean }) =>
-    `px-2.5 py-2 text-[13.5px] border-b-2 transition-colors ${
+    `flex-none whitespace-nowrap px-2.5 py-2 text-[13.5px] border-b-2 transition-colors ${
       isActive ? 'text-ink border-accent font-semibold' : 'text-inkSecondary border-transparent hover:text-ink'
     }`;
 
@@ -57,12 +118,19 @@ export function Layout() {
             </div>
           </div>
 
-          <nav className="hidden md:flex gap-0.5">
-            {visibleItems.map((item) => (
-              <NavLink key={item.to} to={item.to} end={item.to === '/'} className={navLinkCls}>
-                {item.label}
+          <nav className="hidden md:flex items-center gap-0.5">
+            <NavLink to="/" end className={navLinkCls}>
+              Início
+            </NavLink>
+            {isMember &&
+              memberGroups.map((g) => (
+                <NavDropdown key={g.label} group={g} openLabel={openGroup} setOpenLabel={setOpenGroup} />
+              ))}
+            {podeVerAdmin && (
+              <NavLink to="/admin" className={navLinkCls}>
+                Administração
               </NavLink>
-            ))}
+            )}
           </nav>
 
           <div className="hidden md:flex items-center gap-2.5 text-[12.5px] text-muted flex-none">
@@ -92,19 +160,43 @@ export function Layout() {
         </div>
 
         {menuOpen && (
-          <div className="md:hidden border-t border-border bg-surface px-4 sm:px-5 py-3 flex flex-col gap-0.5">
-            {visibleItems.map((item) => (
+          <div className="md:hidden border-t border-border bg-surface px-4 sm:px-5 py-3 flex flex-col gap-0.5 max-h-[calc(100vh-56px)] overflow-y-auto">
+            <NavLink
+              to="/"
+              end
+              className={({ isActive }) =>
+                `px-3 py-2.5 rounded-lg text-[14px] ${isActive ? 'bg-surface2 text-ink font-semibold' : 'text-inkSecondary'}`
+              }
+            >
+              Início
+            </NavLink>
+            {isMember &&
+              memberGroups.map((g) => (
+                <div key={g.label} className="pt-2">
+                  <span className="block px-3 pb-1 text-[10.5px] uppercase tracking-wider text-muted font-bold">{g.label}</span>
+                  {g.items.map((item) => (
+                    <NavLink
+                      key={item.to}
+                      to={item.to}
+                      className={({ isActive }) =>
+                        `block px-3 py-2.5 rounded-lg text-[14px] ${isActive ? 'bg-surface2 text-ink font-semibold' : 'text-inkSecondary'}`
+                      }
+                    >
+                      {item.label}
+                    </NavLink>
+                  ))}
+                </div>
+              ))}
+            {podeVerAdmin && (
               <NavLink
-                key={item.to}
-                to={item.to}
-                end={item.to === '/'}
+                to="/admin"
                 className={({ isActive }) =>
-                  `px-3 py-2.5 rounded-lg text-[14px] ${isActive ? 'bg-surface2 text-ink font-semibold' : 'text-inkSecondary'}`
+                  `mt-2 px-3 py-2.5 rounded-lg text-[14px] ${isActive ? 'bg-surface2 text-ink font-semibold' : 'text-inkSecondary'}`
                 }
               >
-                {item.label}
+                Administração
               </NavLink>
-            ))}
+            )}
             <div className="mt-2 pt-3 border-t border-border flex items-center justify-between gap-2.5">
               {isAuthenticated ? (
                 <>

@@ -124,6 +124,11 @@ export const IconChevronLeft = ({ className = base }: Props) => (
     <path d="M6 9l6 6 6-6" />
   </svg>
 );
+export const IconChevronDown = ({ className = base }: Props) => (
+  <svg className={className} viewBox="0 0 24 24">
+    <path d="M6 9l6 6 6-6" />
+  </svg>
+);
 export const IconMenu = ({ className = base }: Props) => (
   <svg className={className} viewBox="0 0 24 24">
     <path d="M4 6h16M4 12h16M4 18h16" />

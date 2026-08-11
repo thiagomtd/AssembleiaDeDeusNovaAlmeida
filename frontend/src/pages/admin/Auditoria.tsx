@@ -22,6 +22,10 @@ const ACAO_LABEL: Record<string, string> = {
   'campanha.criar': 'Campanha criada',
   'campanha.editar': 'Campanha editada',
   'campanha.remover': 'Campanha removida',
+  'culto.criar': 'Culto criado',
+  'culto.remover': 'Culto removido',
+  'midia.criar': 'Mídia enviada',
+  'midia.remover': 'Mídia removida',
   'info.editar': 'Informações institucionais editadas',
 };
 

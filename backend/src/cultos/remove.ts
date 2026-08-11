@@ -3,6 +3,7 @@ import { DeleteCommand, GetCommand, QueryCommand } from '@aws-sdk/lib-dynamodb';
 import { ddb, Tables } from '../common/ddb';
 import { podeGerenciarMidia } from '../common/auth';
 import { deleteObject, Buckets } from '../common/s3';
+import { registrarAuditoria } from '../common/audit';
 import { badRequest, forbidden, noContent, notFound, serverError } from '../common/response';
 
 // Exclui o culto e, em cascata, todos os itens de mídia associados (S3 + DynamoDB).
@@ -34,6 +35,13 @@ export const handler: APIGatewayProxyHandlerV2WithJWTAuthorizer = async (
     );
 
     await ddb.send(new DeleteCommand({ TableName: Tables.cultos, Key: { cultoId } }));
+
+    await registrarAuditoria(event, {
+      acao: 'culto.remover',
+      entidadeId: cultoId,
+      detalhes: `${culto.Item.titulo} (${items.length} mídia(s) removida(s) junto)`,
+    });
+
     return noContent();
   } catch (err) {
     return serverError(err);

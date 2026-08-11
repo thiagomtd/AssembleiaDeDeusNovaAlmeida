@@ -166,6 +166,8 @@ export class ApiStack extends cdk.Stack {
     props.cultoMediaBucket.grantRead(cultosListPublic);
     props.cultoMediaBucket.grantDelete(cultosRemove);
 
+    [cultosCreate, cultosRemove, midiaCreate, midiaRemove].forEach((f) => props.auditoriaTable.grantWriteData(f));
+
     // ---------- HTTP API ----------
     const authorizer = new HttpUserPoolAuthorizer('CognitoAuthorizer', props.userPool, {
       userPoolClients: [props.userPoolClient],

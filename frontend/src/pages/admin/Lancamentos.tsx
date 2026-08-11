@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { api } from '../../lib/api';
 import { Card, Pill, fmtBRL } from '../../components/ui';
-import { IconPlus, IconEdit, IconUsers } from '../../components/icons';
+import { IconPlus, IconEdit, IconTrash, IconUsers, IconTarget } from '../../components/icons';
 import { MonthPicker } from '../../components/MonthPicker';
 
 interface Lancamento {
@@ -12,19 +12,32 @@ interface Lancamento {
   valor: number;
   categoria: string;
   data: string;
+  membroId?: string;
   membroNome?: string;
+  campanhaId?: string;
+  campanhaTitulo?: string;
+  descricao?: string;
 }
 
 export function Lancamentos() {
+  const navigate = useNavigate();
   const now = new Date();
   const [mes, setMes] = useState(now.getMonth() + 1);
   const [ano, setAno] = useState(now.getFullYear());
   const [itens, setItens] = useState<Lancamento[]>([]);
   const mesAno = `${ano}-${String(mes).padStart(2, '0')}`;
 
-  useEffect(() => {
+  const carregar = () => {
     api.get<Lancamento[]>(`/admin/transactions?mes=${mesAno}`).then(setItens).catch(() => setItens([]));
-  }, [mesAno]);
+  };
+
+  useEffect(carregar, [mesAno]);
+
+  const remover = async (t: Lancamento) => {
+    if (!confirm(`Remover este lançamento de ${fmtBRL(t.valor)} (${t.categoria})? Essa ação não pode ser desfeita.`)) return;
+    await api.del(`/transactions/${t.mesAno}/${t.transactionId}`);
+    carregar();
+  };
 
   return (
     <Card className="overflow-hidden">
@@ -41,7 +54,7 @@ export function Lancamentos() {
         <table className="w-full text-[13.5px]">
           <thead>
             <tr>
-              {['Data', 'Tipo', 'Categoria', 'Dizimista', 'Valor'].map((h) => (
+              {['Data', 'Tipo', 'Categoria', 'Dizimista / Campanha', 'Valor', ''].map((h) => (
                 <th key={h} className="text-left text-[10.5px] uppercase tracking-wider text-muted font-bold px-3 py-2.5 border-b border-border whitespace-nowrap">
                   {h}
                 </th>
@@ -57,22 +70,46 @@ export function Lancamentos() {
                 </td>
                 <td className="px-3 py-2.5 border-b border-border text-inkSecondary">{t.categoria}</td>
                 <td className="px-3 py-2.5 border-b border-border text-inkSecondary">
-                  {t.membroNome ? (
-                    <span className="inline-flex items-center gap-1.5">
-                      <IconUsers className="icon w-3 h-3 text-muted" /> {t.membroNome}
-                    </span>
-                  ) : (
-                    <span className="text-muted">—</span>
-                  )}
+                  <div className="flex flex-col gap-1">
+                    {t.membroNome && (
+                      <span className="inline-flex items-center gap-1.5">
+                        <IconUsers className="icon w-3 h-3 text-muted" /> {t.membroNome}
+                      </span>
+                    )}
+                    {t.campanhaTitulo && (
+                      <span className="inline-flex items-center gap-1.5">
+                        <IconTarget className="icon w-3 h-3 text-muted" /> {t.campanhaTitulo}
+                      </span>
+                    )}
+                    {!t.membroNome && !t.campanhaTitulo && <span className="text-muted">—</span>}
+                  </div>
                 </td>
                 <td className={`px-3 py-2.5 border-b border-border text-right font-semibold ${t.tipo === 'entrada' ? 'text-income' : 'text-expense'}`}>
                   {t.tipo === 'entrada' ? '+' : '-'} {fmtBRL(t.valor)}
+                </td>
+                <td className="px-3 py-2.5 border-b border-border whitespace-nowrap">
+                  <div className="flex gap-1.5">
+                    <button
+                      onClick={() => navigate(`/admin/lancamentos/${t.mesAno}/${t.transactionId}/editar`, { state: { lancamento: t } })}
+                      className="w-[30px] h-[30px] rounded-lg border border-border inline-flex items-center justify-center text-inkSecondary hover:bg-surface2"
+                      title="Editar"
+                    >
+                      <IconEdit className="icon w-[13px] h-[13px]" />
+                    </button>
+                    <button
+                      onClick={() => remover(t)}
+                      className="w-[30px] h-[30px] rounded-lg border border-border inline-flex items-center justify-center text-inkSecondary hover:bg-expense hover:text-white hover:border-expense"
+                      title="Excluir"
+                    >
+                      <IconTrash className="icon w-[13px] h-[13px]" />
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}
             {itens.length === 0 && (
               <tr>
-                <td colSpan={5} className="px-3 py-8 text-center text-muted">
+                <td colSpan={6} className="px-3 py-8 text-center text-muted">
                   Nenhum lançamento neste mês.
                 </td>
               </tr>

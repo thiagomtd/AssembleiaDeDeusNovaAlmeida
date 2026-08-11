@@ -8,6 +8,8 @@ export type Acao =
   | 'membro.criar' | 'membro.editar' | 'membro.remover'
   | 'lancamento.criar' | 'lancamento.editar' | 'lancamento.remover'
   | 'campanha.criar' | 'campanha.editar' | 'campanha.remover'
+  | 'culto.criar' | 'culto.remover'
+  | 'midia.criar' | 'midia.remover'
   | 'info.editar';
 
 /**
