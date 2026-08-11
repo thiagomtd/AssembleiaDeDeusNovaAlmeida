@@ -1,0 +1,70 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Type-check backend
+        run: npm run build -w backend
+
+      - name: Type-check frontend
+        working-directory: frontend
+        run: npx tsc -b
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::120259362543:role/IcadnaGitHubActionsRole
+          aws-region: us-east-1
+
+      - name: Deploy infrastructure (CDK)
+        run: npm run deploy -w infra
+
+      - name: Write frontend .env from stack outputs
+        run: |
+          node -e "
+            const o = require('./infra/cdk-outputs.json');
+            const fs = require('fs');
+            fs.writeFileSync('frontend/.env', [
+              'VITE_AWS_REGION=us-east-1',
+              'VITE_USER_POOL_ID=' + o.IcadnaAuthStack.UserPoolId,
+              'VITE_USER_POOL_CLIENT_ID=' + o.IcadnaAuthStack.UserPoolClientId,
+              'VITE_IDENTITY_POOL_ID=' + o.IcadnaAuthStack.IdentityPoolId,
+              'VITE_API_URL=' + o.IcadnaApiStack.ApiUrl,
+              ''
+            ].join('\n'));
+          "
+
+      - name: Build frontend
+        run: npm run frontend:build
+
+      - name: Deploy frontend to S3 + invalidate CloudFront
+        run: |
+          BUCKET=$(node -e "console.log(require('./infra/cdk-outputs.json').IcadnaStorageStack.FrontendBucketName)")
+          DIST_ID=$(node -e "console.log(require('./infra/cdk-outputs.json').IcadnaStorageStack.FrontendDistributionId)")
+          URL=$(node -e "console.log(require('./infra/cdk-outputs.json').IcadnaStorageStack.FrontendUrl)")
+          aws s3 sync frontend/dist "s3://$BUCKET" --delete
+          aws cloudfront create-invalidation --distribution-id "$DIST_ID" --paths '/*'
+          echo "Deployed: $URL"

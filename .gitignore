@@ -1,0 +1,15 @@
+node_modules/
+dist/
+cdk.out/
+*.js
+!*.config.js
+!scripts/*.js
+.env
+.env.local
+.env.*.local
+*.d.ts
+!bin/**/*.d.ts
+*.tsbuildinfo
+.DS_Store
+*.log
+cdk-outputs.json

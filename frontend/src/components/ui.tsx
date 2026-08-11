@@ -1,0 +1,116 @@
+import type { ReactNode } from 'react';
+
+export function Card({ children, className = '' }: { children: ReactNode; className?: string }) {
+  return <div className={`bg-surface border border-border rounded-2xl shadow-card ${className}`}>{children}</div>;
+}
+
+export function Eyebrow({ children, icon }: { children: ReactNode; icon?: ReactNode }) {
+  return (
+    <p className="flex items-center gap-1.5 text-[11.5px] uppercase tracking-wider text-muted font-bold mb-2">
+      {icon}
+      {children}
+    </p>
+  );
+}
+
+type BtnVariant = 'primary' | 'gold' | 'secondary';
+export function Button({
+  children,
+  variant = 'primary',
+  size = 'md',
+  className = '',
+  ...props
+}: {
+  children: ReactNode;
+  variant?: BtnVariant;
+  size?: 'md' | 'sm';
+  className?: string;
+} & React.ButtonHTMLAttributes<HTMLButtonElement>) {
+  const base = 'inline-flex items-center gap-1.5 rounded-xl font-semibold cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed transition-colors';
+  const sizeCls = size === 'sm' ? 'px-3 py-1.5 text-[12.5px] rounded-lg' : 'px-3.5 py-2 text-[13.5px]';
+  const variantCls =
+    variant === 'gold'
+      ? 'bg-accent border border-accent text-[#241703] hover:bg-accentStrong'
+      : variant === 'secondary'
+        ? 'bg-transparent border border-border text-ink hover:bg-surface2'
+        : 'bg-ink border border-ink text-surface hover:opacity-90';
+  return (
+    <button className={`${base} ${sizeCls} ${variantCls} ${className}`} {...props}>
+      {children}
+    </button>
+  );
+}
+
+type PillTone = 'active' | 'inactive' | 'income' | 'expense' | 'role-admin' | 'role-member' | 'role-midia' | 'role-tesouraria';
+const pillTones: Record<PillTone, string> = {
+  active: 'bg-incomeSoft text-income',
+  inactive: 'bg-surface2 text-muted',
+  income: 'bg-incomeSoft text-income',
+  expense: 'bg-expenseSoft text-expense',
+  'role-admin': 'bg-accentSoft text-accentStrong',
+  'role-member': 'bg-surface2 text-inkSecondary border border-border',
+  'role-midia': 'bg-sage/15 text-sage',
+  'role-tesouraria': 'bg-incomeSoft text-income',
+};
+export function Pill({ tone, children }: { tone: PillTone; children: ReactNode }) {
+  return (
+    <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11.5px] font-bold ${pillTones[tone]}`}>
+      {children}
+    </span>
+  );
+}
+
+export function StatTile({
+  label,
+  value,
+  tone,
+  hint,
+}: {
+  label: string;
+  value: string;
+  tone?: 'income' | 'expense';
+  hint?: string;
+}) {
+  const toneCls = tone === 'income' ? 'text-income' : tone === 'expense' ? 'text-expense' : 'text-ink';
+  return (
+    <Card className="p-4">
+      <Eyebrow>{label}</Eyebrow>
+      <div className={`font-serif text-2xl ${toneCls}`}>{value}</div>
+      {hint && <div className="text-[11px] text-muted mt-1">{hint}</div>}
+    </Card>
+  );
+}
+
+export function Field({
+  label,
+  hint,
+  children,
+}: {
+  label: string;
+  hint?: string;
+  children: ReactNode;
+}) {
+  return (
+    <label className="flex flex-col gap-1.5 w-full min-w-0">
+      <span className="text-xs text-inkSecondary font-semibold">{label}</span>
+      {children}
+      {hint && <span className="text-[11px] text-muted">{hint}</span>}
+    </label>
+  );
+}
+
+export const inputCls =
+  'w-full min-w-0 max-w-full box-border bg-surface2 border border-border rounded-lg px-3 py-2.5 text-[13.5px] text-ink placeholder:text-muted outline-none transition-shadow focus:border-accent focus:ring-2 focus:ring-accent/30';
+
+export function PrivacyNote({ children, icon }: { children: ReactNode; icon?: ReactNode }) {
+  return (
+    <div className="flex gap-2.5 items-start bg-surface2 border border-border rounded-xl px-4 py-3.5 text-[12.5px] text-inkSecondary">
+      {icon}
+      <span>{children}</span>
+    </div>
+  );
+}
+
+export function fmtBRL(v: number) {
+  return v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+}

@@ -1,0 +1,22 @@
+{
+  "name": "icadna-sistema",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Sistema web da Igreja Cristã Assembleia de Deus de Nova Almeida (I.C.A.D.N.A.)",
+  "workspaces": [
+    "frontend",
+    "backend",
+    "infra"
+  ],
+  "scripts": {
+    "infra:bootstrap": "npm run cdk -w infra -- bootstrap",
+    "infra:synth": "npm run cdk -w infra -- synth",
+    "infra:diff": "npm run cdk -w infra -- diff",
+    "infra:deploy": "npm run cdk -w infra -- deploy --all --require-approval never",
+    "infra:destroy": "npm run cdk -w infra -- destroy --all",
+    "backend:build": "npm run build -w backend",
+    "frontend:dev": "npm run dev -w frontend",
+    "frontend:build": "npm run build -w frontend",
+    "deploy:frontend": "bash scripts/deploy-frontend.sh"
+  }
+}
