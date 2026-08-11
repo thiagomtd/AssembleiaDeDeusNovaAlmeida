@@ -8,6 +8,7 @@ import { ForgotPassword } from './pages/ForgotPassword';
 import { Transacoes } from './pages/Transacoes';
 import { Dizimistas } from './pages/Dizimistas';
 import { Aniversariantes } from './pages/Aniversariantes';
+import { MeuExtrato } from './pages/MeuExtrato';
 import { Midia } from './pages/Midia';
 import { MidiaCulto } from './pages/MidiaCulto';
 import { Relatorios } from './pages/Relatorios';
@@ -44,6 +45,7 @@ export function App() {
         <Route path="midia" element={<RequireGroup roles={[...QUALQUER_GRUPO]}><Midia /></RequireGroup>} />
         <Route path="midia/:cultoId" element={<RequireGroup roles={[...QUALQUER_GRUPO]}><MidiaCulto /></RequireGroup>} />
         <Route path="relatorios" element={<RequireGroup roles={[...QUALQUER_GRUPO]}><Relatorios /></RequireGroup>} />
+        <Route path="meu-extrato" element={<RequireGroup roles={[...QUALQUER_GRUPO]}><MeuExtrato /></RequireGroup>} />
 
         <Route
           path="admin"

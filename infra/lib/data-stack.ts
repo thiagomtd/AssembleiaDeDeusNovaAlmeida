@@ -42,6 +42,13 @@ export class DataStack extends cdk.Stack {
       partitionKey: { name: 'ano', type: dynamodb.AttributeType.STRING },
       sortKey: { name: 'data', type: dynamodb.AttributeType.STRING },
     });
+    // Índice esparso: só lançamentos vinculados a um dizimista entram aqui, o que
+    // permite ao Portal do Membro buscar o extrato de UMA pessoa sem varrer a tabela.
+    this.transactionsTable.addGlobalSecondaryIndex({
+      indexName: 'membroId-index',
+      partitionKey: { name: 'membroId', type: dynamodb.AttributeType.STRING },
+      sortKey: { name: 'data', type: dynamodb.AttributeType.STRING },
+    });
 
     // Item único (id fixo "MAIN") com texto institucional, endereço, horários de culto
     // e o saldo total em caixa (mantido por incremento atômico a cada lançamento).
