@@ -1,10 +1,13 @@
 # Sistema — Assembleia de Deus de Nova Almeida
 
 Sistema web da igreja: página inicial pública, controle de entradas e saídas,
-dizimistas do mês (transparência sem expor valores individuais), mídia dos
-cultos (fotos/vídeos com download individual ou em lote) e relatórios
-financeiros mensais/anuais para membros, com administração completa (membros,
-lançamentos, fotos, informações institucionais).
+dizimistas do mês e aniversariantes (transparência sem expor valores
+individuais ou ano de nascimento), mídia dos cultos (fotos/vídeos, só
+visualização, sem download), campanhas de arrecadação com meta e progresso,
+relatórios financeiros mensais/anuais e extrato pessoal de contribuições
+(Portal do Membro), com administração completa (membros, lançamentos,
+campanhas, cultos/mídia, informações institucionais) e trilha de auditoria
+para conformidade com a LGPD.
 
 ## Ambientes no ar
 
@@ -129,14 +132,20 @@ uma igreja é baixo e os access patterns são bem distintos (membro por
 id/e-mail, lançamento por mês/ano, mídia por culto) — tabelas separadas
 mantêm cada Lambda simples sem a complexidade de chaves sobrepostas.
 
-- `icadna-members`: um registro = uma pessoa = uma conta no sistema.
+- `icadna-members`: um registro = uma pessoa = uma conta no sistema. GSI
+  `cognitoSub-index` permite achar o próprio cadastro a partir do token (Portal
+  do Membro, LGPD).
 - `icadna-transactions`: `PK=mesAno` (consulta o mês inteiro em uma Query),
-  GSI por `ano` para relatórios anuais. Nunca expõe o vínculo dizimista↔valor
-  fora da administração.
+  GSI por `ano` para relatórios anuais e GSI esparso por `membroId` (só
+  lançamentos vinculados a alguém) para o extrato pessoal. Nunca expõe o
+  vínculo dizimista↔valor fora da administração.
 - `icadna-church-info`: item único com texto institucional, endereço,
   horários e o saldo total em caixa (mantido por incremento atômico a cada
   lançamento).
-- `icadna-photos`: galeria pública da home.
 - `icadna-cultos` + `icadna-culto-midia`: um culto → N itens de mídia
-  (fotos/vídeos), com download individual (URL pré-assinada) ou em lote
-  (Lambda gera um `.zip` em streaming).
+  (fotos/vídeos), só para visualização (sem download) via URL pré-assinada.
+- `icadna-campanhas`: metas de arrecadação; `arrecadado` é mantido por
+  incremento atômico a cada lançamento vinculado, igual ao saldo em caixa.
+- `icadna-auditoria`: `PK=mesAno` (mesmo padrão de transactions), registra
+  quem criou/editou/removeu membros, lançamentos, campanhas ou informações
+  institucionais — trilha exigida pela LGPD.
