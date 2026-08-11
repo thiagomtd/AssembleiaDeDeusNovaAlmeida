@@ -41,6 +41,7 @@ export function EditarLancamento() {
   const [carregando, setCarregando] = useState(!lancamentoDoState);
   const [salvando, setSalvando] = useState(false);
   const [erro, setErro] = useState('');
+  const [motivo, setMotivo] = useState('');
 
   useEffect(() => {
     api.get<Membro[]>('/members').then(setMembros).catch(() => setMembros([]));
@@ -70,6 +71,10 @@ export function EditarLancamento() {
       setErro('Informe a data do lançamento.');
       return;
     }
+    if (!motivo.trim()) {
+      setErro('Informe o motivo desta alteração.');
+      return;
+    }
     setSalvando(true);
     try {
       const membro = membros.find((m) => m.memberId === lancamento.membroId);
@@ -84,6 +89,7 @@ export function EditarLancamento() {
         membroNome: mostrarDizimista && membro ? membro.nome : undefined,
         campanhaId: mostrarCampanha && lancamento.campanhaId ? lancamento.campanhaId : undefined,
         campanhaTitulo: mostrarCampanha && campanha ? campanha.titulo : undefined,
+        motivo: motivo.trim(),
       });
       navigate('/admin/lancamentos');
     } catch (err: any) {
@@ -182,6 +188,18 @@ export function EditarLancamento() {
                 placeholder="Detalhes do lançamento"
               />
             </Field>
+            <div className="sm:col-span-2">
+              <Field label="Motivo da alteração (obrigatório)" hint="Fica registrado na auditoria.">
+                <textarea
+                  required
+                  rows={2}
+                  className={inputCls}
+                  value={motivo}
+                  onChange={(e) => setMotivo(e.target.value)}
+                  placeholder="Explique o motivo desta alteração"
+                />
+              </Field>
+            </div>
           </div>
           <div className="px-4.5 pb-4.5 flex flex-col gap-3.5">
             {erro && <p className="text-expense text-xs">{erro}</p>}

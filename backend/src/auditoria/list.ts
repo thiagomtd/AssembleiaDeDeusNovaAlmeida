@@ -47,6 +47,7 @@ export const handler: APIGatewayProxyHandlerV2WithJWTAuthorizer = async (
       acao: item.acao,
       entidadeId: item.entidadeId,
       detalhes: item.detalhes,
+      motivo: item.motivo ?? '',
       atorNome: nomesPorSub.get(item.ator as string) ?? 'Desconhecido',
     }));
 

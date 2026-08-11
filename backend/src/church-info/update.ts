@@ -11,9 +11,12 @@ export const handler: APIGatewayProxyHandlerV2WithJWTAuthorizer = async (
   if (!isAdmin(event)) return forbidden();
   try {
     const body = JSON.parse(event.body || '{}');
-    const { textoInstitucional, endereco, mapaEmbedUrl, horarios } = body;
+    const { textoInstitucional, endereco, mapaEmbedUrl, horarios, motivo } = body;
     if (typeof textoInstitucional !== 'string' || typeof endereco !== 'string') {
       return badRequest('Campos obrigatórios: textoInstitucional, endereco.');
+    }
+    if (!motivo || typeof motivo !== 'string' || !motivo.trim()) {
+      return badRequest('Informe o motivo desta alteração.');
     }
 
     const current = await ddb.send(new GetCommand({ TableName: Tables.churchInfo, Key: { id: 'MAIN' } }));
@@ -30,7 +33,7 @@ export const handler: APIGatewayProxyHandlerV2WithJWTAuthorizer = async (
 
     await ddb.send(new PutCommand({ TableName: Tables.churchInfo, Item: item }));
 
-    await registrarAuditoria(event, { acao: 'info.editar', entidadeId: 'MAIN' });
+    await registrarAuditoria(event, { acao: 'info.editar', entidadeId: 'MAIN', motivo });
 
     return ok(item);
   } catch (err) {

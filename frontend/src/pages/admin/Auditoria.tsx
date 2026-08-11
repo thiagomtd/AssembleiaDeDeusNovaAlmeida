@@ -9,6 +9,7 @@ interface Entrada {
   acao: string;
   entidadeId: string;
   detalhes: string;
+  motivo: string;
   atorNome: string;
 }
 
@@ -63,7 +64,7 @@ export function Auditoria() {
           <table className="w-full text-[13.5px]">
             <thead>
               <tr>
-                {['Data/hora', 'Ação', 'Quem fez', 'Detalhes'].map((h) => (
+                {['Data/hora', 'Ação', 'Quem fez', 'Detalhes', 'Motivo'].map((h) => (
                   <th key={h} className="text-left text-[10.5px] uppercase tracking-wider text-muted font-bold px-3 py-2.5 border-b border-border whitespace-nowrap">
                     {h}
                   </th>
@@ -81,11 +82,12 @@ export function Auditoria() {
                   </td>
                   <td className="px-3 py-2.5 border-b border-border text-ink">{e.atorNome}</td>
                   <td className="px-3 py-2.5 border-b border-border text-inkSecondary">{e.detalhes}</td>
+                  <td className="px-3 py-2.5 border-b border-border text-inkSecondary max-w-[240px]">{e.motivo || '—'}</td>
                 </tr>
               ))}
               {!carregando && itens.length === 0 && (
                 <tr>
-                  <td colSpan={4} className="px-3 py-8 text-center text-muted">
+                  <td colSpan={5} className="px-3 py-8 text-center text-muted">
                     Nenhuma ação registrada neste mês.
                   </td>
                 </tr>

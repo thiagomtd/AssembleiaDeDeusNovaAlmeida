@@ -15,6 +15,8 @@ export function Info() {
   const [form, setForm] = useState<ChurchInfo>({ textoInstitucional: '', endereco: '', mapaEmbedUrl: '', horarios: [] });
   const [salvando, setSalvando] = useState(false);
   const [salvo, setSalvo] = useState(false);
+  const [motivo, setMotivo] = useState('');
+  const [erro, setErro] = useState('');
 
   useEffect(() => {
     api.get<ChurchInfo>('/church-info').then((r) =>
@@ -39,11 +41,19 @@ export function Info() {
 
   const salvar = async (e: FormEvent) => {
     e.preventDefault();
+    setErro('');
+    if (!motivo.trim()) {
+      setErro('Informe o motivo desta alteração.');
+      return;
+    }
     setSalvando(true);
     setSalvo(false);
     try {
-      await api.put('/church-info', form);
+      await api.put('/church-info', { ...form, motivo: motivo.trim() });
       setSalvo(true);
+      setMotivo('');
+    } catch (err: any) {
+      setErro(err?.message || 'Não foi possível salvar as alterações.');
     } finally {
       setSalvando(false);
     }
@@ -95,11 +105,25 @@ export function Info() {
           </Button>
         </div>
 
+        <div className="sm:col-span-2">
+          <Field label="Motivo da alteração (obrigatório)" hint="Fica registrado na auditoria.">
+            <textarea
+              required
+              rows={2}
+              className={inputCls}
+              value={motivo}
+              onChange={(e) => setMotivo(e.target.value)}
+              placeholder="Explique o motivo desta alteração"
+            />
+          </Field>
+        </div>
+
         <div className="sm:col-span-2 flex items-center gap-3">
           <Button type="submit" variant="gold" disabled={salvando}>
             {salvando ? 'Salvando...' : 'Salvar alterações'}
           </Button>
           {salvo && <span className="text-income text-xs font-semibold">Salvo com sucesso.</span>}
+          {erro && <span className="text-expense text-xs font-semibold">{erro}</span>}
         </div>
       </form>
     </Card>

@@ -14,6 +14,11 @@ export const handler: APIGatewayProxyHandlerV2WithJWTAuthorizer = async (
   const transactionId = event.pathParameters?.id;
   if (!mesAno || !transactionId) return badRequest('Parâmetros mes e id são obrigatórios na URL.');
 
+  const { motivo } = JSON.parse(event.body || '{}');
+  if (!motivo || typeof motivo !== 'string' || !motivo.trim()) {
+    return badRequest('Informe o motivo desta exclusão.');
+  }
+
   try {
     const existing = await ddb.send(
       new GetCommand({ TableName: Tables.transactions, Key: { mesAno, transactionId } }),
@@ -47,6 +52,7 @@ export const handler: APIGatewayProxyHandlerV2WithJWTAuthorizer = async (
       acao: 'lancamento.remover',
       entidadeId: transactionId,
       detalhes: `${existing.Item.tipo} de R$ ${existing.Item.valor} (${existing.Item.categoria})`,
+      motivo,
     });
 
     return noContent();

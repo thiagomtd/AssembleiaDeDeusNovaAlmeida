@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { api } from '../../lib/api';
 import { Card, Button, Field, inputCls } from '../../components/ui';
+import { ConfirmDialog } from '../../components/ConfirmDialog';
 import { Lightbox } from '../../components/Lightbox';
 import { IconCamera, IconVideo, IconTrash, IconPlus, IconImage } from '../../components/icons';
 
@@ -39,6 +40,8 @@ export function Cultos() {
   const [enviando, setEnviando] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const [alvoRemoverCulto, setAlvoRemoverCulto] = useState<Culto | null>(null);
+  const [alvoRemoverMidia, setAlvoRemoverMidia] = useState<{ cultoId: string; mediaId: string } | null>(null);
 
   const carregar = () => {
     setCarregando(true);
@@ -99,17 +102,20 @@ export function Cultos() {
     }
   };
 
-  const removerMidia = async (cultoId: string, mediaId: string) => {
-    if (!confirm('Remover este arquivo de mídia?')) return;
-    await api.del(`/cultos/${cultoId}/midia/${mediaId}`);
+  const confirmarRemoverMidia = async (motivo: string) => {
+    if (!alvoRemoverMidia) return;
+    const { cultoId, mediaId } = alvoRemoverMidia;
+    await api.del(`/cultos/${cultoId}/midia/${mediaId}`, { motivo });
     setMidia((m) => m.filter((x) => x.mediaId !== mediaId));
+    setAlvoRemoverMidia(null);
     carregar();
   };
 
-  const removerCulto = async (culto: Culto) => {
-    if (!confirm(`Excluir o culto "${culto.titulo}"? Isso apaga também todas as ${culto.fotos + culto.videos} mídias publicadas. Essa ação não pode ser desfeita.`)) return;
-    await api.del(`/cultos/${culto.cultoId}`);
-    if (expandido === culto.cultoId) setExpandido(null);
+  const confirmarRemoverCulto = async (motivo: string) => {
+    if (!alvoRemoverCulto) return;
+    await api.del(`/cultos/${alvoRemoverCulto.cultoId}`, { motivo });
+    if (expandido === alvoRemoverCulto.cultoId) setExpandido(null);
+    setAlvoRemoverCulto(null);
     carregar();
   };
 
@@ -163,7 +169,7 @@ export function Cultos() {
                 {expandido === c.cultoId ? 'Fechar' : 'Gerenciar'}
               </Button>
               <button
-                onClick={() => removerCulto(c)}
+                onClick={() => setAlvoRemoverCulto(c)}
                 className="w-9 h-9 rounded-lg border border-border flex-none flex items-center justify-center text-inkSecondary hover:bg-expense hover:text-white hover:border-expense"
                 title="Excluir culto"
               >
@@ -201,7 +207,7 @@ export function Cultos() {
                           )}
                         </button>
                         <button
-                          onClick={() => removerMidia(c.cultoId, m.mediaId)}
+                          onClick={() => setAlvoRemoverMidia({ cultoId: c.cultoId, mediaId: m.mediaId })}
                           className="absolute top-1.5 right-1.5 w-7 h-7 rounded-full bg-surface/90 border border-border flex items-center justify-center text-inkSecondary hover:bg-expense hover:text-white hover:border-expense"
                           title="Remover"
                         >
@@ -226,6 +232,25 @@ export function Cultos() {
       {lightboxIndex !== null && (
         <Lightbox itens={midia} index={lightboxIndex} onClose={() => setLightboxIndex(null)} onNavigate={setLightboxIndex} />
       )}
+
+      <ConfirmDialog
+        aberto={!!alvoRemoverCulto}
+        titulo="Excluir culto"
+        mensagem={
+          alvoRemoverCulto
+            ? `Excluir o culto "${alvoRemoverCulto.titulo}"? Isso apaga também todas as ${alvoRemoverCulto.fotos + alvoRemoverCulto.videos} mídias publicadas. Essa ação não pode ser desfeita.`
+            : ''
+        }
+        onCancelar={() => setAlvoRemoverCulto(null)}
+        onConfirmar={confirmarRemoverCulto}
+      />
+      <ConfirmDialog
+        aberto={!!alvoRemoverMidia}
+        titulo="Remover mídia"
+        mensagem="Remover este arquivo de mídia? Essa ação não pode ser desfeita."
+        onCancelar={() => setAlvoRemoverMidia(null)}
+        onConfirmar={confirmarRemoverMidia}
+      />
     </div>
   );
 }

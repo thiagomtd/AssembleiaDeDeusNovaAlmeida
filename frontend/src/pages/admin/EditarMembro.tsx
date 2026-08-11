@@ -24,6 +24,7 @@ export function EditarMembro() {
   const [carregando, setCarregando] = useState(!membroDoState);
   const [salvando, setSalvando] = useState(false);
   const [erro, setErro] = useState('');
+  const [motivo, setMotivo] = useState('');
 
   useEffect(() => {
     if (membroDoState) return;
@@ -36,6 +37,10 @@ export function EditarMembro() {
   const salvar = async (e: FormEvent) => {
     e.preventDefault();
     if (!membro) return;
+    if (!motivo.trim()) {
+      setErro('Informe o motivo desta alteração.');
+      return;
+    }
     setErro('');
     setSalvando(true);
     try {
@@ -45,6 +50,7 @@ export function EditarMembro() {
         dataAssociacao: membro.dataAssociacao,
         status: membro.status,
         grupo: membro.grupo,
+        motivo: motivo.trim(),
       });
       navigate('/admin/membros');
     } catch (err: any) {
@@ -121,6 +127,18 @@ export function EditarMembro() {
                 <option value="inativo">Inativo (bloqueia o login)</option>
               </select>
             </Field>
+            <div className="sm:col-span-2">
+              <Field label="Motivo da alteração (obrigatório)" hint="Fica registrado na auditoria.">
+                <textarea
+                  required
+                  rows={2}
+                  className={inputCls}
+                  value={motivo}
+                  onChange={(e) => setMotivo(e.target.value)}
+                  placeholder="Explique o motivo desta alteração"
+                />
+              </Field>
+            </div>
           </div>
           <div className="px-4.5 pb-4.5 flex flex-col gap-3.5">
             {erro && <p className="text-expense text-xs">{erro}</p>}

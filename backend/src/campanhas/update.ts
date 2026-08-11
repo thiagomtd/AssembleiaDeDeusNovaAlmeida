@@ -20,10 +20,13 @@ export const handler: APIGatewayProxyHandlerV2WithJWTAuthorizer = async (
     if (!existing.Item) return notFound('Campanha não encontrada.');
 
     const body = JSON.parse(event.body || '{}');
-    const { titulo, descricao, meta, dataFim, ativa } = body;
+    const { titulo, descricao, meta, dataFim, ativa, motivo } = body;
 
     if (!titulo || typeof titulo !== 'string') return badRequest('Campo titulo é obrigatório.');
     if (typeof meta !== 'number' || meta <= 0) return badRequest('Campo meta deve ser um número positivo.');
+    if (!motivo || typeof motivo !== 'string' || !motivo.trim()) {
+      return badRequest('Informe o motivo desta alteração.');
+    }
 
     const updated = {
       ...existing.Item,
@@ -37,7 +40,7 @@ export const handler: APIGatewayProxyHandlerV2WithJWTAuthorizer = async (
 
     await ddb.send(new PutCommand({ TableName: Tables.campanhas, Item: updated }));
 
-    await registrarAuditoria(event, { acao: 'campanha.editar', entidadeId: campanhaId, detalhes: titulo });
+    await registrarAuditoria(event, { acao: 'campanha.editar', entidadeId: campanhaId, detalhes: titulo, motivo });
 
     return ok(updated);
   } catch (err) {

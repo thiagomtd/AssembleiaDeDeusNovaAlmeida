@@ -14,6 +14,11 @@ export const handler: APIGatewayProxyHandlerV2WithJWTAuthorizer = async (
   const mediaId = event.pathParameters?.mediaId;
   if (!cultoId || !mediaId) return badRequest('Parâmetros id e mediaId são obrigatórios na URL.');
 
+  const { motivo } = JSON.parse(event.body || '{}');
+  if (!motivo || typeof motivo !== 'string' || !motivo.trim()) {
+    return badRequest('Informe o motivo desta exclusão.');
+  }
+
   try {
     const existing = await ddb.send(new GetCommand({ TableName: Tables.midia, Key: { cultoId, mediaId } }));
     if (!existing.Item) return notFound('Mídia não encontrada.');
@@ -25,6 +30,7 @@ export const handler: APIGatewayProxyHandlerV2WithJWTAuthorizer = async (
       acao: 'midia.remover',
       entidadeId: mediaId,
       detalhes: `${existing.Item.tipo} no culto ${cultoId}`,
+      motivo,
     });
 
     return noContent();

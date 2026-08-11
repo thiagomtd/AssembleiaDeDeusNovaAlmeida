@@ -18,7 +18,10 @@ export const handler: APIGatewayProxyHandlerV2WithJWTAuthorizer = async (
     if (!existing.Item) return notFound('Membro não encontrado.');
 
     const body = JSON.parse(event.body || '{}');
-    const { nome, dataNascimento, dataAssociacao, status, grupo } = body;
+    const { nome, dataNascimento, dataAssociacao, status, grupo, motivo } = body;
+    if (!motivo || typeof motivo !== 'string' || !motivo.trim()) {
+      return badRequest('Informe o motivo desta alteração.');
+    }
     const gruposValidos: Grupo[] = ['admin', 'member', 'midia', 'tesouraria'];
     const grupoFinal: Grupo = gruposValidos.includes(grupo) ? grupo : 'member';
     const statusFinal: 'ativo' | 'inativo' = status === 'inativo' ? 'inativo' : 'ativo';
@@ -52,6 +55,7 @@ export const handler: APIGatewayProxyHandlerV2WithJWTAuthorizer = async (
       acao: 'membro.editar',
       entidadeId: memberId,
       detalhes: `${res.Attributes?.nome} (grupo: ${grupoFinal}, status: ${statusFinal})`,
+      motivo,
     });
 
     return ok(res.Attributes);

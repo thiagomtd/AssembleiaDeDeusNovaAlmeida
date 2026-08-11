@@ -24,6 +24,7 @@ export function EditarCampanha() {
   const [carregando, setCarregando] = useState(!campanhaDoState);
   const [salvando, setSalvando] = useState(false);
   const [erro, setErro] = useState('');
+  const [motivo, setMotivo] = useState('');
 
   useEffect(() => {
     if (campanhaDoState) return;
@@ -45,6 +46,10 @@ export function EditarCampanha() {
       setErro('Informe uma meta válida.');
       return;
     }
+    if (!motivo.trim()) {
+      setErro('Informe o motivo desta alteração.');
+      return;
+    }
     setSalvando(true);
     try {
       await api.put(`/campanhas/${campanha.campanhaId}`, {
@@ -53,6 +58,7 @@ export function EditarCampanha() {
         meta: Number(campanha.meta),
         dataFim: campanha.dataFim,
         ativa: campanha.ativa,
+        motivo: motivo.trim(),
       });
       navigate('/admin/campanhas');
     } catch (err: any) {
@@ -126,6 +132,18 @@ export function EditarCampanha() {
                 <option value="encerrada">Encerrada</option>
               </select>
             </Field>
+            <div className="sm:col-span-2">
+              <Field label="Motivo da alteração (obrigatório)" hint="Fica registrado na auditoria.">
+                <textarea
+                  required
+                  rows={2}
+                  className={inputCls}
+                  value={motivo}
+                  onChange={(e) => setMotivo(e.target.value)}
+                  placeholder="Explique o motivo desta alteração"
+                />
+              </Field>
+            </div>
           </div>
           <div className="px-4.5 pb-4.5 flex flex-col gap-3.5">
             {erro && <p className="text-expense text-xs">{erro}</p>}

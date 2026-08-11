@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { api } from '../../lib/api';
 import { Card, Pill, fmtBRL } from '../../components/ui';
+import { ConfirmDialog } from '../../components/ConfirmDialog';
 import { IconPlus, IconEdit, IconTrash } from '../../components/icons';
 
 interface Campanha {
@@ -18,6 +19,7 @@ export function Campanhas() {
   const navigate = useNavigate();
   const [lista, setLista] = useState<Campanha[]>([]);
   const [carregando, setCarregando] = useState(true);
+  const [alvoRemover, setAlvoRemover] = useState<Campanha | null>(null);
 
   const carregar = () => {
     setCarregando(true);
@@ -30,9 +32,10 @@ export function Campanhas() {
 
   useEffect(carregar, []);
 
-  const remover = async (c: Campanha) => {
-    if (!confirm(`Remover a campanha "${c.titulo}"? Os lançamentos já vinculados a ela permanecem no histórico.`)) return;
-    await api.del(`/campanhas/${c.campanhaId}`);
+  const remover = async (motivo: string) => {
+    if (!alvoRemover) return;
+    await api.del(`/campanhas/${alvoRemover.campanhaId}`, { motivo });
+    setAlvoRemover(null);
     carregar();
   };
 
@@ -76,7 +79,7 @@ export function Campanhas() {
                       <IconEdit className="icon w-[13px] h-[13px]" />
                     </button>
                     <button
-                      onClick={() => remover(c)}
+                      onClick={() => setAlvoRemover(c)}
                       className="w-[30px] h-[30px] rounded-lg border border-border inline-flex items-center justify-center text-inkSecondary hover:bg-expense hover:text-white hover:border-expense"
                       title="Excluir"
                     >
@@ -96,6 +99,18 @@ export function Campanhas() {
           </tbody>
         </table>
       </div>
+
+      <ConfirmDialog
+        aberto={!!alvoRemover}
+        titulo="Remover campanha"
+        mensagem={
+          alvoRemover
+            ? `Remover a campanha "${alvoRemover.titulo}"? Os lançamentos já vinculados a ela permanecem no histórico.`
+            : ''
+        }
+        onCancelar={() => setAlvoRemover(null)}
+        onConfirmar={remover}
+      />
     </Card>
   );
 }

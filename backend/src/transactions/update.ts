@@ -21,10 +21,13 @@ export const handler: APIGatewayProxyHandlerV2WithJWTAuthorizer = async (
     if (!existing.Item) return notFound('Lançamento não encontrado.');
 
     const body = JSON.parse(event.body || '{}');
-    const { tipo, valor, categoria, descricao, data, membroId, membroNome, campanhaId, campanhaTitulo } = body;
+    const { tipo, valor, categoria, descricao, data, membroId, membroNome, campanhaId, campanhaTitulo, motivo } = body;
 
     if (tipo !== 'entrada' && tipo !== 'saida') return badRequest('Campo tipo deve ser "entrada" ou "saida".');
     if (typeof valor !== 'number' || valor <= 0) return badRequest('Campo valor deve ser um número positivo.');
+    if (!motivo || typeof motivo !== 'string' || !motivo.trim()) {
+      return badRequest('Informe o motivo desta alteração.');
+    }
 
     const vinculaCampanha = tipo === 'entrada' && campanhaId;
 
@@ -99,6 +102,7 @@ export const handler: APIGatewayProxyHandlerV2WithJWTAuthorizer = async (
       acao: 'lancamento.editar',
       entidadeId: transactionId,
       detalhes: `${tipo} de R$ ${valor} (${categoria ?? existing.Item.categoria})`,
+      motivo,
     });
 
     return ok(updated);

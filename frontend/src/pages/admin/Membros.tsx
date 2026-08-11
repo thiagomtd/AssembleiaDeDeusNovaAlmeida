@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { api } from '../../lib/api';
 import { Card, Pill } from '../../components/ui';
+import { ConfirmDialog } from '../../components/ConfirmDialog';
 import { IconPlus, IconEdit, IconTrash, IconShield, IconUsers, IconImage, IconCheck, IconLock } from '../../components/icons';
 
 interface Membro {
@@ -25,6 +26,7 @@ export function Membros() {
   const navigate = useNavigate();
   const [membros, setMembros] = useState<Membro[]>([]);
   const [carregando, setCarregando] = useState(true);
+  const [alvoRemover, setAlvoRemover] = useState<Membro | null>(null);
 
   const carregar = () => {
     setCarregando(true);
@@ -37,9 +39,10 @@ export function Membros() {
 
   useEffect(carregar, []);
 
-  const remover = async (m: Membro) => {
-    if (!confirm(`Remover o acesso de ${m.nome}? A conta também é removida do Cognito.`)) return;
-    await api.del(`/members/${m.memberId}`);
+  const remover = async (motivo: string) => {
+    if (!alvoRemover) return;
+    await api.del(`/members/${alvoRemover.memberId}`, { motivo });
+    setAlvoRemover(null);
     carregar();
   };
 
@@ -98,7 +101,7 @@ export function Membros() {
                         <IconEdit className="icon w-[13px] h-[13px]" />
                       </button>
                       <button
-                        onClick={() => remover(m)}
+                        onClick={() => setAlvoRemover(m)}
                         className="w-[30px] h-[30px] rounded-lg border border-border inline-flex items-center justify-center text-inkSecondary hover:bg-expense hover:text-white hover:border-expense"
                         title="Excluir"
                       >
@@ -126,6 +129,14 @@ export function Membros() {
         gestão de cultos e fotos/vídeos; <strong className="text-ink">Tesouraria</strong> soma a gestão de
         lançamentos financeiros; <strong className="text-ink">Administração</strong> (diretoria) tem acesso total.
       </p>
+
+      <ConfirmDialog
+        aberto={!!alvoRemover}
+        titulo="Remover membro"
+        mensagem={alvoRemover ? `Remover o acesso de ${alvoRemover.nome}? A conta também é removida do Cognito.` : ''}
+        onCancelar={() => setAlvoRemover(null)}
+        onConfirmar={remover}
+      />
     </div>
   );
 }

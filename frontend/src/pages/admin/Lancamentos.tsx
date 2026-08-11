@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { api } from '../../lib/api';
 import { Card, Pill, fmtBRL } from '../../components/ui';
+import { ConfirmDialog } from '../../components/ConfirmDialog';
 import { IconPlus, IconEdit, IconTrash, IconUsers, IconTarget } from '../../components/icons';
 import { MonthPicker } from '../../components/MonthPicker';
 
@@ -25,6 +26,7 @@ export function Lancamentos() {
   const [mes, setMes] = useState(now.getMonth() + 1);
   const [ano, setAno] = useState(now.getFullYear());
   const [itens, setItens] = useState<Lancamento[]>([]);
+  const [alvoRemover, setAlvoRemover] = useState<Lancamento | null>(null);
   const mesAno = `${ano}-${String(mes).padStart(2, '0')}`;
 
   const carregar = () => {
@@ -33,9 +35,10 @@ export function Lancamentos() {
 
   useEffect(carregar, [mesAno]);
 
-  const remover = async (t: Lancamento) => {
-    if (!confirm(`Remover este lançamento de ${fmtBRL(t.valor)} (${t.categoria})? Essa ação não pode ser desfeita.`)) return;
-    await api.del(`/transactions/${t.mesAno}/${t.transactionId}`);
+  const remover = async (motivo: string) => {
+    if (!alvoRemover) return;
+    await api.del(`/transactions/${alvoRemover.mesAno}/${alvoRemover.transactionId}`, { motivo });
+    setAlvoRemover(null);
     carregar();
   };
 
@@ -97,7 +100,7 @@ export function Lancamentos() {
                       <IconEdit className="icon w-[13px] h-[13px]" />
                     </button>
                     <button
-                      onClick={() => remover(t)}
+                      onClick={() => setAlvoRemover(t)}
                       className="w-[30px] h-[30px] rounded-lg border border-border inline-flex items-center justify-center text-inkSecondary hover:bg-expense hover:text-white hover:border-expense"
                       title="Excluir"
                     >
@@ -117,6 +120,18 @@ export function Lancamentos() {
           </tbody>
         </table>
       </div>
+
+      <ConfirmDialog
+        aberto={!!alvoRemover}
+        titulo="Remover lançamento"
+        mensagem={
+          alvoRemover
+            ? `Remover este lançamento de ${fmtBRL(alvoRemover.valor)} (${alvoRemover.categoria})? Essa ação não pode ser desfeita.`
+            : ''
+        }
+        onCancelar={() => setAlvoRemover(null)}
+        onConfirmar={remover}
+      />
     </Card>
   );
 }

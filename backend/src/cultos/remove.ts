@@ -14,6 +14,11 @@ export const handler: APIGatewayProxyHandlerV2WithJWTAuthorizer = async (
   const cultoId = event.pathParameters?.id;
   if (!cultoId) return badRequest('Parâmetro id ausente na URL.');
 
+  const { motivo } = JSON.parse(event.body || '{}');
+  if (!motivo || typeof motivo !== 'string' || !motivo.trim()) {
+    return badRequest('Informe o motivo desta exclusão.');
+  }
+
   try {
     const culto = await ddb.send(new GetCommand({ TableName: Tables.cultos, Key: { cultoId } }));
     if (!culto.Item) return notFound('Culto não encontrado.');
@@ -40,6 +45,7 @@ export const handler: APIGatewayProxyHandlerV2WithJWTAuthorizer = async (
       acao: 'culto.remover',
       entidadeId: cultoId,
       detalhes: `${culto.Item.titulo} (${items.length} mídia(s) removida(s) junto)`,
+      motivo,
     });
 
     return noContent();
