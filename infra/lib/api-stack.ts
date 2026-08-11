@@ -19,6 +19,7 @@ export interface ApiStackProps extends cdk.StackProps {
   churchInfoTable: dynamodb.Table;
   cultosTable: dynamodb.Table;
   midiaTable: dynamodb.Table;
+  campanhasTable: dynamodb.Table;
   cultoMediaBucket: s3.Bucket;
   frontendDistributionDomain: string;
 }
@@ -35,6 +36,7 @@ export class ApiStack extends cdk.Stack {
       TABLE_CHURCH_INFO: props.churchInfoTable.tableName,
       TABLE_CULTOS: props.cultosTable.tableName,
       TABLE_MIDIA: props.midiaTable.tableName,
+      TABLE_CAMPANHAS: props.campanhasTable.tableName,
       BUCKET_CULTO_MEDIA: props.cultoMediaBucket.bucketName,
       USER_POOL_ID: props.userPool.userPoolId,
     };
@@ -93,9 +95,10 @@ export class ApiStack extends cdk.Stack {
     props.transactionsTable.grantReadWriteData(transactionsCreate);
     props.transactionsTable.grantReadWriteData(transactionsUpdate);
     props.transactionsTable.grantReadWriteData(transactionsRemove);
-    [transactionsCreate, transactionsUpdate, transactionsRemove].forEach((f) =>
-      props.churchInfoTable.grantReadWriteData(f),
-    );
+    [transactionsCreate, transactionsUpdate, transactionsRemove].forEach((f) => {
+      props.churchInfoTable.grantReadWriteData(f);
+      props.campanhasTable.grantReadWriteData(f);
+    });
 
     // ---------- dizimistas ----------
     const dizimistasList = fn('DizimistasListFn', 'dizimistas/list.ts');
@@ -109,6 +112,16 @@ export class ApiStack extends cdk.Stack {
     const meContribuicoes = fn('MeContribuicoesFn', 'me/contribuicoes.ts');
     props.membersTable.grantReadData(meContribuicoes);
     props.transactionsTable.grantReadData(meContribuicoes);
+
+    // ---------- campanhas ----------
+    const campanhasList = fn('CampanhasListFn', 'campanhas/list.ts');
+    const campanhasCreate = fn('CampanhasCreateFn', 'campanhas/create.ts');
+    const campanhasUpdate = fn('CampanhasUpdateFn', 'campanhas/update.ts');
+    const campanhasRemove = fn('CampanhasRemoveFn', 'campanhas/remove.ts');
+    props.campanhasTable.grantReadData(campanhasList);
+    props.campanhasTable.grantReadWriteData(campanhasCreate);
+    props.campanhasTable.grantReadWriteData(campanhasUpdate);
+    props.campanhasTable.grantReadWriteData(campanhasRemove);
 
     // ---------- cultos / mídia ----------
     const cultosList = fn('CultosListFn', 'cultos/list.ts');
@@ -193,6 +206,11 @@ export class ApiStack extends cdk.Stack {
     route('/dizimistas', [apigw.HttpMethod.GET], priv(dizimistasList));
     route('/aniversariantes', [apigw.HttpMethod.GET], priv(aniversariantesList));
     route('/me/contribuicoes', [apigw.HttpMethod.GET], priv(meContribuicoes));
+
+    route('/campanhas', [apigw.HttpMethod.GET], priv(campanhasList));
+    route('/campanhas', [apigw.HttpMethod.POST], priv(campanhasCreate));
+    route('/campanhas/{id}', [apigw.HttpMethod.PUT], priv(campanhasUpdate));
+    route('/campanhas/{id}', [apigw.HttpMethod.DELETE], priv(campanhasRemove));
 
     route('/cultos', [apigw.HttpMethod.GET], priv(cultosList));
     route('/cultos', [apigw.HttpMethod.POST], priv(cultosCreate));

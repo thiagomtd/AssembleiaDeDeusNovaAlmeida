@@ -14,4 +14,5 @@ export const Tables = {
   photos: process.env.TABLE_PHOTOS as string,
   cultos: process.env.TABLE_CULTOS as string,
   midia: process.env.TABLE_MIDIA as string,
+  campanhas: process.env.TABLE_CAMPANHAS as string,
 };

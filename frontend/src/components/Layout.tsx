@@ -12,6 +12,7 @@ const navItems = [
   { to: '/midia', label: 'Mídia do Culto', role: 'member' as const },
   { to: '/relatorios', label: 'Relatórios', role: 'member' as const },
   { to: '/meu-extrato', label: 'Meu Extrato', role: 'member' as const },
+  { to: '/campanhas', label: 'Campanhas', role: 'member' as const },
   { to: '/admin', label: 'Administração', role: 'admin' as const },
 ];
 

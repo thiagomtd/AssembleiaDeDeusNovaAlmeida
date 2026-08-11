@@ -12,7 +12,7 @@ export const handler: APIGatewayProxyHandlerV2WithJWTAuthorizer = async (
 
   try {
     const body = JSON.parse(event.body || '{}');
-    const { tipo, valor, categoria, descricao, data, membroId, membroNome } = body;
+    const { tipo, valor, categoria, descricao, data, membroId, membroNome, campanhaId, campanhaTitulo } = body;
 
     if (tipo !== 'entrada' && tipo !== 'saida') return badRequest('Campo tipo deve ser "entrada" ou "saida".');
     if (typeof valor !== 'number' || valor <= 0) return badRequest('Campo valor deve ser um número positivo.');
@@ -23,6 +23,7 @@ export const handler: APIGatewayProxyHandlerV2WithJWTAuthorizer = async (
     const mesAno = data.slice(0, 7);
     const ano = data.slice(0, 4);
     const transactionId = randomUUID();
+    const vinculaCampanha = tipo === 'entrada' && campanhaId;
 
     const item = {
       mesAno,
@@ -35,6 +36,8 @@ export const handler: APIGatewayProxyHandlerV2WithJWTAuthorizer = async (
       data,
       membroId: membroId ?? undefined,
       membroNome: membroNome ?? undefined,
+      campanhaId: vinculaCampanha ? campanhaId : undefined,
+      campanhaTitulo: vinculaCampanha ? campanhaTitulo : undefined,
       criadoPor: getSub(event),
       createdAt: new Date().toISOString(),
     };
@@ -50,6 +53,17 @@ export const handler: APIGatewayProxyHandlerV2WithJWTAuthorizer = async (
         ExpressionAttributeValues: { ':delta': delta },
       }),
     );
+
+    if (vinculaCampanha) {
+      await ddb.send(
+        new UpdateCommand({
+          TableName: Tables.campanhas,
+          Key: { campanhaId },
+          UpdateExpression: 'ADD arrecadado :valor',
+          ExpressionAttributeValues: { ':valor': valor },
+        }),
+      );
+    }
 
     return ok(item, 201);
   } catch (err) {

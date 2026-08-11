@@ -10,23 +10,32 @@ interface Membro {
   nome: string;
 }
 
+interface Campanha {
+  campanhaId: string;
+  titulo: string;
+  ativa: boolean;
+}
+
 export function NovoLancamento() {
   const navigate = useNavigate();
   const [membros, setMembros] = useState<Membro[]>([]);
+  const [campanhas, setCampanhas] = useState<Campanha[]>([]);
   const [form, setForm] = useState({
-    tipo: 'entrada', categoria: 'Dízimo', valor: '', data: '', membroId: '', descricao: '',
+    tipo: 'entrada', categoria: 'Dízimo', valor: '', data: '', membroId: '', campanhaId: '', descricao: '',
   });
   const [erro, setErro] = useState('');
   const [salvando, setSalvando] = useState(false);
 
   useEffect(() => {
     api.get<Membro[]>('/members').then(setMembros).catch(() => setMembros([]));
+    api.get<Campanha[]>('/campanhas').then((r) => setCampanhas(r.filter((c) => c.ativa))).catch(() => setCampanhas([]));
   }, []);
 
   const set = (k: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
     setForm((f) => ({ ...f, [k]: e.target.value }));
 
   const mostrarDizimista = form.tipo === 'entrada' && form.categoria === 'Dízimo';
+  const mostrarCampanha = form.tipo === 'entrada' && campanhas.length > 0;
 
   const salvar = async (e: FormEvent) => {
     e.preventDefault();
@@ -43,6 +52,7 @@ export function NovoLancamento() {
     setSalvando(true);
     try {
       const membro = membros.find((m) => m.memberId === form.membroId);
+      const campanha = campanhas.find((c) => c.campanhaId === form.campanhaId);
       await api.post('/transactions', {
         tipo: form.tipo,
         categoria: form.categoria,
@@ -51,6 +61,8 @@ export function NovoLancamento() {
         descricao: form.descricao,
         membroId: mostrarDizimista && form.membroId ? form.membroId : undefined,
         membroNome: mostrarDizimista && membro ? membro.nome : undefined,
+        campanhaId: mostrarCampanha && form.campanhaId ? form.campanhaId : undefined,
+        campanhaTitulo: mostrarCampanha && campanha ? campanha.titulo : undefined,
       });
       navigate('/admin/lancamentos');
     } catch (err: any) {
@@ -89,6 +101,16 @@ export function NovoLancamento() {
                 <option value="">— não vincular a uma pessoa —</option>
                 {membros.map((m) => (
                   <option key={m.memberId} value={m.memberId}>{m.nome}</option>
+                ))}
+              </select>
+            </Field>
+          )}
+          {mostrarCampanha && (
+            <Field label="Campanha (opcional)" hint="Soma o valor à meta de arrecadação da campanha.">
+              <select className={inputCls} value={form.campanhaId} onChange={set('campanhaId')}>
+                <option value="">— não vincular a uma campanha —</option>
+                {campanhas.map((c) => (
+                  <option key={c.campanhaId} value={c.campanhaId}>{c.titulo}</option>
                 ))}
               </select>
             </Field>

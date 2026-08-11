@@ -8,6 +8,7 @@ export class DataStack extends cdk.Stack {
   public readonly churchInfoTable: dynamodb.Table;
   public readonly cultosTable: dynamodb.Table;
   public readonly midiaTable: dynamodb.Table;
+  public readonly campanhasTable: dynamodb.Table;
 
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
@@ -72,6 +73,15 @@ export class DataStack extends cdk.Stack {
       tableName: 'icadna-culto-midia',
       partitionKey: { name: 'cultoId', type: dynamodb.AttributeType.STRING },
       sortKey: { name: 'mediaId', type: dynamodb.AttributeType.STRING },
+      billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
+      removalPolicy: cdk.RemovalPolicy.DESTROY,
+    });
+
+    // Metas de arrecadação (ex: reforma, missões). `arrecadado` é mantido por
+    // incremento atômico a cada lançamento vinculado, igual ao saldoCaixa.
+    this.campanhasTable = new dynamodb.Table(this, 'CampanhasTable', {
+      tableName: 'icadna-campanhas',
+      partitionKey: { name: 'campanhaId', type: dynamodb.AttributeType.STRING },
       billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
       removalPolicy: cdk.RemovalPolicy.DESTROY,
     });

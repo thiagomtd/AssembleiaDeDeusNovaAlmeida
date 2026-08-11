@@ -9,6 +9,10 @@ import { Transacoes } from './pages/Transacoes';
 import { Dizimistas } from './pages/Dizimistas';
 import { Aniversariantes } from './pages/Aniversariantes';
 import { MeuExtrato } from './pages/MeuExtrato';
+import { Campanhas } from './pages/Campanhas';
+import { Campanhas as AdminCampanhas } from './pages/admin/Campanhas';
+import { NovaCampanha } from './pages/admin/NovaCampanha';
+import { EditarCampanha } from './pages/admin/EditarCampanha';
 import { Midia } from './pages/Midia';
 import { MidiaCulto } from './pages/MidiaCulto';
 import { Relatorios } from './pages/Relatorios';
@@ -46,6 +50,7 @@ export function App() {
         <Route path="midia/:cultoId" element={<RequireGroup roles={[...QUALQUER_GRUPO]}><MidiaCulto /></RequireGroup>} />
         <Route path="relatorios" element={<RequireGroup roles={[...QUALQUER_GRUPO]}><Relatorios /></RequireGroup>} />
         <Route path="meu-extrato" element={<RequireGroup roles={[...QUALQUER_GRUPO]}><MeuExtrato /></RequireGroup>} />
+        <Route path="campanhas" element={<RequireGroup roles={[...QUALQUER_GRUPO]}><Campanhas /></RequireGroup>} />
 
         <Route
           path="admin"
@@ -61,6 +66,9 @@ export function App() {
           <Route path="membros/:id/editar" element={<RequireGroup roles={['admin']}><EditarMembro /></RequireGroup>} />
           <Route path="lancamentos" element={<RequireGroup roles={['admin', 'tesouraria']}><Lancamentos /></RequireGroup>} />
           <Route path="lancamentos/novo" element={<RequireGroup roles={['admin', 'tesouraria']}><NovoLancamento /></RequireGroup>} />
+          <Route path="campanhas" element={<RequireGroup roles={['admin', 'tesouraria']}><AdminCampanhas /></RequireGroup>} />
+          <Route path="campanhas/nova" element={<RequireGroup roles={['admin', 'tesouraria']}><NovaCampanha /></RequireGroup>} />
+          <Route path="campanhas/:id/editar" element={<RequireGroup roles={['admin', 'tesouraria']}><EditarCampanha /></RequireGroup>} />
           <Route path="cultos" element={<RequireGroup roles={['admin', 'midia']}><Cultos /></RequireGroup>} />
           <Route path="info" element={<RequireGroup roles={['admin']}><Info /></RequireGroup>} />
         </Route>

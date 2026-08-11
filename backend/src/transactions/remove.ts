@@ -31,6 +31,17 @@ export const handler: APIGatewayProxyHandlerV2WithJWTAuthorizer = async (
       }),
     );
 
+    if (existing.Item.tipo === 'entrada' && existing.Item.campanhaId) {
+      await ddb.send(
+        new UpdateCommand({
+          TableName: Tables.campanhas,
+          Key: { campanhaId: existing.Item.campanhaId },
+          UpdateExpression: 'ADD arrecadado :delta',
+          ExpressionAttributeValues: { ':delta': -existing.Item.valor },
+        }),
+      );
+    }
+
     return noContent();
   } catch (err) {
     return serverError(err);
