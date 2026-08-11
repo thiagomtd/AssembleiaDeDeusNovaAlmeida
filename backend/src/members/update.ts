@@ -3,6 +3,7 @@ import { GetCommand, UpdateCommand } from '@aws-sdk/lib-dynamodb';
 import { ddb, Tables } from '../common/ddb';
 import { isAdmin, type Grupo } from '../common/auth';
 import { setUserGroupExclusive, setCognitoUserEnabled } from '../common/cognito';
+import { registrarAuditoria } from '../common/audit';
 import { ok, badRequest, forbidden, notFound, serverError } from '../common/response';
 
 export const handler: APIGatewayProxyHandlerV2WithJWTAuthorizer = async (
@@ -46,6 +47,13 @@ export const handler: APIGatewayProxyHandlerV2WithJWTAuthorizer = async (
         ReturnValues: 'ALL_NEW',
       }),
     );
+
+    await registrarAuditoria(event, {
+      acao: 'membro.editar',
+      entidadeId: memberId,
+      detalhes: `${res.Attributes?.nome} (grupo: ${grupoFinal}, status: ${statusFinal})`,
+    });
+
     return ok(res.Attributes);
   } catch (err) {
     return serverError(err);

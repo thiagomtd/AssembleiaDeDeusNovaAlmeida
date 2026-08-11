@@ -29,6 +29,7 @@ new ApiStack(app, `${prefix}ApiStack`, {
   cultosTable: data.cultosTable,
   midiaTable: data.midiaTable,
   campanhasTable: data.campanhasTable,
+  auditoriaTable: data.auditoriaTable,
   cultoMediaBucket: storage.cultoMediaBucket,
   frontendDistributionDomain: storage.frontendDistribution.distributionDomainName,
 });

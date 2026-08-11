@@ -13,6 +13,8 @@ import { Campanhas } from './pages/Campanhas';
 import { Campanhas as AdminCampanhas } from './pages/admin/Campanhas';
 import { NovaCampanha } from './pages/admin/NovaCampanha';
 import { EditarCampanha } from './pages/admin/EditarCampanha';
+import { Auditoria } from './pages/admin/Auditoria';
+import { Privacidade } from './pages/Privacidade';
 import { Midia } from './pages/Midia';
 import { MidiaCulto } from './pages/MidiaCulto';
 import { Relatorios } from './pages/Relatorios';
@@ -42,6 +44,7 @@ export function App() {
         <Route index element={<Home />} />
         <Route path="entrar" element={<Login />} />
         <Route path="recuperar-senha" element={<ForgotPassword />} />
+        <Route path="privacidade" element={<Privacidade />} />
 
         <Route path="entradas-saidas" element={<RequireGroup roles={[...QUALQUER_GRUPO]}><Transacoes /></RequireGroup>} />
         <Route path="dizimistas" element={<RequireGroup roles={[...QUALQUER_GRUPO]}><Dizimistas /></RequireGroup>} />
@@ -71,6 +74,7 @@ export function App() {
           <Route path="campanhas/:id/editar" element={<RequireGroup roles={['admin', 'tesouraria']}><EditarCampanha /></RequireGroup>} />
           <Route path="cultos" element={<RequireGroup roles={['admin', 'midia']}><Cultos /></RequireGroup>} />
           <Route path="info" element={<RequireGroup roles={['admin']}><Info /></RequireGroup>} />
+          <Route path="auditoria" element={<RequireGroup roles={['admin']}><Auditoria /></RequireGroup>} />
         </Route>
 
         <Route path="*" element={<Navigate to="/" replace />} />

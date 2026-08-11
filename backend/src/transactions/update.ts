@@ -2,6 +2,7 @@ import type { APIGatewayProxyEventV2WithJWTAuthorizer, APIGatewayProxyHandlerV2W
 import { GetCommand, PutCommand, UpdateCommand } from '@aws-sdk/lib-dynamodb';
 import { ddb, Tables } from '../common/ddb';
 import { podeGerenciarFinancas } from '../common/auth';
+import { registrarAuditoria } from '../common/audit';
 import { ok, badRequest, forbidden, notFound, serverError } from '../common/response';
 
 export const handler: APIGatewayProxyHandlerV2WithJWTAuthorizer = async (
@@ -93,6 +94,12 @@ export const handler: APIGatewayProxyHandlerV2WithJWTAuthorizer = async (
         );
       }
     }
+
+    await registrarAuditoria(event, {
+      acao: 'lancamento.editar',
+      entidadeId: transactionId,
+      detalhes: `${tipo} de R$ ${valor} (${categoria ?? existing.Item.categoria})`,
+    });
 
     return ok(updated);
   } catch (err) {

@@ -20,6 +20,7 @@ export interface ApiStackProps extends cdk.StackProps {
   cultosTable: dynamodb.Table;
   midiaTable: dynamodb.Table;
   campanhasTable: dynamodb.Table;
+  auditoriaTable: dynamodb.Table;
   cultoMediaBucket: s3.Bucket;
   frontendDistributionDomain: string;
 }
@@ -37,6 +38,7 @@ export class ApiStack extends cdk.Stack {
       TABLE_CULTOS: props.cultosTable.tableName,
       TABLE_MIDIA: props.midiaTable.tableName,
       TABLE_CAMPANHAS: props.campanhasTable.tableName,
+      TABLE_AUDITORIA: props.auditoriaTable.tableName,
       BUCKET_CULTO_MEDIA: props.cultoMediaBucket.bucketName,
       USER_POOL_ID: props.userPool.userPoolId,
     };
@@ -59,6 +61,7 @@ export class ApiStack extends cdk.Stack {
     const churchInfoUpdate = fn('ChurchInfoUpdateFn', 'church-info/update.ts');
     props.churchInfoTable.grantReadData(churchInfoGet);
     props.churchInfoTable.grantReadWriteData(churchInfoUpdate);
+    props.auditoriaTable.grantWriteData(churchInfoUpdate);
 
     // ---------- members ----------
     const membersList = fn('MembersListFn', 'members/list.ts');
@@ -81,6 +84,7 @@ export class ApiStack extends cdk.Stack {
       resources: [props.userPool.userPoolArn],
     });
     [membersCreate, membersUpdate, membersRemove].forEach((f) => f.addToRolePolicy(cognitoAdminPolicy));
+    [membersCreate, membersUpdate, membersRemove].forEach((f) => props.auditoriaTable.grantWriteData(f));
 
     // ---------- transactions ----------
     const transactionsList = fn('TransactionsListFn', 'transactions/list.ts');
@@ -98,6 +102,7 @@ export class ApiStack extends cdk.Stack {
     [transactionsCreate, transactionsUpdate, transactionsRemove].forEach((f) => {
       props.churchInfoTable.grantReadWriteData(f);
       props.campanhasTable.grantReadWriteData(f);
+      props.auditoriaTable.grantWriteData(f);
     });
 
     // ---------- dizimistas ----------
@@ -122,6 +127,16 @@ export class ApiStack extends cdk.Stack {
     props.campanhasTable.grantReadWriteData(campanhasCreate);
     props.campanhasTable.grantReadWriteData(campanhasUpdate);
     props.campanhasTable.grantReadWriteData(campanhasRemove);
+    [campanhasCreate, campanhasUpdate, campanhasRemove].forEach((f) => props.auditoriaTable.grantWriteData(f));
+
+    // ---------- auditoria (LGPD) ----------
+    const auditoriaList = fn('AuditoriaListFn', 'auditoria/list.ts');
+    props.auditoriaTable.grantReadData(auditoriaList);
+    props.membersTable.grantReadData(auditoriaList);
+
+    // ---------- portal do membro: meus dados (LGPD) ----------
+    const meDados = fn('MeDadosFn', 'me/dados.ts');
+    props.membersTable.grantReadData(meDados);
 
     // ---------- cultos / mídia ----------
     const cultosList = fn('CultosListFn', 'cultos/list.ts');
@@ -206,6 +221,8 @@ export class ApiStack extends cdk.Stack {
     route('/dizimistas', [apigw.HttpMethod.GET], priv(dizimistasList));
     route('/aniversariantes', [apigw.HttpMethod.GET], priv(aniversariantesList));
     route('/me/contribuicoes', [apigw.HttpMethod.GET], priv(meContribuicoes));
+    route('/me/dados', [apigw.HttpMethod.GET], priv(meDados));
+    route('/auditoria', [apigw.HttpMethod.GET], priv(auditoriaList));
 
     route('/campanhas', [apigw.HttpMethod.GET], priv(campanhasList));
     route('/campanhas', [apigw.HttpMethod.POST], priv(campanhasCreate));

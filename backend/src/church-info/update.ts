@@ -2,6 +2,7 @@ import type { APIGatewayProxyEventV2WithJWTAuthorizer, APIGatewayProxyHandlerV2W
 import { PutCommand, GetCommand } from '@aws-sdk/lib-dynamodb';
 import { ddb, Tables } from '../common/ddb';
 import { isAdmin } from '../common/auth';
+import { registrarAuditoria } from '../common/audit';
 import { ok, badRequest, forbidden, serverError } from '../common/response';
 
 export const handler: APIGatewayProxyHandlerV2WithJWTAuthorizer = async (
@@ -28,6 +29,9 @@ export const handler: APIGatewayProxyHandlerV2WithJWTAuthorizer = async (
     };
 
     await ddb.send(new PutCommand({ TableName: Tables.churchInfo, Item: item }));
+
+    await registrarAuditoria(event, { acao: 'info.editar', entidadeId: 'MAIN' });
+
     return ok(item);
   } catch (err) {
     return serverError(err);

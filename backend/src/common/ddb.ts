@@ -15,4 +15,5 @@ export const Tables = {
   cultos: process.env.TABLE_CULTOS as string,
   midia: process.env.TABLE_MIDIA as string,
   campanhas: process.env.TABLE_CAMPANHAS as string,
+  auditoria: process.env.TABLE_AUDITORIA as string,
 };

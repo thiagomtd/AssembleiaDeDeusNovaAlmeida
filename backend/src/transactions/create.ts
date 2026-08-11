@@ -3,6 +3,7 @@ import { randomUUID } from 'crypto';
 import { PutCommand, UpdateCommand } from '@aws-sdk/lib-dynamodb';
 import { ddb, Tables } from '../common/ddb';
 import { podeGerenciarFinancas, getSub } from '../common/auth';
+import { registrarAuditoria } from '../common/audit';
 import { ok, badRequest, forbidden, serverError } from '../common/response';
 
 export const handler: APIGatewayProxyHandlerV2WithJWTAuthorizer = async (
@@ -64,6 +65,12 @@ export const handler: APIGatewayProxyHandlerV2WithJWTAuthorizer = async (
         }),
       );
     }
+
+    await registrarAuditoria(event, {
+      acao: 'lancamento.criar',
+      entidadeId: transactionId,
+      detalhes: `${tipo} de R$ ${valor} (${categoria})`,
+    });
 
     return ok(item, 201);
   } catch (err) {

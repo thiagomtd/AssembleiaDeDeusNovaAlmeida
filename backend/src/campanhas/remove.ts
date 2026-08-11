@@ -1,7 +1,8 @@
 import type { APIGatewayProxyEventV2WithJWTAuthorizer, APIGatewayProxyHandlerV2WithJWTAuthorizer } from 'aws-lambda';
-import { DeleteCommand } from '@aws-sdk/lib-dynamodb';
+import { DeleteCommand, GetCommand } from '@aws-sdk/lib-dynamodb';
 import { ddb, Tables } from '../common/ddb';
 import { podeGerenciarFinancas } from '../common/auth';
+import { registrarAuditoria } from '../common/audit';
 import { badRequest, forbidden, noContent, serverError } from '../common/response';
 
 export const handler: APIGatewayProxyHandlerV2WithJWTAuthorizer = async (
@@ -13,7 +14,15 @@ export const handler: APIGatewayProxyHandlerV2WithJWTAuthorizer = async (
   if (!campanhaId) return badRequest('Parâmetro id é obrigatório na URL.');
 
   try {
+    const existing = await ddb.send(new GetCommand({ TableName: Tables.campanhas, Key: { campanhaId } }));
     await ddb.send(new DeleteCommand({ TableName: Tables.campanhas, Key: { campanhaId } }));
+
+    await registrarAuditoria(event, {
+      acao: 'campanha.remover',
+      entidadeId: campanhaId,
+      detalhes: existing.Item?.titulo ?? '',
+    });
+
     return noContent();
   } catch (err) {
     return serverError(err);

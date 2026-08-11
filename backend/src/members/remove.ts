@@ -3,6 +3,7 @@ import { DeleteCommand, GetCommand } from '@aws-sdk/lib-dynamodb';
 import { ddb, Tables } from '../common/ddb';
 import { isAdmin } from '../common/auth';
 import { deleteCognitoUser } from '../common/cognito';
+import { registrarAuditoria } from '../common/audit';
 import { badRequest, forbidden, noContent, notFound, serverError } from '../common/response';
 
 export const handler: APIGatewayProxyHandlerV2WithJWTAuthorizer = async (
@@ -18,6 +19,9 @@ export const handler: APIGatewayProxyHandlerV2WithJWTAuthorizer = async (
 
     await deleteCognitoUser(existing.Item.telefone);
     await ddb.send(new DeleteCommand({ TableName: Tables.members, Key: { memberId } }));
+
+    await registrarAuditoria(event, { acao: 'membro.remover', entidadeId: memberId, detalhes: existing.Item.nome });
+
     return noContent();
   } catch (err) {
     return serverError(err);

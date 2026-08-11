@@ -5,6 +5,7 @@ import { ddb, Tables } from '../common/ddb';
 import { isAdmin, type Grupo } from '../common/auth';
 import { createCognitoUser, setUserGroup } from '../common/cognito';
 import { normalizePhoneBR, isValidE164 } from '../common/phone';
+import { registrarAuditoria } from '../common/audit';
 import { ok, badRequest, forbidden, serverError } from '../common/response';
 
 export const handler: APIGatewayProxyHandlerV2WithJWTAuthorizer = async (
@@ -41,6 +42,8 @@ export const handler: APIGatewayProxyHandlerV2WithJWTAuthorizer = async (
       createdAt: new Date().toISOString(),
     };
     await ddb.send(new PutCommand({ TableName: Tables.members, Item: item }));
+
+    await registrarAuditoria(event, { acao: 'membro.criar', entidadeId: memberId, detalhes: `${nome} (${grupoFinal})` });
 
     return ok(item, 201);
   } catch (err: any) {

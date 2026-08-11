@@ -129,8 +129,11 @@ export function Layout() {
         <Outlet />
       </main>
 
-      <footer className="text-center py-6 text-[11.5px] text-muted px-4">
-        Assembleia de Deus de Nova Almeida
+      <footer className="text-center py-6 text-[11.5px] text-muted px-4 flex flex-col items-center gap-1.5">
+        <span>Assembleia de Deus de Nova Almeida</span>
+        <NavLink to="/privacidade" className="text-inkSecondary hover:text-ink underline underline-offset-2">
+          Privacidade e Proteção de Dados
+        </NavLink>
       </footer>
     </div>
   );

@@ -3,6 +3,7 @@ import { randomUUID } from 'crypto';
 import { PutCommand } from '@aws-sdk/lib-dynamodb';
 import { ddb, Tables } from '../common/ddb';
 import { podeGerenciarFinancas } from '../common/auth';
+import { registrarAuditoria } from '../common/audit';
 import { ok, badRequest, forbidden, serverError } from '../common/response';
 
 export const handler: APIGatewayProxyHandlerV2WithJWTAuthorizer = async (
@@ -29,6 +30,9 @@ export const handler: APIGatewayProxyHandlerV2WithJWTAuthorizer = async (
     };
 
     await ddb.send(new PutCommand({ TableName: Tables.campanhas, Item: item }));
+
+    await registrarAuditoria(event, { acao: 'campanha.criar', entidadeId: item.campanhaId, detalhes: titulo });
+
     return ok(item, 201);
   } catch (err) {
     return serverError(err);

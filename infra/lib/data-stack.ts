@@ -9,6 +9,7 @@ export class DataStack extends cdk.Stack {
   public readonly cultosTable: dynamodb.Table;
   public readonly midiaTable: dynamodb.Table;
   public readonly campanhasTable: dynamodb.Table;
+  public readonly auditoriaTable: dynamodb.Table;
 
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
@@ -82,6 +83,16 @@ export class DataStack extends cdk.Stack {
     this.campanhasTable = new dynamodb.Table(this, 'CampanhasTable', {
       tableName: 'icadna-campanhas',
       partitionKey: { name: 'campanhaId', type: dynamodb.AttributeType.STRING },
+      billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
+      removalPolicy: cdk.RemovalPolicy.DESTROY,
+    });
+
+    // Trilha de auditoria (LGPD): PK=mesAno permite listar "o que aconteceu neste mês"
+    // com uma única Query, igual ao padrão já usado em transactions.
+    this.auditoriaTable = new dynamodb.Table(this, 'AuditoriaTable', {
+      tableName: 'icadna-auditoria',
+      partitionKey: { name: 'mesAno', type: dynamodb.AttributeType.STRING },
+      sortKey: { name: 'timestampId', type: dynamodb.AttributeType.STRING },
       billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
       removalPolicy: cdk.RemovalPolicy.DESTROY,
     });

@@ -2,6 +2,7 @@ import type { APIGatewayProxyEventV2WithJWTAuthorizer, APIGatewayProxyHandlerV2W
 import { GetCommand, PutCommand } from '@aws-sdk/lib-dynamodb';
 import { ddb, Tables } from '../common/ddb';
 import { podeGerenciarFinancas } from '../common/auth';
+import { registrarAuditoria } from '../common/audit';
 import { ok, badRequest, forbidden, notFound, serverError } from '../common/response';
 
 // arrecadado nunca é editável aqui — só é alterado pelos lançamentos vinculados
@@ -35,6 +36,9 @@ export const handler: APIGatewayProxyHandlerV2WithJWTAuthorizer = async (
     };
 
     await ddb.send(new PutCommand({ TableName: Tables.campanhas, Item: updated }));
+
+    await registrarAuditoria(event, { acao: 'campanha.editar', entidadeId: campanhaId, detalhes: titulo });
+
     return ok(updated);
   } catch (err) {
     return serverError(err);
