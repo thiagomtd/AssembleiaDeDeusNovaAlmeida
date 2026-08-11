@@ -9,6 +9,7 @@ cdk.out/
 .env.*.local
 *.d.ts
 !bin/**/*.d.ts
+!frontend/src/vite-env.d.ts
 *.tsbuildinfo
 .DS_Store
 *.log
