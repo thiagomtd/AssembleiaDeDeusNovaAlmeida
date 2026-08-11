@@ -8,6 +8,7 @@ const navItems = [
   { to: '/', label: 'Início', role: null as null | 'member' | 'admin' },
   { to: '/entradas-saidas', label: 'Entradas e Saídas', role: 'member' as const },
   { to: '/dizimistas', label: 'Dizimistas do Mês', role: 'member' as const },
+  { to: '/aniversariantes', label: 'Aniversariantes', role: 'member' as const },
   { to: '/midia', label: 'Mídia do Culto', role: 'member' as const },
   { to: '/relatorios', label: 'Relatórios', role: 'member' as const },
   { to: '/admin', label: 'Administração', role: 'admin' as const },

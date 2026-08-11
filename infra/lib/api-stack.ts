@@ -101,6 +101,10 @@ export class ApiStack extends cdk.Stack {
     const dizimistasList = fn('DizimistasListFn', 'dizimistas/list.ts');
     props.transactionsTable.grantReadData(dizimistasList);
 
+    // ---------- aniversariantes ----------
+    const aniversariantesList = fn('AniversariantesListFn', 'aniversariantes/list.ts');
+    props.membersTable.grantReadData(aniversariantesList);
+
     // ---------- cultos / mídia ----------
     const cultosList = fn('CultosListFn', 'cultos/list.ts');
     const cultosListPublic = fn('CultosListPublicFn', 'cultos/list-public.ts');
@@ -182,6 +186,7 @@ export class ApiStack extends cdk.Stack {
     route('/admin/transactions', [apigw.HttpMethod.GET], priv(transactionsListAdmin));
 
     route('/dizimistas', [apigw.HttpMethod.GET], priv(dizimistasList));
+    route('/aniversariantes', [apigw.HttpMethod.GET], priv(aniversariantesList));
 
     route('/cultos', [apigw.HttpMethod.GET], priv(cultosList));
     route('/cultos', [apigw.HttpMethod.POST], priv(cultosCreate));
