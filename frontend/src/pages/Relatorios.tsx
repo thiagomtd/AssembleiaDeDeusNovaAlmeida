@@ -71,7 +71,7 @@ export function Relatorios() {
   return (
     <section>
       <Eyebrow icon={<IconShield className="icon w-3 h-3" />}>Área de membros</Eyebrow>
-      <h1 className="text-[27px] mb-1.5 text-ink">Relatórios Financeiros</h1>
+      <h1 className="text-[32px] mb-1.5 text-ink">Relatórios Financeiros</h1>
       <p className="text-inkSecondary text-[14.5px] max-w-[62ch] mb-6">
         Visão mensal e anual das finanças da igreja, com detalhamento por categoria — sempre em valores agregados.
       </p>

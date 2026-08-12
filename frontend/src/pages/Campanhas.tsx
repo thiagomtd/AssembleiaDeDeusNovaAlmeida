@@ -28,7 +28,7 @@ export function Campanhas() {
   return (
     <section>
       <Eyebrow icon={<IconTarget className="icon w-3 h-3" />}>Campanhas</Eyebrow>
-      <h1 className="text-[27px] mb-1.5 text-ink">Metas de Arrecadação</h1>
+      <h1 className="text-[32px] mb-1.5 text-ink">Metas de Arrecadação</h1>
       <p className="text-inkSecondary text-[14.5px] max-w-[62ch] mb-6">
         Acompanhe o andamento das campanhas da igreja, como reformas e projetos especiais.
       </p>

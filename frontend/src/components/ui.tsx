@@ -5,10 +5,19 @@ export function Card({ children, className = '' }: { children: ReactNode; classN
   return <div className={`bg-surface border border-border rounded-2xl shadow-card ${className}`}>{children}</div>;
 }
 
+// Com ícone = eyebrow de título de página (vira selo/pill, estilo costeiro).
+// Sem ícone = rótulo pequeno de estatística/card (continua discreto, sem pill).
 export function Eyebrow({ children, icon }: { children: ReactNode; icon?: ReactNode }) {
+  if (icon) {
+    return (
+      <p className="inline-flex items-center gap-1.5 bg-coastMist rounded-full px-3 py-1 text-[10.5px] uppercase tracking-widest text-coastOcean font-bold mb-3">
+        {icon}
+        {children}
+      </p>
+    );
+  }
   return (
     <p className="flex items-center gap-1.5 text-[11.5px] uppercase tracking-wider text-muted font-bold mb-2">
-      {icon}
       {children}
     </p>
   );

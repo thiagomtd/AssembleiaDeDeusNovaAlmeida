@@ -25,7 +25,7 @@ export function Dizimistas() {
   return (
     <section>
       <Eyebrow icon={<IconUsers className="icon w-3 h-3" />}>Transparência</Eyebrow>
-      <h1 className="text-[27px] mb-1.5 text-ink">Dizimistas do Mês</h1>
+      <h1 className="text-[32px] mb-1.5 text-ink">Dizimistas do Mês</h1>
       <p className="text-inkSecondary text-[14.5px] max-w-[62ch] mb-6">
         Veja quem contribuiu com o dízimo neste mês. Por respeito à privacidade, os valores individuais não são
         exibidos aqui — apenas os totais agregados, disponíveis em Relatórios.

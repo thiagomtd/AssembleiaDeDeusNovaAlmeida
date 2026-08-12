@@ -36,7 +36,7 @@ export function MeuExtrato() {
     <section className="print:max-w-none">
       <div className="print:hidden">
         <Eyebrow icon={<IconWallet className="icon w-3 h-3" />}>Portal do Membro</Eyebrow>
-        <h1 className="text-[27px] mb-1.5 text-ink">Meu Extrato</h1>
+        <h1 className="text-[32px] mb-1.5 text-ink">Meu Extrato</h1>
         <p className="text-inkSecondary text-[14.5px] max-w-[62ch] mb-6">
           Suas contribuições registradas pela tesouraria, para conferência pessoal e para declaração de imposto de
           renda.
