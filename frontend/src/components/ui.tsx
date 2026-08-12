@@ -14,7 +14,7 @@ export function Eyebrow({ children, icon }: { children: ReactNode; icon?: ReactN
   );
 }
 
-type BtnVariant = 'primary' | 'gold' | 'secondary';
+type BtnVariant = 'primary' | 'gold' | 'secondary' | 'outlineLight';
 export function Button({
   children,
   variant = 'primary',
@@ -34,7 +34,9 @@ export function Button({
       ? 'bg-accent border border-accent text-[#241703] hover:bg-accentStrong'
       : variant === 'secondary'
         ? 'bg-transparent border border-border text-ink hover:bg-surface2'
-        : 'bg-ink border border-ink text-surface hover:opacity-90';
+        : variant === 'outlineLight'
+          ? 'bg-white/10 border border-white/25 text-white hover:bg-white/20'
+          : 'bg-ink border border-ink text-surface hover:opacity-90';
   return (
     <button className={`${base} ${sizeCls} ${variantCls} ${className}`} {...props}>
       {children}
