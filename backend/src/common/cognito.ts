@@ -6,6 +6,7 @@ import {
   AdminDeleteUserCommand,
   AdminDisableUserCommand,
   AdminEnableUserCommand,
+  AdminUserGlobalSignOutCommand,
 } from '@aws-sdk/client-cognito-identity-provider';
 import type { Grupo } from './auth';
 
@@ -54,4 +55,13 @@ export async function deleteCognitoUser(username: string) {
 export async function setCognitoUserEnabled(username: string, enabled: boolean) {
   const Command = enabled ? AdminEnableUserCommand : AdminDisableUserCommand;
   await cognito.send(new Command({ UserPoolId, Username: username }));
+}
+
+/**
+ * Invalida o refresh token da pessoa — assim que o access/ID token atual expirar
+ * (curto, veja idTokenValidity na AuthStack), ela precisa logar de novo e recebe o
+ * grupo/status novo. Chamado sempre que o grupo ou o status de acesso mudam.
+ */
+export async function globalSignOutUser(username: string) {
+  await cognito.send(new AdminUserGlobalSignOutCommand({ UserPoolId, Username: username })).catch(() => {});
 }

@@ -52,6 +52,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     refresh();
+    // Reconfere a sessão periodicamente: se o grupo/status de acesso da pessoa mudar
+    // enquanto ela está com o site aberto, o token antigo expira em até 15 min (ver
+    // AuthStack) e essa checagem detecta a queda de sessão sem precisar recarregar a página.
+    const id = setInterval(refresh, 60_000);
+    return () => clearInterval(id);
   }, []);
 
   const signOut = async () => {

@@ -2,7 +2,7 @@ import { useState, type FormEvent } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { signIn, confirmSignIn } from 'aws-amplify/auth';
 import { useAuth } from '../context/AuthContext';
-import { Card, Button, Field, inputCls, Eyebrow } from '../components/ui';
+import { Card, Button, Field, inputCls, Eyebrow, PasswordField } from '../components/ui';
 import { Emblem, IconShield } from '../components/icons';
 import { normalizePhoneBR } from '../lib/phone';
 
@@ -75,21 +75,18 @@ export function Login() {
                   placeholder="(27) 99911-2233"
                 />
               </Field>
-              <Field label="Senha">
-                <input
-                  type="password"
-                  required
-                  className={inputCls}
-                  value={senha}
-                  onChange={(e) => setSenha(e.target.value)}
-                  placeholder="••••••••"
-                />
-                <div className="text-right -mt-1">
-                  <Link to="/recuperar-senha" className="text-accentStrong text-xs font-semibold">
-                    Esqueci minha senha
-                  </Link>
-                </div>
-              </Field>
+              <PasswordField
+                label="Senha"
+                required
+                value={senha}
+                onChange={(e) => setSenha(e.target.value)}
+                placeholder="••••••••"
+              />
+              <div className="text-right -mt-2">
+                <Link to="/recuperar-senha" className="text-accentStrong text-xs font-semibold">
+                  Esqueci minha senha
+                </Link>
+              </div>
               {erro && <p className="text-expense text-xs">{erro}</p>}
               <Button type="submit" variant="gold" disabled={carregando} className="w-full justify-center">
                 {carregando ? 'Entrando...' : 'Entrar'}
@@ -105,17 +102,15 @@ export function Login() {
             <Eyebrow icon={<IconShield className="icon w-3 h-3" />}>Primeiro acesso</Eyebrow>
             <h2 className="text-[19px] mb-4 text-ink">Defina sua nova senha</h2>
             <form onSubmit={definirNovaSenha} className="flex flex-col gap-3.5">
-              <Field label="Nova senha" hint="Mínimo de 8 caracteres, com letra maiúscula, minúscula e número.">
-                <input
-                  type="password"
-                  required
-                  minLength={8}
-                  className={inputCls}
-                  value={novaSenha}
-                  onChange={(e) => setNovaSenha(e.target.value)}
-                  placeholder="mínimo 8 caracteres"
-                />
-              </Field>
+              <PasswordField
+                label="Nova senha"
+                hint="Mínimo de 8 caracteres, com letra maiúscula, minúscula e número."
+                required
+                minLength={8}
+                value={novaSenha}
+                onChange={(e) => setNovaSenha(e.target.value)}
+                placeholder="mínimo 8 caracteres"
+              />
               {erro && <p className="text-expense text-xs">{erro}</p>}
               <Button type="submit" variant="gold" disabled={carregando} className="w-full justify-center">
                 {carregando ? 'Salvando...' : 'Salvar e entrar'}

@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { resetPassword, confirmResetPassword } from 'aws-amplify/auth';
-import { Card, Button, Field, inputCls, Eyebrow } from '../components/ui';
+import { Card, Button, Field, inputCls, Eyebrow, PasswordField } from '../components/ui';
 import { Emblem, IconLock, IconCheck, IconChevronLeft } from '../components/icons';
 import { normalizePhoneBR } from '../lib/phone';
 
@@ -95,27 +95,21 @@ export function ForgotPassword() {
                 placeholder="000000"
               />
             </Field>
-            <Field label="Nova senha">
-              <input
-                type="password"
-                required
-                minLength={8}
-                className={inputCls}
-                value={novaSenha}
-                onChange={(e) => setNovaSenha(e.target.value)}
-                placeholder="mínimo 8 caracteres"
-              />
-            </Field>
-            <Field label="Confirmar nova senha">
-              <input
-                type="password"
-                required
-                className={inputCls}
-                value={confirmarSenha}
-                onChange={(e) => setConfirmarSenha(e.target.value)}
-                placeholder="repita a nova senha"
-              />
-            </Field>
+            <PasswordField
+              label="Nova senha"
+              required
+              minLength={8}
+              value={novaSenha}
+              onChange={(e) => setNovaSenha(e.target.value)}
+              placeholder="mínimo 8 caracteres"
+            />
+            <PasswordField
+              label="Confirmar nova senha"
+              required
+              value={confirmarSenha}
+              onChange={(e) => setConfirmarSenha(e.target.value)}
+              placeholder="repita a nova senha"
+            />
             {erro && <p className="text-expense text-xs">{erro}</p>}
             <Button type="submit" variant="gold" disabled={carregando} className="w-full justify-center">
               {carregando ? 'Salvando...' : 'Redefinir senha'}

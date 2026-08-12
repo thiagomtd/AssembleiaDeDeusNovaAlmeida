@@ -1,4 +1,5 @@
-import type { ReactNode } from 'react';
+import { useState, type InputHTMLAttributes, type ReactNode } from 'react';
+import { IconEye, IconEyeOff } from './icons';
 
 export function Card({ children, className = '' }: { children: ReactNode; className?: string }) {
   return <div className={`bg-surface border border-border rounded-2xl shadow-card ${className}`}>{children}</div>;
@@ -101,6 +102,33 @@ export function Field({
 
 export const inputCls =
   'w-full min-w-0 max-w-full box-border bg-surface2 border border-border rounded-lg px-3 py-2.5 text-[13.5px] text-ink placeholder:text-muted outline-none transition-shadow focus:border-accent focus:ring-2 focus:ring-accent/30';
+
+export function PasswordField({
+  label,
+  hint,
+  ...props
+}: {
+  label: string;
+  hint?: string;
+} & InputHTMLAttributes<HTMLInputElement>) {
+  const [visivel, setVisivel] = useState(false);
+  return (
+    <Field label={label} hint={hint}>
+      <div className="relative w-full min-w-0">
+        <input type={visivel ? 'text' : 'password'} className={`${inputCls} pr-10`} {...props} />
+        <button
+          type="button"
+          onClick={() => setVisivel((v) => !v)}
+          className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted hover:text-inkSecondary"
+          tabIndex={-1}
+          aria-label={visivel ? 'Ocultar senha' : 'Mostrar senha'}
+        >
+          {visivel ? <IconEyeOff className="icon w-4 h-4" /> : <IconEye className="icon w-4 h-4" />}
+        </button>
+      </div>
+    </Field>
+  );
+}
 
 export function PrivacyNote({ children, icon }: { children: ReactNode; icon?: ReactNode }) {
   return (

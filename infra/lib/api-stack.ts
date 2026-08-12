@@ -82,6 +82,7 @@ export class ApiStack extends cdk.Stack {
         'cognito-idp:AdminDeleteUser',
         'cognito-idp:AdminEnableUser',
         'cognito-idp:AdminDisableUser',
+        'cognito-idp:AdminUserGlobalSignOut',
       ],
       resources: [props.userPool.userPoolArn],
     });

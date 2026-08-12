@@ -74,8 +74,11 @@ export class AuthStack extends cdk.Stack {
         userSrp: true,
         userPassword: true,
       },
-      accessTokenValidity: cdk.Duration.hours(1),
-      idTokenValidity: cdk.Duration.hours(1),
+      // Curto de propósito: se o grupo/status de alguém mudar, o token antigo (com o
+      // grupo velho) não pode continuar valendo por muito tempo. O refresh token
+      // renova isso sozinho em segundo plano enquanto a sessão for válida.
+      accessTokenValidity: cdk.Duration.minutes(15),
+      idTokenValidity: cdk.Duration.minutes(15),
       refreshTokenValidity: cdk.Duration.days(30),
       preventUserExistenceErrors: true,
     });

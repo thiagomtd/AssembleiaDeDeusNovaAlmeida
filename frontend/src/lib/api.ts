@@ -1,4 +1,4 @@
-import { fetchAuthSession } from 'aws-amplify/auth';
+import { fetchAuthSession, signOut } from 'aws-amplify/auth';
 
 const API_URL = import.meta.env.VITE_API_URL as string;
 
@@ -21,6 +21,14 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
     ...(options.headers as Record<string, string> | undefined),
   };
   const res = await fetch(`${API_URL}${path}`, { ...options, headers });
+  if (res.status === 401) {
+    // Sessão inválida/expirada — por exemplo, o grupo de acesso mudou e o token
+    // antigo foi revogado (globalSignOutUser). Desloga na hora, sem esperar o
+    // token expirar sozinho.
+    await signOut().catch(() => {});
+    window.location.assign('/entrar');
+    throw new Error('Sessão expirada. Faça login novamente.');
+  }
   if (res.status === 204) return undefined as T;
   const data = await res.json().catch(() => ({}));
   if (!res.ok) {
