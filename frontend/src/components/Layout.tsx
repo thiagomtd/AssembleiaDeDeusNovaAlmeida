@@ -221,18 +221,16 @@ export function Layout() {
         <Outlet />
       </main>
 
-      <footer className="bg-navy text-white/70 mt-10">
-        <div className="max-w-[1180px] mx-auto px-4 sm:px-5 py-9 flex flex-col items-center gap-3 text-center">
-          <Emblem className="w-10 h-10" />
-          <div>
-            <p className="font-serif text-[15px] text-white">Assembleia de Deus de Nova Almeida</p>
-            <p className="text-[10.5px] uppercase tracking-[0.16em] text-accentSoft/80 mt-1">Fé · Família · Esperança</p>
-          </div>
-          <div className="w-10 h-px bg-white/15 my-1.5" />
-          <NavLink to="/privacidade" className="text-[11.5px] text-white/60 hover:text-white underline underline-offset-2">
-            Privacidade e Proteção de Dados
-          </NavLink>
-        </div>
+      <footer className="mt-10 py-10 px-4 text-center">
+        <p className="text-[11px] tracking-[0.18em] uppercase text-muted">
+          © {new Date().getFullYear()} Assembleia de Deus de Nova Almeida — Fé, Família e Esperança
+        </p>
+        <NavLink
+          to="/privacidade"
+          className="inline-block mt-2 text-[11px] tracking-[0.14em] uppercase text-muted hover:text-inkSecondary underline underline-offset-2"
+        >
+          Privacidade e Proteção de Dados
+        </NavLink>
       </footer>
     </div>
   );

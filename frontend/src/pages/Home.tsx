@@ -2,8 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../lib/api';
 import { useAuth } from '../context/AuthContext';
-import { Card, Button } from '../components/ui';
-import { Emblem, IconBook, IconClock, IconPin, IconImage, IconVideo, IconCamera, IconArrowRight } from '../components/icons';
+import { Emblem, IconBook, IconUsers, IconVideo, IconPin } from '../components/icons';
 
 interface ChurchInfo {
   textoInstitucional: string;
@@ -12,22 +11,36 @@ interface ChurchInfo {
   horarios: { dia: string; horario: string }[];
 }
 
-interface CultoCapa {
-  cultoId: string;
-  titulo: string;
-  data: string;
-  capaUrl: string;
-  capaTipo: 'foto' | 'video';
-}
+const feelings = [
+  {
+    titulo: 'A Quarta-Feira',
+    texto:
+      'O ritmo é calmo. Enquanto o dia esfria, a sala se enche devagar. É o momento da oração, da avó em seu lugar de sempre, do fôlego no meio da semana.',
+    icone: IconBook,
+    tom: 'coastClay',
+  },
+  {
+    titulo: 'Domingo de Manhã',
+    texto:
+      'Escola Bíblica. As crianças correm nos fundos enquanto os adultos mergulham nas Escrituras. Um abraço de quem se conhece há anos — aqui, ninguém é estranho por muito tempo.',
+    icone: IconUsers,
+    tom: 'coastOcean',
+  },
+  {
+    titulo: 'Domingo à Noite',
+    texto:
+      'A grande celebração. O lugar aquece com a força das vozes em uníssono, e a esperança é renovada para os dias que virão.',
+    icone: IconVideo,
+    tom: 'coastMist',
+  },
+] as const;
 
 export function Home() {
   const { isAuthenticated } = useAuth();
   const [info, setInfo] = useState<ChurchInfo | null>(null);
-  const [cultos, setCultos] = useState<CultoCapa[]>([]);
 
   useEffect(() => {
     api.get<ChurchInfo>('/church-info').then(setInfo).catch(() => {});
-    api.get<CultoCapa[]>('/cultos/public').then(setCultos).catch(() => {});
   }, []);
 
   const mapsUrl = info?.endereco
@@ -35,143 +48,142 @@ export function Home() {
     : undefined;
 
   return (
-    <section>
+    <div className="-mx-4 sm:-mx-5 -mt-6 sm:-mt-7">
       {/* Hero */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-navy to-[#10141f] text-white px-6 sm:px-11 py-10 sm:py-16 mb-9">
-        <div className="absolute -right-16 -top-16 opacity-[0.08] pointer-events-none">
-          <Emblem className="w-72 h-72" />
-        </div>
-        <div className="relative max-w-[640px]">
-          <Emblem className="w-16 h-16 mb-6 ring-4 ring-white/10 rounded-full" />
-          <p className="flex items-center gap-1.5 text-[11.5px] uppercase tracking-wider text-accentSoft font-bold mb-3">
-            <IconBook className="icon w-3 h-3" /> Bem-vindos
-          </p>
-          <h1 className="font-serif text-[30px] sm:text-[40px] leading-[1.15] mb-4 text-white">
-            Assembleia de Deus de Nova Almeida
-          </h1>
-          <p className="text-white/75 text-[15px] leading-relaxed max-w-[56ch] mb-5">
-            {info?.textoInstitucional ||
-              'Uma comunidade de fé, família e esperança. Anunciando o Evangelho e servindo a comunidade de Nova Almeida.'}
-          </p>
-          <p className="text-[11px] tracking-[0.18em] uppercase text-accentSoft/90 font-semibold mb-8">
-            Fé · Família · Esperança
-          </p>
-          <div className="flex flex-wrap gap-3">
-            <Link to={isAuthenticated ? '/midia' : '/entrar'}>
-              <Button variant="gold">
-                Ver mídia dos cultos <IconArrowRight className="icon w-3.5 h-3.5" />
-              </Button>
-            </Link>
-            <a href="#horarios-local">
-              <Button variant="outlineLight">Horários e localização</Button>
-            </a>
-          </div>
-        </div>
-      </div>
-
-      {/* Galeria */}
-      <div className="flex items-baseline justify-between mb-3.5">
-        <h2 className="text-[19px] text-ink">Galeria</h2>
-        {cultos.length > 0 && <span className="text-xs text-muted">entre para ver tudo em Mídia do Culto</span>}
-      </div>
-      {cultos.length === 0 ? (
-        <div className="flex flex-col items-center justify-center gap-2.5 rounded-2xl border border-dashed border-border bg-surface2 py-10 mb-9 text-center">
-          <div className="w-11 h-11 rounded-full bg-surface border border-border flex items-center justify-center">
-            <IconCamera className="icon w-5 h-5 text-muted" />
-          </div>
-          <p className="text-[13.5px] text-inkSecondary font-medium">Em breve, fotos e vídeos dos cultos por aqui.</p>
-          <p className="text-xs text-muted max-w-[42ch]">A administração ainda não publicou nenhum culto.</p>
-        </div>
-      ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 mb-9">
-          {cultos.map((c) => (
-            <Link
-              key={c.cultoId}
-              to={`/midia/${c.cultoId}`}
-              title={c.titulo}
-              className="relative aspect-[4/3] rounded-xl bg-surface2 border border-border overflow-hidden flex items-end cursor-pointer transition-transform hover:-translate-y-0.5"
-            >
-              {c.capaTipo === 'video' ? (
-                <video src={c.capaUrl} className="absolute inset-0 w-full h-full object-cover" muted preload="metadata" />
-              ) : (
-                <img src={c.capaUrl} alt={c.titulo} className="absolute inset-0 w-full h-full object-cover" loading="lazy" />
-              )}
-              <span className="relative m-2 px-2 py-1 rounded-md bg-black/55 text-white text-[11px] flex items-center gap-1">
-                {c.capaTipo === 'video' ? <IconVideo className="icon w-3 h-3" /> : <IconImage className="icon w-3 h-3" />}
-                {c.titulo}
+      <section className="px-4 sm:px-5 pt-8 pb-16 md:pb-24">
+        <div className="max-w-[1180px] mx-auto">
+          <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+            <div className="order-2 lg:order-1">
+              <span className="inline-block py-1 px-3 bg-coastMist rounded-full text-[10px] font-bold uppercase tracking-widest text-coastOcean italic mb-6">
+                Fé · Família · Esperança
               </span>
-            </Link>
-          ))}
+              <h1 className="font-serif text-[38px] sm:text-[52px] md:text-[60px] leading-[1.08] mb-6 text-coastInk">
+                Assembleia de Deus <br />
+                <span className="text-coastClay italic">de Nova Almeida</span>
+              </h1>
+              <p className="text-[15px] sm:text-[17px] text-coastInk/70 max-w-lg mb-9 leading-relaxed">
+                {info?.textoInstitucional ||
+                  'Uma comunidade de fé, família e esperança. Anunciando o Evangelho e servindo a comunidade de Nova Almeida.'}
+              </p>
+              <div className="flex flex-col sm:flex-row gap-3.5">
+                <a
+                  href="#convite"
+                  className="px-7 py-3.5 bg-coastOcean text-white font-semibold rounded-md hover:bg-coastInk transition-colors shadow-lg text-center text-[14px]"
+                >
+                  Ver horários e endereço
+                </a>
+                <Link
+                  to={isAuthenticated ? '/midia' : '/entrar'}
+                  className="px-7 py-3.5 border border-coastInk/15 font-semibold rounded-md hover:bg-white transition-colors flex items-center justify-center gap-2 text-[14px] text-coastInk"
+                >
+                  Galeria dos Cultos
+                </Link>
+              </div>
+            </div>
+            <div className="order-1 lg:order-2 relative">
+              <div className="w-full aspect-[4/5] rounded-2xl overflow-hidden shadow-lg bg-gradient-to-br from-coastMist via-coastSand to-coastClay/20 flex items-center justify-center">
+                <Emblem className="w-28 h-28 sm:w-36 sm:h-36 opacity-90" />
+              </div>
+              <div className="absolute -bottom-5 -left-5 sm:-bottom-6 sm:-left-6 bg-white p-5 sm:p-6 shadow-xl rounded-lg hidden md:block max-w-[230px]">
+                <p className="text-[13.5px] italic font-serif leading-relaxed text-coastInk">
+                  "Sentir o cheiro do mar e o calor da nossa gente. Aqui o Evangelho tem raízes profundas."
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
-      )}
+      </section>
 
-      {/* Horários e localização */}
-      <div id="horarios-local" className="grid sm:grid-cols-2 gap-4.5 gap-y-4 scroll-mt-20">
-        <Card className="p-5 overflow-hidden relative">
-          <div className="absolute top-0 left-0 right-0 h-1 bg-accent" />
-          <h3 className="flex items-center gap-2.5 text-[13.5px] mb-4 text-ink font-semibold">
-            <span className="w-8 h-8 rounded-lg bg-accentSoft flex items-center justify-center flex-none">
-              <IconClock className="icon w-4 h-4 text-accentStrong" />
-            </span>
-            Horários de culto
-          </h3>
-          <div>
-            {(info?.horarios ?? []).map((h, i) => (
-              <div key={i} className="flex justify-between py-2.5 text-[13.5px] border-b border-dashed border-border last:border-none">
-                <span className="text-ink font-medium">{h.dia}</span>
-                <span className="text-inkSecondary">{h.horario}</span>
+      {/* A sensação de estar lá */}
+      <section className="bg-coastOcean text-coastSand py-16 md:py-24 px-4 sm:px-5">
+        <div className="max-w-[1180px] mx-auto">
+          <div className="grid sm:grid-cols-3 gap-10 md:gap-14">
+            {feelings.map((f) => (
+              <div key={f.titulo} className="space-y-4">
+                <h3 className="font-serif text-[24px]">{f.titulo}</h3>
+                <p className="text-coastSand/80 text-[13.5px] leading-relaxed">{f.texto}</p>
+                <div className="w-full aspect-video rounded-lg bg-white/10 flex items-center justify-center">
+                  <f.icone className="icon w-7 h-7 text-coastSand/50" />
+                </div>
               </div>
             ))}
-            {(!info || info.horarios.length === 0) && <p className="text-sm text-muted">A definir.</p>}
           </div>
-        </Card>
-        <Card className="p-5 overflow-hidden relative">
-          <div className="absolute top-0 left-0 right-0 h-1 bg-sage" />
-          <h3 className="flex items-center gap-2.5 text-[13.5px] mb-4 text-ink font-semibold">
-            <span className="w-8 h-8 rounded-lg bg-sage/15 flex items-center justify-center flex-none">
-              <IconPin className="icon w-4 h-4 text-sage" />
-            </span>
-            Como chegar
-          </h3>
-          <p className="text-[13.5px] text-inkSecondary mb-3">{info?.endereco || 'Endereço a definir.'}</p>
-          <div className="h-[150px] rounded-lg border border-border bg-surface2 flex items-center justify-center text-muted text-xs gap-1.5 overflow-hidden mb-2.5">
-            {info?.mapaEmbedUrl ? (
-              <iframe title="mapa" src={info.mapaEmbedUrl} className="w-full h-full rounded-lg border-0" />
-            ) : (
-              <>
-                <IconPin className="icon w-[15px] h-[15px]" /> mapa não configurado
-              </>
-            )}
-          </div>
-          {mapsUrl && (
-            <a
-              href={mapsUrl}
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex items-center gap-1 text-[12.5px] font-semibold text-accentStrong hover:underline"
-            >
-              Abrir no Google Maps <IconArrowRight className="icon w-3 h-3" />
-            </a>
-          )}
-        </Card>
-      </div>
+        </div>
+      </section>
 
       {/* Convite */}
-      {!isAuthenticated && (
-        <div className="mt-9 rounded-2xl border border-border bg-accentSoft/40 px-6 py-7 sm:px-9 flex flex-col sm:flex-row items-center gap-5 justify-between text-center sm:text-left">
-          <div>
-            <h3 className="font-serif text-[19px] text-ink mb-1.5">Já faz parte da igreja?</h3>
-            <p className="text-[13.5px] text-inkSecondary max-w-[52ch]">
-              Membros acompanham finanças, mídia dos cultos, campanhas e muito mais entrando na área restrita.
-            </p>
+      <section id="convite" className="py-20 md:py-28 px-4 sm:px-5 bg-white scroll-mt-16">
+        <div className="max-w-[820px] mx-auto text-center">
+          <h2 className="font-serif text-[32px] md:text-[42px] mb-12 text-coastInk">Você é nosso convidado</h2>
+
+          <div className="grid md:grid-cols-2 gap-10 md:gap-14 text-left">
+            <div>
+              <h4 className="text-coastClay font-bold uppercase tracking-widest text-[11px] mb-4">Nossos Encontros</h4>
+              <ul className="space-y-5">
+                {(info?.horarios ?? []).map((h, i) => (
+                  <li key={i} className="flex justify-between items-end border-b border-coastInk/10 pb-3.5">
+                    <span className="font-serif text-[18px] text-coastInk">{h.dia}</span>
+                    <span className="text-[12.5px] font-semibold text-coastInk/70 text-right">{h.horario}</span>
+                  </li>
+                ))}
+                {(!info || info.horarios.length === 0) && (
+                  <li className="text-sm text-coastInk/50">Horários a definir.</li>
+                )}
+              </ul>
+            </div>
+
+            <div className="bg-coastMist p-6 sm:p-7 rounded-2xl flex flex-col justify-between">
+              <div>
+                <h4 className="text-coastOcean font-bold uppercase tracking-widest text-[11px] mb-4">Onde Estamos</h4>
+                <p className="font-serif text-[19px] leading-snug mb-3 text-coastInk">
+                  {info?.endereco || 'Endereço a definir'}
+                </p>
+              </div>
+              {mapsUrl && (
+                <a
+                  href={mapsUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="w-full py-3.5 bg-white text-coastInk border border-coastInk/5 font-semibold rounded shadow-sm flex items-center justify-center gap-2 hover:bg-coastOcean hover:text-white transition-colors text-[13.5px]"
+                >
+                  Abrir no Google Maps <IconPin className="icon w-4 h-4" />
+                </a>
+              )}
+            </div>
           </div>
-          <Link to="/entrar" className="flex-none">
-            <Button variant="gold">
-              Entrar <IconArrowRight className="icon w-3.5 h-3.5" />
-            </Button>
-          </Link>
         </div>
+      </section>
+
+      {/* Convite ao portal do membro */}
+      {!isAuthenticated && (
+        <section className="px-4 sm:px-5 pb-16 md:pb-24">
+          <div className="max-w-[1180px] mx-auto bg-coastClay rounded-[2rem] p-8 md:p-16 text-white text-center overflow-hidden relative">
+            <div className="relative z-10 max-w-2xl mx-auto">
+              <h2 className="font-serif text-[30px] md:text-[46px] mb-5">Faça parte da nossa família</h2>
+              <p className="text-white/85 text-[14.5px] md:text-[16px] mb-8 leading-relaxed">
+                Já frequenta a nossa igreja? Acesse o portal para ver aniversariantes, transparência financeira e as
+                fotos dos últimos cultos.
+              </p>
+              <div className="flex flex-col sm:flex-row justify-center gap-3.5">
+                <Link
+                  to="/entrar"
+                  className="inline-block px-9 py-3.5 bg-white text-coastClay font-bold rounded-full hover:scale-105 transition-transform text-[14px] text-center"
+                >
+                  Entrar no Portal do Membro
+                </Link>
+                <a
+                  href="#convite"
+                  className="inline-block px-9 py-3.5 border border-white/40 text-white font-bold rounded-full hover:bg-white/10 transition-colors text-[14px] text-center"
+                >
+                  Quero me envolver
+                </a>
+              </div>
+            </div>
+            <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/3 w-64 h-64 bg-white/10 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute bottom-0 left-0 translate-y-1/2 -translate-x-1/3 w-64 h-64 bg-black/10 rounded-full blur-3xl pointer-events-none" />
+          </div>
+        </section>
       )}
-    </section>
+    </div>
   );
 }
