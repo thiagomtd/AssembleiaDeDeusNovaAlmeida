@@ -154,7 +154,7 @@ export function NovoLancamento() {
         <div className="px-4.5 pb-4.5 flex flex-col gap-3.5">
           {erro && <p className="text-expense text-xs">{erro}</p>}
           <div className="flex flex-col sm:flex-row gap-2.5">
-            <Button type="submit" variant="gold" disabled={salvando} className="justify-center">
+            <Button type="submit" variant="success" disabled={salvando} className="justify-center">
               {salvando ? 'Salvando...' : 'Salvar lançamento'}
             </Button>
             <Button type="button" variant="secondary" onClick={() => navigate('/admin/lancamentos')} className="justify-center">

@@ -30,6 +30,16 @@ export default {
         incomeSoft: '#e7ede4',
         expense: '#a1543c',
         expenseSoft: '#f1e4dd',
+        // Semântica de ação nos botões: verde = adicionar, azul = editar,
+        // vermelho = apagar. Independentes de income/expense (que são só
+        // sobre valores financeiros, não sobre a ação do botão em si).
+        success: '#2f8f4e',
+        successSoft: '#e3f3e6',
+        info: '#2f6fb8',
+        infoSoft: '#e5eefa',
+        danger: '#d1372f',
+        dangerStrong: '#b02c25',
+        dangerSoft: '#fbe6e4',
         // Aliases explícitos da paleta costeira, para blocos de cor fortes (hero,
         // faixas) que não devem seguir a leitura mais neutra de ink/accent.
         coastSand: 'oklch(0.99 0.003 95)',

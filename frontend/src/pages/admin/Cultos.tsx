@@ -123,7 +123,7 @@ export function Cultos() {
     <div>
       <div className="flex justify-between items-center gap-2.5 flex-wrap mb-4">
         <span className="text-[12.5px] text-muted">{cultos.length} cultos publicados</span>
-        <Button size="sm" variant="gold" onClick={() => setMostrarForm((v) => !v)}>
+        <Button size="sm" variant="success" onClick={() => setMostrarForm((v) => !v)}>
           <IconPlus className="icon w-3.5 h-3.5" /> Novo culto
         </Button>
       </div>
@@ -137,7 +137,7 @@ export function Cultos() {
             <Field label="Título">
               <input required className={inputCls} value={novoCulto.titulo} onChange={(e) => setNovoCulto((c) => ({ ...c, titulo: e.target.value }))} placeholder="Ex: Culto da Família" />
             </Field>
-            <Button type="submit" variant="secondary" className="justify-center">Criar</Button>
+            <Button type="submit" variant="success" className="justify-center">Criar</Button>
           </form>
         </Card>
       )}
@@ -170,7 +170,7 @@ export function Cultos() {
               </Button>
               <button
                 onClick={() => setAlvoRemoverCulto(c)}
-                className="w-9 h-9 rounded-lg border border-border flex-none flex items-center justify-center text-inkSecondary hover:bg-expense hover:text-white hover:border-expense"
+                className="w-9 h-9 rounded-lg border border-danger/30 bg-dangerSoft flex-none flex items-center justify-center text-danger hover:bg-danger hover:text-white hover:border-danger"
                 title="Excluir culto"
               >
                 <IconTrash className="icon w-4 h-4" />
@@ -208,7 +208,7 @@ export function Cultos() {
                         </button>
                         <button
                           onClick={() => setAlvoRemoverMidia({ cultoId: c.cultoId, mediaId: m.mediaId })}
-                          className="absolute top-1.5 right-1.5 w-7 h-7 rounded-full bg-surface/90 border border-border flex items-center justify-center text-inkSecondary hover:bg-expense hover:text-white hover:border-expense"
+                          className="absolute top-1.5 right-1.5 w-7 h-7 rounded-full bg-danger/85 border border-danger flex items-center justify-center text-white hover:bg-danger"
                           title="Remover"
                         >
                           <IconTrash className="icon w-3.5 h-3.5" />
@@ -241,6 +241,7 @@ export function Cultos() {
             ? `Excluir o culto "${alvoRemoverCulto.titulo}"? Isso apaga também todas as ${alvoRemoverCulto.fotos + alvoRemoverCulto.videos} mídias publicadas. Essa ação não pode ser desfeita.`
             : ''
         }
+        perigo
         onCancelar={() => setAlvoRemoverCulto(null)}
         onConfirmar={confirmarRemoverCulto}
       />
@@ -248,6 +249,7 @@ export function Cultos() {
         aberto={!!alvoRemoverMidia}
         titulo="Remover mídia"
         mensagem="Remover este arquivo de mídia? Essa ação não pode ser desfeita."
+        perigo
         onCancelar={() => setAlvoRemoverMidia(null)}
         onConfirmar={confirmarRemoverMidia}
       />

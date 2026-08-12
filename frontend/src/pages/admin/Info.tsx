@@ -104,7 +104,7 @@ export function Info() {
         </div>
 
         <div className="sm:col-span-2 flex items-center gap-3">
-          <Button type="submit" variant="gold">
+          <Button type="submit" variant="info">
             Salvar alterações
           </Button>
           {salvo && <span className="text-income text-xs font-semibold">Salvo com sucesso.</span>}

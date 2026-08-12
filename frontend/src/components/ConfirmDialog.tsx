@@ -12,12 +12,14 @@ export function ConfirmDialog({
   aberto,
   titulo,
   mensagem,
+  perigo,
   onCancelar,
   onConfirmar,
 }: {
   aberto: boolean;
   titulo: string;
   mensagem: string;
+  perigo?: boolean;
   onCancelar: () => void;
   onConfirmar: (motivo: string, anexoKey?: string) => void | Promise<void>;
 }) {
@@ -102,7 +104,7 @@ export function ConfirmDialog({
             </Button>
             <Button
               type="button"
-              variant="gold"
+              variant={perigo ? 'danger' : 'info'}
               disabled={!motivo.trim() || enviando}
               onClick={confirmar}
               className="justify-center flex-1"

@@ -65,7 +65,7 @@ export function NovoMembro() {
           </PrivacyNote>
           {erro && <p className="text-expense text-xs">{erro}</p>}
           <div className="flex flex-col sm:flex-row gap-2.5">
-            <Button type="submit" variant="gold" disabled={salvando} className="justify-center">
+            <Button type="submit" variant="success" disabled={salvando} className="justify-center">
               <IconPlus className="icon w-3.5 h-3.5" /> {salvando ? 'Criando...' : 'Criar membro e enviar acesso'}
             </Button>
             <Button type="button" variant="secondary" onClick={() => navigate('/admin/membros')} className="justify-center">

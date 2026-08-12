@@ -95,14 +95,14 @@ export function Membros() {
                     <div className="flex gap-1.5">
                       <button
                         onClick={() => navigate(`/admin/membros/${m.memberId}/editar`, { state: { membro: m } })}
-                        className="w-[30px] h-[30px] rounded-lg border border-border inline-flex items-center justify-center text-inkSecondary hover:bg-surface2"
+                        className="w-[30px] h-[30px] rounded-lg border border-info/30 bg-infoSoft inline-flex items-center justify-center text-info hover:bg-info hover:text-white hover:border-info"
                         title="Editar"
                       >
                         <IconEdit className="icon w-[13px] h-[13px]" />
                       </button>
                       <button
                         onClick={() => setAlvoRemover(m)}
-                        className="w-[30px] h-[30px] rounded-lg border border-border inline-flex items-center justify-center text-inkSecondary hover:bg-expense hover:text-white hover:border-expense"
+                        className="w-[30px] h-[30px] rounded-lg border border-danger/30 bg-dangerSoft inline-flex items-center justify-center text-danger hover:bg-danger hover:text-white hover:border-danger"
                         title="Excluir"
                       >
                         <IconTrash className="icon w-[13px] h-[13px]" />
@@ -134,6 +134,7 @@ export function Membros() {
         aberto={!!alvoRemover}
         titulo="Remover membro"
         mensagem={alvoRemover ? `Remover o acesso de ${alvoRemover.nome}? A conta também é removida do Cognito.` : ''}
+        perigo
         onCancelar={() => setAlvoRemover(null)}
         onConfirmar={remover}
       />

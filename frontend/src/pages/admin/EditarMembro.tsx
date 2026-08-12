@@ -131,7 +131,7 @@ export function EditarMembro() {
           <div className="px-4.5 pb-4.5 flex flex-col gap-3.5">
             {erro && <p className="text-expense text-xs">{erro}</p>}
             <div className="flex flex-col sm:flex-row gap-2.5">
-              <Button type="submit" variant="gold" className="justify-center">
+              <Button type="submit" variant="info" className="justify-center">
                 Salvar alterações
               </Button>
               <Button type="button" variant="secondary" onClick={() => navigate('/admin/membros')} className="justify-center">

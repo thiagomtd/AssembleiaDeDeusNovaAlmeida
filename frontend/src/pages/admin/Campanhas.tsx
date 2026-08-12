@@ -78,14 +78,14 @@ export function Campanhas() {
                   <div className="flex gap-1.5">
                     <button
                       onClick={() => navigate(`/admin/campanhas/${c.campanhaId}/editar`, { state: { campanha: c } })}
-                      className="w-[30px] h-[30px] rounded-lg border border-border inline-flex items-center justify-center text-inkSecondary hover:bg-surface2"
+                      className="w-[30px] h-[30px] rounded-lg border border-info/30 bg-infoSoft inline-flex items-center justify-center text-info hover:bg-info hover:text-white hover:border-info"
                       title="Editar"
                     >
                       <IconEdit className="icon w-[13px] h-[13px]" />
                     </button>
                     <button
                       onClick={() => setAlvoRemover(c)}
-                      className="w-[30px] h-[30px] rounded-lg border border-border inline-flex items-center justify-center text-inkSecondary hover:bg-expense hover:text-white hover:border-expense"
+                      className="w-[30px] h-[30px] rounded-lg border border-danger/30 bg-dangerSoft inline-flex items-center justify-center text-danger hover:bg-danger hover:text-white hover:border-danger"
                       title="Excluir"
                     >
                       <IconTrash className="icon w-[13px] h-[13px]" />
@@ -113,6 +113,7 @@ export function Campanhas() {
             ? `Remover a campanha "${alvoRemover.titulo}"? Os lançamentos já vinculados a ela permanecem no histórico.`
             : ''
         }
+        perigo
         onCancelar={() => setAlvoRemover(null)}
         onConfirmar={remover}
       />

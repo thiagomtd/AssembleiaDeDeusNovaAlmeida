@@ -35,6 +35,21 @@ exceto quando for um bloco de cor forte e deliberado (hero, faixas).
 parte da "marca"): `income`/`incomeSoft` (verde, entradas), `expense`/`expenseSoft`
 (terracota, saídas), `sage` (crachá do grupo Mídia).
 
+**Semântica de ação nos botões** (`success`/`successSoft`, `info`/`infoSoft`,
+`danger`/`dangerStrong`/`dangerSoft`): usada nos botões e ícones de ação do
+admin para não confundir o usuário com o `accent` (que é terracota/alaranjado
+e pode ler como "vermelho de perigo"). Convenção fixa:
+- **Verde** (`success`) — criar/adicionar (Novo membro, Novo lançamento, Nova
+  campanha, Novo culto).
+- **Azul** (`info`) — editar um registro existente (ícone de lápis nas
+  tabelas, "Salvar alterações" nas telas de edição, confirmar no
+  `ConfirmDialog` quando não é destrutivo).
+- **Vermelho** (`danger`) — apagar/excluir (ícone de lixeira nas tabelas,
+  confirmar no `ConfirmDialog` quando `perigo` está marcado).
+`Button` tem variantes `success`/`info`/`danger` prontas; `ConfirmDialog`
+aceita a prop `perigo` para trocar o botão de confirmar entre `info` e
+`danger` conforme o contexto.
+
 ## Tipografia
 
 - **Serif (`font-serif`)**: [Fraunces](https://fonts.google.com/specimen/Fraunces) — títulos, `h1`-`h6`. Usa itálico em palavras de destaque dentro do título (ex: `<span className="text-coastClay italic">`).
