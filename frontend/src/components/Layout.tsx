@@ -110,13 +110,13 @@ export function Layout() {
     <div className="min-h-screen flex flex-col">
       <header className="sticky top-0 z-20 bg-surface border-b border-border">
         <div className="max-w-[1180px] mx-auto px-4 sm:px-5 py-2.5 flex items-center gap-4">
-          <div className="flex items-center gap-2.5 mr-auto min-w-0">
+          <NavLink to="/" className="flex items-center gap-2.5 mr-auto min-w-0">
             <Emblem className="w-[34px] h-[34px] flex-none" />
             <div className="flex flex-col leading-tight min-w-0">
               <strong className="font-serif text-[14.5px] text-ink truncate">Assembleia de Deus</strong>
               <span className="text-[10.5px] text-muted uppercase tracking-wider truncate">Nova Almeida</span>
             </div>
-          </div>
+          </NavLink>
 
           <nav className="hidden md:flex items-center gap-0.5">
             <NavLink to="/" end className={navLinkCls}>
