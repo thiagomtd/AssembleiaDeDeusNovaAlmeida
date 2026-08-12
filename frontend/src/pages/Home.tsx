@@ -14,24 +14,18 @@ interface ChurchInfo {
 const feelings = [
   {
     titulo: 'A Quarta-Feira',
-    texto:
-      'Um momento de oração e estudo da Palavra, no meio da semana. Um café, a Bíblia aberta, e gente que já se conhece há anos reunida para orar.',
     imagem: '/wednesday-warmth.jpg',
     versiculo: '"Onde estiverem dois ou três reunidos em meu nome, aí estou eu no meio deles."',
     referencia: 'Mateus 18:20',
   },
   {
     titulo: 'Domingo de Manhã',
-    texto:
-      'Começamos o domingo com a Escola Bíblica. As crianças brincam por perto enquanto os adultos estudam a Palavra juntos — aqui todo mundo se sente em casa.',
     imagem: '/sunday-morning.jpg',
     versiculo: '"Lâmpada para os meus pés é tua palavra, e luz para o meu caminho."',
     referencia: 'Salmos 119:105',
   },
   {
     titulo: 'Domingo à Noite',
-    texto:
-      'O culto de celebração: louvor, pregação e uma igreja inteira reunida para adorar, saindo fortalecida para a semana que começa.',
     imagem: '/sunday-worship.jpg',
     versiculo: '"Vinde, cantemos ao Senhor; jubilemos à Rocha da nossa salvação."',
     referencia: 'Salmos 95:1',
@@ -108,9 +102,8 @@ export function Home() {
               <div key={f.titulo} className="flex flex-col">
                 <h3 className="font-serif text-[24px] mb-4">{f.titulo}</h3>
                 <div className="flex-1 mb-4">
-                  <p className="text-coastSand/80 text-[13.5px] leading-relaxed mb-3">{f.texto}</p>
-                  <p className="text-[12.5px] italic font-serif text-coastSand/90 leading-relaxed">{f.versiculo}</p>
-                  <p className="text-[10.5px] text-coastSand/50 mt-1 not-italic">{f.referencia}</p>
+                  <p className="text-[15px] italic font-serif text-coastSand/90 leading-relaxed">{f.versiculo}</p>
+                  <p className="text-[11px] text-coastSand/50 mt-2 not-italic">{f.referencia}</p>
                 </div>
                 <img
                   src={f.imagem}
