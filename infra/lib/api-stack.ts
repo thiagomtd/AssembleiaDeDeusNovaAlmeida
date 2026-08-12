@@ -51,7 +51,10 @@ export class ApiStack extends cdk.Stack {
         handler: 'handler',
         runtime: lambda.Runtime.NODEJS_24_X,
         architecture: lambda.Architecture.ARM_64,
-        memorySize: 256,
+        // 512 (em vez de 256): mais memória = mais CPU na Lambda, o que reduz o cold
+        // start e a execução em si — geralmente sem aumentar o custo real, porque a
+        // função termina mais rápido e usa menos tempo faturável.
+        memorySize: 512,
         timeout: cdk.Duration.seconds(15),
         environment: sharedEnv,
         bundling: { minify: true },

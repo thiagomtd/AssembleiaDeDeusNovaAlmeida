@@ -58,7 +58,7 @@ export class AuthStack extends cdk.Stack {
       handler: 'handler',
       runtime: lambda.Runtime.NODEJS_24_X,
       architecture: lambda.Architecture.ARM_64,
-      memorySize: 256,
+      memorySize: 512,
       timeout: cdk.Duration.seconds(15),
       environment: { TABLE_AUDITORIA: props.auditoriaTable.tableName },
       bundling: { minify: true },
