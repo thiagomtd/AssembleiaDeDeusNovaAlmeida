@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../lib/api';
 import { useAuth } from '../context/AuthContext';
-import { Emblem, IconBook, IconUsers, IconVideo, IconPin } from '../components/icons';
+import { IconPin } from '../components/icons';
 
 interface ChurchInfo {
   textoInstitucional: string;
@@ -16,22 +16,19 @@ const feelings = [
     titulo: 'A Quarta-Feira',
     texto:
       'O ritmo é calmo. Enquanto o dia esfria, a sala se enche devagar. É o momento da oração, da avó em seu lugar de sempre, do fôlego no meio da semana.',
-    icone: IconBook,
-    tom: 'coastClay',
+    imagem: '/wednesday-warmth.jpg',
   },
   {
     titulo: 'Domingo de Manhã',
     texto:
       'Escola Bíblica. As crianças correm nos fundos enquanto os adultos mergulham nas Escrituras. Um abraço de quem se conhece há anos — aqui, ninguém é estranho por muito tempo.',
-    icone: IconUsers,
-    tom: 'coastOcean',
+    imagem: '/sunday-morning.jpg',
   },
   {
     titulo: 'Domingo à Noite',
     texto:
       'A grande celebração. O lugar aquece com a força das vozes em uníssono, e a esperança é renovada para os dias que virão.',
-    icone: IconVideo,
-    tom: 'coastMist',
+    imagem: '/sunday-worship.jpg',
   },
 ] as const;
 
@@ -81,9 +78,11 @@ export function Home() {
               </div>
             </div>
             <div className="order-1 lg:order-2 relative">
-              <div className="w-full aspect-[4/5] rounded-2xl overflow-hidden shadow-lg bg-gradient-to-br from-coastMist via-coastSand to-coastClay/20 flex items-center justify-center">
-                <Emblem className="w-28 h-28 sm:w-36 sm:h-36 opacity-90" />
-              </div>
+              <img
+                src="/hero-church.jpg"
+                alt="Igreja com vista para o mar em Nova Almeida"
+                className="w-full aspect-[4/5] object-cover rounded-2xl shadow-lg bg-coastMist"
+              />
               <div className="absolute -bottom-5 -left-5 sm:-bottom-6 sm:-left-6 bg-white p-5 sm:p-6 shadow-xl rounded-lg hidden md:block max-w-[230px]">
                 <p className="text-[13.5px] italic font-serif leading-relaxed text-coastInk">
                   "Sentir o cheiro do mar e o calor da nossa gente. Aqui o Evangelho tem raízes profundas."
@@ -102,9 +101,11 @@ export function Home() {
               <div key={f.titulo} className="flex flex-col">
                 <h3 className="font-serif text-[24px] mb-4">{f.titulo}</h3>
                 <p className="text-coastSand/80 text-[13.5px] leading-relaxed mb-4 flex-1">{f.texto}</p>
-                <div className="w-full aspect-video rounded-lg bg-white/10 flex items-center justify-center flex-none">
-                  <f.icone className="icon w-7 h-7 text-coastSand/50" />
-                </div>
+                <img
+                  src={f.imagem}
+                  alt={f.titulo}
+                  className="w-full aspect-video object-cover rounded-lg bg-white/10 flex-none"
+                />
               </div>
             ))}
           </div>
