@@ -37,7 +37,7 @@ export function Privacidade() {
   return (
     <section>
       <Eyebrow icon={<IconShield className="icon w-3 h-3" />}>LGPD</Eyebrow>
-      <h1 className="text-[27px] mb-1.5 text-ink">Privacidade e Proteção de Dados</h1>
+      <h1 className="text-[32px] mb-1.5 text-ink">Privacidade e Proteção de Dados</h1>
       <p className="text-inkSecondary text-[14.5px] max-w-[62ch] mb-6">
         Como a Assembleia de Deus de Nova Almeida trata os dados pessoais de membros e visitantes no sistema.
       </p>

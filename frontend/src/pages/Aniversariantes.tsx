@@ -29,7 +29,7 @@ export function Aniversariantes() {
   return (
     <section>
       <Eyebrow icon={<IconGift className="icon w-3 h-3" />}>Comunidade</Eyebrow>
-      <h1 className="text-[27px] mb-1.5 text-ink">Aniversariantes</h1>
+      <h1 className="text-[32px] mb-1.5 text-ink">Aniversariantes</h1>
       <p className="text-inkSecondary text-[14.5px] max-w-[62ch] mb-6">
         Membros que fazem aniversário neste mês, para a igreja celebrar junto.
       </p>

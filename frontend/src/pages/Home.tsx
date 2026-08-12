@@ -15,20 +15,26 @@ const feelings = [
   {
     titulo: 'A Quarta-Feira',
     texto:
-      'O ritmo é calmo. Enquanto o dia esfria, a sala se enche devagar. É o momento da oração, da avó em seu lugar de sempre, do fôlego no meio da semana.',
+      'Um momento de oração e estudo da Palavra, no meio da semana. Um café, a Bíblia aberta, e gente que já se conhece há anos reunida para orar.',
     imagem: '/wednesday-warmth.jpg',
+    versiculo: '"Onde estiverem dois ou três reunidos em meu nome, aí estou eu no meio deles."',
+    referencia: 'Mateus 18:20',
   },
   {
     titulo: 'Domingo de Manhã',
     texto:
-      'Escola Bíblica. As crianças correm nos fundos enquanto os adultos mergulham nas Escrituras. Um abraço de quem se conhece há anos — aqui, ninguém é estranho por muito tempo.',
+      'Começamos o domingo com a Escola Bíblica. As crianças brincam por perto enquanto os adultos estudam a Palavra juntos — aqui todo mundo se sente em casa.',
     imagem: '/sunday-morning.jpg',
+    versiculo: '"Lâmpada para os meus pés é tua palavra, e luz para o meu caminho."',
+    referencia: 'Salmos 119:105',
   },
   {
     titulo: 'Domingo à Noite',
     texto:
-      'A grande celebração. O lugar aquece com a força das vozes em uníssono, e a esperança é renovada para os dias que virão.',
+      'O culto de celebração: louvor, pregação e uma igreja inteira reunida para adorar, saindo fortalecida para a semana que começa.',
     imagem: '/sunday-worship.jpg',
+    versiculo: '"Vinde, cantemos ao Senhor; jubilemos à Rocha da nossa salvação."',
+    referencia: 'Salmos 95:1',
   },
 ] as const;
 
@@ -85,8 +91,9 @@ export function Home() {
               />
               <div className="absolute -bottom-5 -left-5 sm:-bottom-6 sm:-left-6 bg-white p-5 sm:p-6 shadow-xl rounded-lg hidden md:block max-w-[230px]">
                 <p className="text-[13.5px] italic font-serif leading-relaxed text-coastInk">
-                  "Sentir o cheiro do mar e o calor da nossa gente. Aqui o Evangelho tem raízes profundas."
+                  "Oh! Quão bom e quão suave é que os irmãos vivam em união!"
                 </p>
+                <p className="text-[11px] text-coastInk/50 mt-1.5 not-italic">Salmos 133:1</p>
               </div>
             </div>
           </div>
@@ -100,7 +107,11 @@ export function Home() {
             {feelings.map((f) => (
               <div key={f.titulo} className="flex flex-col">
                 <h3 className="font-serif text-[24px] mb-4">{f.titulo}</h3>
-                <p className="text-coastSand/80 text-[13.5px] leading-relaxed mb-4 flex-1">{f.texto}</p>
+                <div className="flex-1 mb-4">
+                  <p className="text-coastSand/80 text-[13.5px] leading-relaxed mb-3">{f.texto}</p>
+                  <p className="text-[12.5px] italic font-serif text-coastSand/90 leading-relaxed">{f.versiculo}</p>
+                  <p className="text-[10.5px] text-coastSand/50 mt-1 not-italic">{f.referencia}</p>
+                </div>
                 <img
                   src={f.imagem}
                   alt={f.titulo}
