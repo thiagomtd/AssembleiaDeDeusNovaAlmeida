@@ -75,7 +75,7 @@ export function ForgotPassword() {
               />
             </Field>
             {erro && <p className="text-expense text-xs">{erro}</p>}
-            <Button type="submit" variant="gold" disabled={carregando} className="w-full justify-center">
+            <Button type="submit" variant="info" disabled={carregando} className="w-full justify-center">
               {carregando ? 'Enviando...' : 'Enviar código'}
             </Button>
           </form>
@@ -111,7 +111,7 @@ export function ForgotPassword() {
               placeholder="repita a nova senha"
             />
             {erro && <p className="text-expense text-xs">{erro}</p>}
-            <Button type="submit" variant="gold" disabled={carregando} className="w-full justify-center">
+            <Button type="submit" variant="info" disabled={carregando} className="w-full justify-center">
               {carregando ? 'Salvando...' : 'Redefinir senha'}
             </Button>
           </form>
@@ -121,7 +121,7 @@ export function ForgotPassword() {
           <div className="flex flex-col gap-3.5 text-center">
             <IconCheck className="icon w-8 h-8 mx-auto text-income" />
             <p className="font-semibold text-ink">Senha redefinida com sucesso.</p>
-            <Button variant="gold" className="w-full justify-center" onClick={() => navigate('/entrar')}>
+            <Button variant="info" className="w-full justify-center" onClick={() => navigate('/entrar')}>
               Voltar para o login
             </Button>
           </div>

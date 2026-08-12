@@ -88,7 +88,7 @@ export function Login() {
                 </Link>
               </div>
               {erro && <p className="text-expense text-xs">{erro}</p>}
-              <Button type="submit" variant="gold" disabled={carregando} className="w-full justify-center">
+              <Button type="submit" variant="info" disabled={carregando} className="w-full justify-center">
                 {carregando ? 'Entrando...' : 'Entrar'}
               </Button>
               <p className="text-[12px] text-muted leading-relaxed">
@@ -112,7 +112,7 @@ export function Login() {
                 placeholder="mínimo 8 caracteres"
               />
               {erro && <p className="text-expense text-xs">{erro}</p>}
-              <Button type="submit" variant="gold" disabled={carregando} className="w-full justify-center">
+              <Button type="submit" variant="info" disabled={carregando} className="w-full justify-center">
                 {carregando ? 'Salvando...' : 'Salvar e entrar'}
               </Button>
             </form>

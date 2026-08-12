@@ -51,7 +51,7 @@ export function Lancamentos() {
       <div className="flex justify-between items-center gap-2.5 flex-wrap px-4.5 py-3.5 border-b border-border">
         <MonthPicker mes={mes} ano={ano} onChange={(m, a) => { setMes(m); setAno(a); }} />
         <Link to="/admin/lancamentos/novo">
-          <span className="inline-flex items-center gap-1.5 bg-accent text-[#241703] text-[12.5px] font-semibold rounded-lg px-3 py-1.5">
+          <span className="inline-flex items-center gap-1.5 bg-success text-white text-[12.5px] font-semibold rounded-lg px-3 py-1.5 hover:opacity-90">
             <IconPlus className="icon w-3.5 h-3.5" /> Novo lançamento
           </span>
         </Link>

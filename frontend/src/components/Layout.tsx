@@ -143,7 +143,7 @@ export function Layout() {
               </>
             ) : (
               <NavLink to="/entrar">
-                <Button variant="gold" size="sm">
+                <Button variant="info" size="sm">
                   Entrar
                 </Button>
               </NavLink>
@@ -207,7 +207,7 @@ export function Layout() {
                 </>
               ) : (
                 <NavLink to="/entrar" className="w-full">
-                  <Button variant="gold" size="sm" className="w-full justify-center">
+                  <Button variant="info" size="sm" className="w-full justify-center">
                     Entrar
                   </Button>
                 </NavLink>
