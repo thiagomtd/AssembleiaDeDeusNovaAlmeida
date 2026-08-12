@@ -15,8 +15,8 @@ const env = {
 
 const prefix = 'Icadna';
 
-const auth = new AuthStack(app, `${prefix}AuthStack`, { env });
 const data = new DataStack(app, `${prefix}DataStack`, { env });
+const auth = new AuthStack(app, `${prefix}AuthStack`, { env, auditoriaTable: data.auditoriaTable });
 const storage = new StorageStack(app, `${prefix}StorageStack`, { env });
 
 new ApiStack(app, `${prefix}ApiStack`, {

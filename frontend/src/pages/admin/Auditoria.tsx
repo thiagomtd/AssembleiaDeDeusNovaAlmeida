@@ -30,6 +30,7 @@ const ACAO_LABEL: Record<string, string> = {
   'midia.criar': 'Mídia enviada',
   'midia.remover': 'Mídia removida',
   'info.editar': 'Informações institucionais editadas',
+  login: 'Login realizado',
 };
 
 function acaoTone(acao: string): 'expense' | 'income' | 'inactive' {
@@ -113,8 +114,8 @@ export function Auditoria() {
         </div>
       </Card>
       <p className="text-[12px] text-muted leading-relaxed mt-3">
-        Registro das ações administrativas (criação, edição e remoção de membros, lançamentos, campanhas e
-        informações institucionais), mantido para conformidade com a LGPD.
+        Registro dos logins e das ações administrativas (criação, edição e remoção de membros, lançamentos,
+        campanhas e informações institucionais), mantido para conformidade com a LGPD.
       </p>
     </div>
   );

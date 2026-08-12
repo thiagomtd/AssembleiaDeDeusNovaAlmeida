@@ -1,6 +1,16 @@
 import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import * as cognito from 'aws-cdk-lib/aws-cognito';
+import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
+import * as lambdaNode from 'aws-cdk-lib/aws-lambda-nodejs';
+import * as lambda from 'aws-cdk-lib/aws-lambda';
+import * as path from 'path';
+
+export interface AuthStackProps extends cdk.StackProps {
+  auditoriaTable: dynamodb.Table;
+}
+
+const BACKEND_SRC = path.join(__dirname, '..', '..', 'backend', 'src');
 
 export class AuthStack extends cdk.Stack {
   public readonly userPool: cognito.UserPool;
@@ -10,7 +20,7 @@ export class AuthStack extends cdk.Stack {
   public readonly midiaGroupName = 'midia';
   public readonly tesourariaGroupName = 'tesouraria';
 
-  constructor(scope: Construct, id: string, props?: cdk.StackProps) {
+  constructor(scope: Construct, id: string, props: AuthStackProps) {
     super(scope, id, props);
 
     this.userPool = new cognito.UserPool(this, 'UserPool', {
@@ -39,6 +49,22 @@ export class AuthStack extends cdk.Stack {
       enableSmsRole: true,
       removalPolicy: cdk.RemovalPolicy.DESTROY,
     });
+
+    // Trigger do Cognito: registra cada login bem-sucedido na auditoria. Precisa ficar
+    // nesta stack (não na ApiStack) porque addTrigger modifica o próprio UserPool — se
+    // o Lambda estivesse na ApiStack (que já depende desta stack), criaria um ciclo.
+    const postAuthentication = new lambdaNode.NodejsFunction(this, 'PostAuthenticationFn', {
+      entry: path.join(BACKEND_SRC, 'auth/post-authentication.ts'),
+      handler: 'handler',
+      runtime: lambda.Runtime.NODEJS_24_X,
+      architecture: lambda.Architecture.ARM_64,
+      memorySize: 256,
+      timeout: cdk.Duration.seconds(15),
+      environment: { TABLE_AUDITORIA: props.auditoriaTable.tableName },
+      bundling: { minify: true },
+    });
+    props.auditoriaTable.grantWriteData(postAuthentication);
+    this.userPool.addTrigger(cognito.UserPoolOperation.POST_AUTHENTICATION, postAuthentication);
 
     this.userPoolClient = new cognito.UserPoolClient(this, 'UserPoolClient', {
       userPool: this.userPool,
