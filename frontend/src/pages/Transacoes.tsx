@@ -3,8 +3,9 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../lib/api';
 import { Card, Eyebrow, Pill, fmtBRL } from '../components/ui';
-import { IconShield, IconWallet, IconInfo, IconPlus } from '../components/icons';
+import { IconShield, IconWallet, IconInfo, IconPlus, IconPaperclip } from '../components/icons';
 import { MonthPicker } from '../components/MonthPicker';
+import { AttachmentViewer } from '../components/AttachmentViewer';
 
 interface Transacao {
   transactionId: string;
@@ -13,6 +14,7 @@ interface Transacao {
   categoria: string;
   descricao: string;
   data: string;
+  comprovanteUrl?: string | null;
 }
 
 export function Transacoes() {
@@ -24,6 +26,7 @@ export function Transacoes() {
   const [itens, setItens] = useState<Transacao[]>([]);
   const [saldoCaixa, setSaldoCaixa] = useState<number | null>(null);
   const [carregando, setCarregando] = useState(true);
+  const [comprovanteAberto, setComprovanteAberto] = useState<string | null>(null);
 
   const mesAno = `${ano}-${String(mes).padStart(2, '0')}`;
 
@@ -99,8 +102,13 @@ export function Transacoes() {
           <table className="w-full text-[13.5px] border-collapse">
             <thead>
               <tr>
-                {['Data', 'Tipo', 'Categoria', 'Descrição', 'Valor'].map((h) => (
-                  <th key={h} className="text-left text-[10.5px] uppercase tracking-wider text-muted font-bold px-3 py-2.5 border-b border-border whitespace-nowrap">
+                {['Data', 'Tipo', 'Categoria', 'Descrição', 'Valor', 'Comprovante'].map((h) => (
+                  <th
+                    key={h}
+                    className={`text-[10.5px] uppercase tracking-wider text-muted font-bold px-3 py-2.5 border-b border-border whitespace-nowrap ${
+                      h === 'Valor' ? 'text-right' : 'text-left'
+                    }`}
+                  >
                     {h}
                   </th>
                 ))}
@@ -122,11 +130,24 @@ export function Transacoes() {
                   <td className={`px-3 py-2.5 border-b border-border text-right font-semibold ${t.tipo === 'entrada' ? 'text-income' : 'text-expense'}`}>
                     {t.tipo === 'entrada' ? '+' : '-'} {fmtBRL(t.valor)}
                   </td>
+                  <td className="px-3 py-2.5 border-b border-border">
+                    {t.comprovanteUrl ? (
+                      <button
+                        type="button"
+                        onClick={() => setComprovanteAberto(t.comprovanteUrl!)}
+                        className="inline-flex items-center gap-1 text-accentStrong hover:underline text-[12.5px]"
+                      >
+                        <IconPaperclip className="icon w-3.5 h-3.5" /> Ver
+                      </button>
+                    ) : (
+                      <span className="text-muted">—</span>
+                    )}
+                  </td>
                 </tr>
               ))}
               {!carregando && itens.length === 0 && (
                 <tr>
-                  <td colSpan={5} className="px-3 py-8 text-center text-muted">
+                  <td colSpan={6} className="px-3 py-8 text-center text-muted">
                     Nenhum lançamento neste mês.
                   </td>
                 </tr>
@@ -147,6 +168,8 @@ export function Transacoes() {
           .
         </span>
       </div>
+
+      {comprovanteAberto && <AttachmentViewer url={comprovanteAberto} onClose={() => setComprovanteAberto(null)} />}
     </section>
   );
 }

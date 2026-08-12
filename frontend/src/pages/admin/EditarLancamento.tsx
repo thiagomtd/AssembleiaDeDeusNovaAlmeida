@@ -3,9 +3,24 @@ import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { api } from '../../lib/api';
 import { Card, Button, Field, inputCls } from '../../components/ui';
 import { ConfirmDialog } from '../../components/ConfirmDialog';
-import { IconChevronLeft } from '../../components/icons';
+import { AttachmentViewer } from '../../components/AttachmentViewer';
+import { IconChevronLeft, IconPaperclip } from '../../components/icons';
 
 const CATEGORIAS = ['Dízimo', 'Oferta', 'Doação', 'Contas', 'Manutenção', 'Eventos', 'Outros'];
+
+function extensaoDe(file: File) {
+  const partes = file.name.split('.');
+  return partes.length > 1 ? partes.pop()! : 'bin';
+}
+
+async function enviarComprovante(file: File): Promise<string> {
+  const { comprovanteKey, uploadUrl } = await api.post<{ comprovanteKey: string; uploadUrl: string }>(
+    '/transactions/comprovante/presign',
+    { contentType: file.type || 'application/octet-stream', extensao: extensaoDe(file) },
+  );
+  await fetch(uploadUrl, { method: 'PUT', body: file, headers: { 'Content-Type': file.type || 'application/octet-stream' } });
+  return comprovanteKey;
+}
 
 interface Membro {
   memberId: string;
@@ -28,6 +43,8 @@ interface Lancamento {
   campanhaId?: string;
   campanhaTitulo?: string;
   descricao?: string;
+  comprovanteKey?: string;
+  comprovanteUrl?: string | null;
 }
 
 export function EditarLancamento() {
@@ -42,6 +59,8 @@ export function EditarLancamento() {
   const [carregando, setCarregando] = useState(!lancamentoDoState);
   const [erro, setErro] = useState('');
   const [confirmando, setConfirmando] = useState(false);
+  const [comprovante, setComprovante] = useState<File | null>(null);
+  const [comprovanteAberto, setComprovanteAberto] = useState<string | null>(null);
 
   useEffect(() => {
     api.get<Membro[]>('/members').then(setMembros).catch(() => setMembros([]));
@@ -71,6 +90,10 @@ export function EditarLancamento() {
       setErro('Informe a data do lançamento.');
       return;
     }
+    if (lancamento.tipo === 'saida' && !comprovante && !lancamento.comprovanteKey) {
+      setErro('Anexe um comprovante para registrar uma saída.');
+      return;
+    }
     setConfirmando(true);
   };
 
@@ -79,6 +102,12 @@ export function EditarLancamento() {
     try {
       const membro = membros.find((m) => m.memberId === lancamento.membroId);
       const campanha = campanhas.find((c) => c.campanhaId === lancamento.campanhaId);
+      const comprovanteKey =
+        lancamento.tipo === 'saida'
+          ? comprovante
+            ? await enviarComprovante(comprovante)
+            : lancamento.comprovanteKey
+          : undefined;
       await api.put(`/transactions/${lancamento.mesAno}/${lancamento.transactionId}`, {
         tipo: lancamento.tipo,
         categoria: lancamento.categoria,
@@ -89,6 +118,7 @@ export function EditarLancamento() {
         membroNome: mostrarDizimista && membro ? membro.nome : undefined,
         campanhaId: mostrarCampanha && lancamento.campanhaId ? lancamento.campanhaId : undefined,
         campanhaTitulo: mostrarCampanha && campanha ? campanha.titulo : undefined,
+        comprovanteKey,
         motivo,
         anexoKey,
       });
@@ -188,6 +218,29 @@ export function EditarLancamento() {
                 placeholder="Detalhes do lançamento"
               />
             </Field>
+            {lancamento.tipo === 'saida' && (
+              <div className="sm:col-span-2">
+                <Field
+                  label={lancamento.comprovanteKey ? 'Trocar comprovante (opcional)' : 'Comprovante (obrigatório para saídas)'}
+                  hint="Fica visível para todos em Entradas e Saídas."
+                >
+                  {lancamento.comprovanteUrl && (
+                    <button
+                      type="button"
+                      onClick={() => setComprovanteAberto(lancamento.comprovanteUrl!)}
+                      className="inline-flex items-center gap-1 text-accentStrong hover:underline text-[12.5px] mb-1.5"
+                    >
+                      <IconPaperclip className="icon w-3.5 h-3.5" /> Ver comprovante atual
+                    </button>
+                  )}
+                  <input
+                    type="file"
+                    className={inputCls}
+                    onChange={(e) => setComprovante(e.target.files?.[0] ?? null)}
+                  />
+                </Field>
+              </div>
+            )}
           </div>
           <div className="px-4.5 pb-4.5 flex flex-col gap-3.5">
             {erro && <p className="text-expense text-xs">{erro}</p>}
@@ -210,6 +263,8 @@ export function EditarLancamento() {
         onCancelar={() => setConfirmando(false)}
         onConfirmar={salvar}
       />
+
+      {comprovanteAberto && <AttachmentViewer url={comprovanteAberto} onClose={() => setComprovanteAberto(null)} />}
     </div>
   );
 }

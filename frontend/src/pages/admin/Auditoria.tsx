@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { api } from '../../lib/api';
 import { Card, Pill } from '../../components/ui';
 import { MonthPicker } from '../../components/MonthPicker';
+import { AttachmentViewer } from '../../components/AttachmentViewer';
 import { IconPaperclip } from '../../components/icons';
 
 interface Entrada {
@@ -45,6 +46,7 @@ export function Auditoria() {
   const [ano, setAno] = useState(now.getFullYear());
   const [itens, setItens] = useState<Entrada[]>([]);
   const [carregando, setCarregando] = useState(true);
+  const [anexoAberto, setAnexoAberto] = useState<string | null>(null);
   const mesAno = `${ano}-${String(mes).padStart(2, '0')}`;
 
   useEffect(() => {
@@ -88,14 +90,13 @@ export function Auditoria() {
                   <td className="px-3 py-2.5 border-b border-border text-inkSecondary max-w-[240px]">{e.motivo || '—'}</td>
                   <td className="px-3 py-2.5 border-b border-border">
                     {e.anexoUrl ? (
-                      <a
-                        href={e.anexoUrl}
-                        target="_blank"
-                        rel="noreferrer"
+                      <button
+                        type="button"
+                        onClick={() => setAnexoAberto(e.anexoUrl!)}
                         className="inline-flex items-center gap-1 text-accentStrong hover:underline text-[12.5px]"
                       >
                         <IconPaperclip className="icon w-3.5 h-3.5" /> Ver
-                      </a>
+                      </button>
                     ) : (
                       <span className="text-muted">—</span>
                     )}
@@ -117,6 +118,8 @@ export function Auditoria() {
         Registro dos logins e das ações administrativas (criação, edição e remoção de membros, lançamentos,
         campanhas e informações institucionais), mantido para conformidade com a LGPD.
       </p>
+
+      {anexoAberto && <AttachmentViewer url={anexoAberto} onClose={() => setAnexoAberto(null)} />}
     </div>
   );
 }

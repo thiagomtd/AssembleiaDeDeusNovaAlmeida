@@ -2,6 +2,7 @@ import type { APIGatewayProxyEventV2WithJWTAuthorizer, APIGatewayProxyHandlerV2W
 import { QueryCommand } from '@aws-sdk/lib-dynamodb';
 import { ddb, Tables } from '../common/ddb';
 import { podeGerenciarFinancas } from '../common/auth';
+import { presignGet, Buckets } from '../common/s3';
 import { ok, badRequest, forbidden, serverError } from '../common/response';
 
 // Visão completa (com o vínculo do dizimista) — usada só por quem gerencia finanças.
@@ -21,7 +22,13 @@ export const handler: APIGatewayProxyHandlerV2WithJWTAuthorizer = async (
         ExpressionAttributeValues: { ':mes': mes },
       }),
     );
-    return ok(res.Items ?? []);
+    const items = await Promise.all(
+      (res.Items ?? []).map(async (item) => ({
+        ...item,
+        comprovanteUrl: item.comprovanteKey ? await presignGet(Buckets.auditoriaAnexos, item.comprovanteKey, 300) : null,
+      })),
+    );
+    return ok(items);
   } catch (err) {
     return serverError(err);
   }

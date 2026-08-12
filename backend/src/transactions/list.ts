@@ -2,6 +2,7 @@ import type { APIGatewayProxyEventV2WithJWTAuthorizer, APIGatewayProxyHandlerV2W
 import { QueryCommand } from '@aws-sdk/lib-dynamodb';
 import { ddb, Tables } from '../common/ddb';
 import { hasGrupo, QUALQUER_GRUPO } from '../common/auth';
+import { presignGet, Buckets } from '../common/s3';
 import { ok, badRequest, forbidden, serverError } from '../common/response';
 
 // Tela de Entradas e Saídas: transparente sobre o fluxo de caixa, mas NUNCA expõe
@@ -22,7 +23,12 @@ export const handler: APIGatewayProxyHandlerV2WithJWTAuthorizer = async (
         ExpressionAttributeValues: { ':mes': mes },
       }),
     );
-    const items = (res.Items ?? []).map(({ membroId, membroNome, ...rest }) => rest);
+    const items = await Promise.all(
+      (res.Items ?? []).map(async ({ membroId, membroNome, comprovanteKey, ...rest }) => ({
+        ...rest,
+        comprovanteUrl: comprovanteKey ? await presignGet(Buckets.auditoriaAnexos, comprovanteKey, 300) : null,
+      })),
+    );
     return ok(items);
   } catch (err) {
     return serverError(err);

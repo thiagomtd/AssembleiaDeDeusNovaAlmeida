@@ -13,12 +13,15 @@ export const handler: APIGatewayProxyHandlerV2WithJWTAuthorizer = async (
 
   try {
     const body = JSON.parse(event.body || '{}');
-    const { tipo, valor, categoria, descricao, data, membroId, membroNome, campanhaId, campanhaTitulo } = body;
+    const { tipo, valor, categoria, descricao, data, membroId, membroNome, campanhaId, campanhaTitulo, comprovanteKey } = body;
 
     if (tipo !== 'entrada' && tipo !== 'saida') return badRequest('Campo tipo deve ser "entrada" ou "saida".');
     if (typeof valor !== 'number' || valor <= 0) return badRequest('Campo valor deve ser um número positivo.');
     if (!categoria || !data || !/^\d{4}-\d{2}-\d{2}$/.test(data)) {
       return badRequest('Campos obrigatórios: categoria, data (YYYY-MM-DD).');
+    }
+    if (tipo === 'saida' && (!comprovanteKey || typeof comprovanteKey !== 'string')) {
+      return badRequest('Anexe um comprovante para registrar uma saída.');
     }
 
     const mesAno = data.slice(0, 7);
@@ -39,6 +42,7 @@ export const handler: APIGatewayProxyHandlerV2WithJWTAuthorizer = async (
       membroNome: membroNome ?? undefined,
       campanhaId: vinculaCampanha ? campanhaId : undefined,
       campanhaTitulo: vinculaCampanha ? campanhaTitulo : undefined,
+      comprovanteKey: tipo === 'saida' ? comprovanteKey : undefined,
       criadoPor: getSub(event),
       createdAt: new Date().toISOString(),
     };

@@ -21,12 +21,16 @@ export const handler: APIGatewayProxyHandlerV2WithJWTAuthorizer = async (
     if (!existing.Item) return notFound('Lançamento não encontrado.');
 
     const body = JSON.parse(event.body || '{}');
-    const { tipo, valor, categoria, descricao, data, membroId, membroNome, campanhaId, campanhaTitulo, motivo, anexoKey } = body;
+    const { tipo, valor, categoria, descricao, data, membroId, membroNome, campanhaId, campanhaTitulo, motivo, anexoKey, comprovanteKey } = body;
 
     if (tipo !== 'entrada' && tipo !== 'saida') return badRequest('Campo tipo deve ser "entrada" ou "saida".');
     if (typeof valor !== 'number' || valor <= 0) return badRequest('Campo valor deve ser um número positivo.');
     if (!motivo || typeof motivo !== 'string' || !motivo.trim()) {
       return badRequest('Informe o motivo desta alteração.');
+    }
+    const comprovanteFinal = tipo === 'saida' ? (comprovanteKey || existing.Item.comprovanteKey) : undefined;
+    if (tipo === 'saida' && !comprovanteFinal) {
+      return badRequest('Anexe um comprovante para registrar uma saída.');
     }
 
     const vinculaCampanha = tipo === 'entrada' && campanhaId;
@@ -44,6 +48,7 @@ export const handler: APIGatewayProxyHandlerV2WithJWTAuthorizer = async (
       membroNome: membroNome ?? undefined,
       campanhaId: vinculaCampanha ? campanhaId : undefined,
       campanhaTitulo: vinculaCampanha ? campanhaTitulo : undefined,
+      comprovanteKey: comprovanteFinal,
       updatedAt: new Date().toISOString(),
     };
     await ddb.send(new PutCommand({ TableName: Tables.transactions, Item: updated }));

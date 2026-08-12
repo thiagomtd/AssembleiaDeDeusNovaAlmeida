@@ -54,7 +54,12 @@ export function Campanhas() {
           <thead>
             <tr>
               {['Título', 'Meta', 'Arrecadado', 'Status', ''].map((h) => (
-                <th key={h} className="text-left text-[10.5px] uppercase tracking-wider text-muted font-bold px-3 py-2.5 border-b border-border whitespace-nowrap">
+                <th
+                  key={h}
+                  className={`text-[10.5px] uppercase tracking-wider text-muted font-bold px-3 py-2.5 border-b border-border whitespace-nowrap ${
+                    h === 'Meta' || h === 'Arrecadado' ? 'text-right' : 'text-left'
+                  }`}
+                >
                   {h}
                 </th>
               ))}
@@ -64,8 +69,8 @@ export function Campanhas() {
             {lista.map((c) => (
               <tr key={c.campanhaId}>
                 <td className="px-3 py-2.5 border-b border-border text-ink">{c.titulo}</td>
-                <td className="px-3 py-2.5 border-b border-border text-inkSecondary">{fmtBRL(c.meta)}</td>
-                <td className="px-3 py-2.5 border-b border-border font-semibold text-income">{fmtBRL(c.arrecadado)}</td>
+                <td className="px-3 py-2.5 border-b border-border text-right text-inkSecondary">{fmtBRL(c.meta)}</td>
+                <td className="px-3 py-2.5 border-b border-border text-right font-semibold text-income">{fmtBRL(c.arrecadado)}</td>
                 <td className="px-3 py-2.5 border-b border-border">
                   <Pill tone={c.ativa ? 'active' : 'inactive'}>{c.ativa ? 'Ativa' : 'Encerrada'}</Pill>
                 </td>

@@ -96,6 +96,7 @@ export class ApiStack extends cdk.Stack {
     const transactionsCreate = fn('TransactionsCreateFn', 'transactions/create.ts');
     const transactionsUpdate = fn('TransactionsUpdateFn', 'transactions/update.ts');
     const transactionsRemove = fn('TransactionsRemoveFn', 'transactions/remove.ts');
+    const transactionsComprovantePresign = fn('TransactionsComprovantePresignFn', 'transactions/comprovante-presign.ts');
     props.transactionsTable.grantReadData(transactionsList);
     props.transactionsTable.grantReadData(transactionsListAnnual);
     props.transactionsTable.grantReadData(transactionsListAdmin);
@@ -107,6 +108,9 @@ export class ApiStack extends cdk.Stack {
       props.campanhasTable.grantReadWriteData(f);
       props.auditoriaTable.grantWriteData(f);
     });
+    props.auditoriaAnexosBucket.grantRead(transactionsList);
+    props.auditoriaAnexosBucket.grantRead(transactionsListAdmin);
+    props.auditoriaAnexosBucket.grantPut(transactionsComprovantePresign);
 
     // ---------- dizimistas ----------
     const dizimistasList = fn('DizimistasListFn', 'dizimistas/list.ts');
@@ -225,6 +229,7 @@ export class ApiStack extends cdk.Stack {
     route('/transactions/{mes}/{id}', [apigw.HttpMethod.PUT], priv(transactionsUpdate));
     route('/transactions/{mes}/{id}', [apigw.HttpMethod.DELETE], priv(transactionsRemove));
     route('/admin/transactions', [apigw.HttpMethod.GET], priv(transactionsListAdmin));
+    route('/transactions/comprovante/presign', [apigw.HttpMethod.POST], priv(transactionsComprovantePresign));
 
     route('/dizimistas', [apigw.HttpMethod.GET], priv(dizimistasList));
     route('/aniversariantes', [apigw.HttpMethod.GET], priv(aniversariantesList));

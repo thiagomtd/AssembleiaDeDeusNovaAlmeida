@@ -3,7 +3,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { api } from '../../lib/api';
 import { Card, Pill, fmtBRL } from '../../components/ui';
 import { ConfirmDialog } from '../../components/ConfirmDialog';
-import { IconPlus, IconEdit, IconTrash, IconUsers, IconTarget } from '../../components/icons';
+import { AttachmentViewer } from '../../components/AttachmentViewer';
+import { IconPlus, IconEdit, IconTrash, IconUsers, IconTarget, IconPaperclip } from '../../components/icons';
 import { MonthPicker } from '../../components/MonthPicker';
 
 interface Lancamento {
@@ -18,6 +19,8 @@ interface Lancamento {
   campanhaId?: string;
   campanhaTitulo?: string;
   descricao?: string;
+  comprovanteKey?: string;
+  comprovanteUrl?: string | null;
 }
 
 export function Lancamentos() {
@@ -27,6 +30,7 @@ export function Lancamentos() {
   const [ano, setAno] = useState(now.getFullYear());
   const [itens, setItens] = useState<Lancamento[]>([]);
   const [alvoRemover, setAlvoRemover] = useState<Lancamento | null>(null);
+  const [comprovanteAberto, setComprovanteAberto] = useState<string | null>(null);
   const mesAno = `${ano}-${String(mes).padStart(2, '0')}`;
 
   const carregar = () => {
@@ -57,8 +61,13 @@ export function Lancamentos() {
         <table className="w-full text-[13.5px]">
           <thead>
             <tr>
-              {['Data', 'Tipo', 'Categoria', 'Dizimista / Campanha', 'Valor', ''].map((h) => (
-                <th key={h} className="text-left text-[10.5px] uppercase tracking-wider text-muted font-bold px-3 py-2.5 border-b border-border whitespace-nowrap">
+              {['Data', 'Tipo', 'Categoria', 'Dizimista / Campanha', 'Valor', 'Comprovante', ''].map((h) => (
+                <th
+                  key={h}
+                  className={`text-[10.5px] uppercase tracking-wider text-muted font-bold px-3 py-2.5 border-b border-border whitespace-nowrap ${
+                    h === 'Valor' ? 'text-right' : 'text-left'
+                  }`}
+                >
                   {h}
                 </th>
               ))}
@@ -90,6 +99,19 @@ export function Lancamentos() {
                 <td className={`px-3 py-2.5 border-b border-border text-right font-semibold ${t.tipo === 'entrada' ? 'text-income' : 'text-expense'}`}>
                   {t.tipo === 'entrada' ? '+' : '-'} {fmtBRL(t.valor)}
                 </td>
+                <td className="px-3 py-2.5 border-b border-border">
+                  {t.comprovanteUrl ? (
+                    <button
+                      type="button"
+                      onClick={() => setComprovanteAberto(t.comprovanteUrl!)}
+                      className="inline-flex items-center gap-1 text-accentStrong hover:underline text-[12.5px]"
+                    >
+                      <IconPaperclip className="icon w-3.5 h-3.5" /> Ver
+                    </button>
+                  ) : (
+                    <span className="text-muted">—</span>
+                  )}
+                </td>
                 <td className="px-3 py-2.5 border-b border-border whitespace-nowrap">
                   <div className="flex gap-1.5">
                     <button
@@ -112,7 +134,7 @@ export function Lancamentos() {
             ))}
             {itens.length === 0 && (
               <tr>
-                <td colSpan={6} className="px-3 py-8 text-center text-muted">
+                <td colSpan={7} className="px-3 py-8 text-center text-muted">
                   Nenhum lançamento neste mês.
                 </td>
               </tr>
@@ -132,6 +154,8 @@ export function Lancamentos() {
         onCancelar={() => setAlvoRemover(null)}
         onConfirmar={remover}
       />
+
+      {comprovanteAberto && <AttachmentViewer url={comprovanteAberto} onClose={() => setComprovanteAberto(null)} />}
     </Card>
   );
 }

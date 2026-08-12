@@ -5,6 +5,20 @@ import { Card, Button, Field, inputCls } from '../../components/ui';
 
 const CATEGORIAS = ['Dízimo', 'Oferta', 'Doação', 'Contas', 'Manutenção', 'Eventos', 'Outros'];
 
+function extensaoDe(file: File) {
+  const partes = file.name.split('.');
+  return partes.length > 1 ? partes.pop()! : 'bin';
+}
+
+async function enviarComprovante(file: File): Promise<string> {
+  const { comprovanteKey, uploadUrl } = await api.post<{ comprovanteKey: string; uploadUrl: string }>(
+    '/transactions/comprovante/presign',
+    { contentType: file.type || 'application/octet-stream', extensao: extensaoDe(file) },
+  );
+  await fetch(uploadUrl, { method: 'PUT', body: file, headers: { 'Content-Type': file.type || 'application/octet-stream' } });
+  return comprovanteKey;
+}
+
 interface Membro {
   memberId: string;
   nome: string;
@@ -25,6 +39,7 @@ export function NovoLancamento() {
   });
   const [erro, setErro] = useState('');
   const [salvando, setSalvando] = useState(false);
+  const [comprovante, setComprovante] = useState<File | null>(null);
 
   useEffect(() => {
     api.get<Membro[]>('/members').then(setMembros).catch(() => setMembros([]));
@@ -49,10 +64,15 @@ export function NovoLancamento() {
       setErro('Informe a data do lançamento.');
       return;
     }
+    if (form.tipo === 'saida' && !comprovante) {
+      setErro('Anexe um comprovante para registrar uma saída.');
+      return;
+    }
     setSalvando(true);
     try {
       const membro = membros.find((m) => m.memberId === form.membroId);
       const campanha = campanhas.find((c) => c.campanhaId === form.campanhaId);
+      const comprovanteKey = form.tipo === 'saida' && comprovante ? await enviarComprovante(comprovante) : undefined;
       await api.post('/transactions', {
         tipo: form.tipo,
         categoria: form.categoria,
@@ -63,6 +83,7 @@ export function NovoLancamento() {
         membroNome: mostrarDizimista && membro ? membro.nome : undefined,
         campanhaId: mostrarCampanha && form.campanhaId ? form.campanhaId : undefined,
         campanhaTitulo: mostrarCampanha && campanha ? campanha.titulo : undefined,
+        comprovanteKey,
       });
       navigate('/admin/lancamentos');
     } catch (err: any) {
@@ -118,6 +139,17 @@ export function NovoLancamento() {
           <Field label="Descrição">
             <input className={inputCls} value={form.descricao} onChange={set('descricao')} placeholder="Detalhes do lançamento" />
           </Field>
+          {form.tipo === 'saida' && (
+            <div className="sm:col-span-2">
+              <Field label="Comprovante (obrigatório para saídas)" hint="Fica visível para todos em Entradas e Saídas.">
+                <input
+                  type="file"
+                  className={inputCls}
+                  onChange={(e) => setComprovante(e.target.files?.[0] ?? null)}
+                />
+              </Field>
+            </div>
+          )}
         </div>
         <div className="px-4.5 pb-4.5 flex flex-col gap-3.5">
           {erro && <p className="text-expense text-xs">{erro}</p>}
