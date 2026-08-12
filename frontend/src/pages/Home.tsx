@@ -99,10 +99,10 @@ export function Home() {
         <div className="max-w-[1180px] mx-auto">
           <div className="grid sm:grid-cols-3 gap-10 md:gap-14">
             {feelings.map((f) => (
-              <div key={f.titulo} className="space-y-4">
-                <h3 className="font-serif text-[24px]">{f.titulo}</h3>
-                <p className="text-coastSand/80 text-[13.5px] leading-relaxed">{f.texto}</p>
-                <div className="w-full aspect-video rounded-lg bg-white/10 flex items-center justify-center">
+              <div key={f.titulo} className="flex flex-col">
+                <h3 className="font-serif text-[24px] mb-4">{f.titulo}</h3>
+                <p className="text-coastSand/80 text-[13.5px] leading-relaxed mb-4 flex-1">{f.texto}</p>
+                <div className="w-full aspect-video rounded-lg bg-white/10 flex items-center justify-center flex-none">
                   <f.icone className="icon w-7 h-7 text-coastSand/50" />
                 </div>
               </div>
