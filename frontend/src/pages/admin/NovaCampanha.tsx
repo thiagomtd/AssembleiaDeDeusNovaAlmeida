@@ -17,7 +17,7 @@ export function NovaCampanha() {
     setErro('');
     const meta = Number(form.meta.replace(',', '.'));
     if (!form.titulo.trim()) {
-      setErro('Informe o título da campanha.');
+      setErro('Informe o título da meta.');
       return;
     }
     if (!meta || meta <= 0) {
@@ -34,7 +34,7 @@ export function NovaCampanha() {
       });
       navigate('/admin/campanhas');
     } catch (err: any) {
-      setErro(err?.message || 'Não foi possível salvar a campanha.');
+      setErro(err?.message || 'Não foi possível salvar a meta.');
     } finally {
       setSalvando(false);
     }
@@ -65,7 +65,7 @@ export function NovaCampanha() {
           {erro && <p className="text-expense text-xs">{erro}</p>}
           <div className="flex flex-col sm:flex-row gap-2.5">
             <Button type="submit" variant="success" disabled={salvando} className="justify-center">
-              {salvando ? 'Salvando...' : 'Salvar campanha'}
+              {salvando ? 'Salvando...' : 'Salvar meta'}
             </Button>
             <Button type="button" variant="secondary" onClick={() => navigate('/admin/campanhas')} className="justify-center">
               Cancelar

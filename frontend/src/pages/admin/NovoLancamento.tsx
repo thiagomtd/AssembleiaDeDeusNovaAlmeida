@@ -127,9 +127,9 @@ export function NovoLancamento() {
             </Field>
           )}
           {mostrarCampanha && (
-            <Field label="Campanha (opcional)" hint="Soma o valor à meta de arrecadação da campanha.">
+            <Field label="Meta (opcional)" hint="Soma o valor arrecadado desta meta.">
               <select className={inputCls} value={form.campanhaId} onChange={set('campanhaId')}>
-                <option value="">— não vincular a uma campanha —</option>
+                <option value="">— não vincular a uma meta —</option>
                 {campanhas.map((c) => (
                   <option key={c.campanhaId} value={c.campanhaId}>{c.titulo}</option>
                 ))}

@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../lib/api';
 import { Card, Eyebrow, Pill, fmtBRL } from '../components/ui';
-import { IconShield, IconWallet, IconInfo, IconPlus, IconPaperclip } from '../components/icons';
+import { IconShield, IconWallet, IconInfo, IconPlus, IconPaperclip, IconTarget } from '../components/icons';
 import { MonthPicker } from '../components/MonthPicker';
 import { AttachmentViewer } from '../components/AttachmentViewer';
 
@@ -14,6 +14,7 @@ interface Transacao {
   categoria: string;
   descricao: string;
   data: string;
+  campanhaTitulo?: string;
   comprovanteUrl?: string | null;
 }
 
@@ -125,7 +126,16 @@ export function Transacoes() {
                       {t.tipo === 'entrada' ? 'Entrada' : 'Saída'}
                     </Pill>
                   </td>
-                  <td className="px-3 py-2.5 border-b border-border text-inkSecondary">{t.categoria}</td>
+                  <td className="px-3 py-2.5 border-b border-border text-inkSecondary">
+                    <div className="flex flex-col gap-1 items-start">
+                      <span>{t.categoria}</span>
+                      {t.campanhaTitulo && (
+                        <span className="inline-flex items-center gap-1 bg-accentSoft text-accentStrong text-[11px] font-semibold rounded-full px-2 py-0.5">
+                          <IconTarget className="icon w-2.5 h-2.5" /> {t.campanhaTitulo}
+                        </span>
+                      )}
+                    </div>
+                  </td>
                   <td className="px-3 py-2.5 border-b border-border text-inkSecondary">{t.descricao}</td>
                   <td className={`px-3 py-2.5 border-b border-border text-right font-semibold ${t.tipo === 'entrada' ? 'text-income' : 'text-expense'}`}>
                     {t.tipo === 'entrada' ? '+' : '-'} {fmtBRL(t.valor)}
@@ -160,12 +170,18 @@ export function Transacoes() {
       <div className="flex gap-2.5 items-start bg-surface2 border border-border rounded-xl px-4 py-3.5 text-[12.5px] text-inkSecondary mt-4.5">
         <IconInfo className="icon w-[17px] h-[17px] text-muted mt-0.5" />
         <span>
-          Esta tela mostra o fluxo de caixa de forma aberta e transparente. Nenhum lançamento é vinculado
-          publicamente a uma pessoa — veja quem contribuiu em{' '}
-          <Link to="/dizimistas" className="text-accentStrong font-semibold">
-            Dizimistas do mês
-          </Link>
-          .
+          {podeGerenciarFinancas ? (
+            <>
+              Esta tela mostra o fluxo de caixa de forma aberta e transparente. Nenhum lançamento é vinculado
+              publicamente a uma pessoa — veja quem contribuiu em{' '}
+              <Link to="/dizimistas" className="text-accentStrong font-semibold">
+                Dizimistas do mês
+              </Link>
+              .
+            </>
+          ) : (
+            'Esta tela mostra o fluxo de caixa de forma aberta e transparente. Nenhum lançamento é vinculado publicamente a uma pessoa.'
+          )}
         </span>
       </div>
 

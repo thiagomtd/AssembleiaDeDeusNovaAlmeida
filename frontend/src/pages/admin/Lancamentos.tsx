@@ -61,7 +61,7 @@ export function Lancamentos() {
         <table className="w-full text-[13.5px]">
           <thead>
             <tr>
-              {['Data', 'Tipo', 'Categoria', 'Dizimista / Campanha', 'Valor', 'Comprovante', ''].map((h) => (
+              {['Data', 'Tipo', 'Categoria', 'Dizimista / Meta', 'Valor', 'Comprovante', ''].map((h) => (
                 <th
                   key={h}
                   className={`text-[10.5px] uppercase tracking-wider text-muted font-bold px-3 py-2.5 border-b border-border whitespace-nowrap ${

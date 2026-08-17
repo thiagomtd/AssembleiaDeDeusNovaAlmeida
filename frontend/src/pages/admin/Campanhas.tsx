@@ -42,10 +42,10 @@ export function Campanhas() {
   return (
     <Card className="overflow-hidden">
       <div className="flex justify-between items-center gap-2.5 flex-wrap px-4.5 py-3.5 border-b border-border">
-        <span className="text-[12.5px] text-muted">{lista.length} campanhas cadastradas</span>
+        <span className="text-[12.5px] text-muted">{lista.length} metas cadastradas</span>
         <Link to="/admin/campanhas/nova">
           <span className="inline-flex items-center gap-1.5 bg-success text-white text-[12.5px] font-semibold rounded-lg px-3 py-1.5 hover:opacity-90">
-            <IconPlus className="icon w-3.5 h-3.5" /> Nova campanha
+            <IconPlus className="icon w-3.5 h-3.5" /> Nova meta
           </span>
         </Link>
       </div>
@@ -97,7 +97,7 @@ export function Campanhas() {
             {!carregando && lista.length === 0 && (
               <tr>
                 <td colSpan={5} className="px-3 py-8 text-center text-muted">
-                  Nenhuma campanha cadastrada.
+                  Nenhuma meta cadastrada.
                 </td>
               </tr>
             )}
@@ -107,10 +107,10 @@ export function Campanhas() {
 
       <ConfirmDialog
         aberto={!!alvoRemover}
-        titulo="Remover campanha"
+        titulo="Remover meta"
         mensagem={
           alvoRemover
-            ? `Remover a campanha "${alvoRemover.titulo}"? Os lançamentos já vinculados a ela permanecem no histórico.`
+            ? `Remover a meta "${alvoRemover.titulo}"? Os lançamentos já vinculados a ela permanecem no histórico.`
             : ''
         }
         perigo

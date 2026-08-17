@@ -13,16 +13,18 @@ interface NavGroup {
   items: NavLeaf[];
 }
 
-const financeiro: NavGroup = {
-  label: 'Financeiro',
-  items: [
-    { to: '/entradas-saidas', label: 'Entradas e Saídas' },
-    { to: '/dizimistas', label: 'Dizimistas do Mês' },
-    { to: '/relatorios', label: 'Relatórios' },
-    { to: '/meu-extrato', label: 'Meu Extrato' },
-    { to: '/campanhas', label: 'Campanhas' },
-  ],
-};
+function financeiroPara(podeVerDizimistas: boolean): NavGroup {
+  return {
+    label: 'Financeiro',
+    items: [
+      { to: '/entradas-saidas', label: 'Entradas e Saídas' },
+      ...(podeVerDizimistas ? [{ to: '/dizimistas', label: 'Dizimistas do Mês' }] : []),
+      { to: '/relatorios', label: 'Relatórios' },
+      { to: '/meu-extrato', label: 'Meu Extrato' },
+      { to: '/campanhas', label: 'Metas' },
+    ],
+  };
+}
 
 const comunidade: NavGroup = {
   label: 'Comunidade',
@@ -31,8 +33,6 @@ const comunidade: NavGroup = {
     { to: '/midia', label: 'Mídia do Culto' },
   ],
 };
-
-const memberGroups = [financeiro, comunidade];
 
 function NavDropdown({ group, openLabel, setOpenLabel }: { group: NavGroup; openLabel: string | null; setOpenLabel: (l: string | null) => void }) {
   const location = useLocation();
@@ -95,6 +95,7 @@ export function Layout() {
   }, [location.pathname]);
 
   const podeVerAdmin = isAdmin || isMidia || isTesouraria;
+  const memberGroups = [financeiroPara(isAdmin || isTesouraria), comunidade];
 
   const handleSignOut = async () => {
     await signOut();

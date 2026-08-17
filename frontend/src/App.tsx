@@ -48,7 +48,7 @@ export function App() {
         <Route path="privacidade" element={<Privacidade />} />
 
         <Route path="entradas-saidas" element={<RequireGroup roles={[...QUALQUER_GRUPO]}><Transacoes /></RequireGroup>} />
-        <Route path="dizimistas" element={<RequireGroup roles={[...QUALQUER_GRUPO]}><Dizimistas /></RequireGroup>} />
+        <Route path="dizimistas" element={<RequireGroup roles={['admin', 'tesouraria']}><Dizimistas /></RequireGroup>} />
         <Route path="aniversariantes" element={<RequireGroup roles={[...QUALQUER_GRUPO]}><Aniversariantes /></RequireGroup>} />
         <Route path="midia" element={<RequireGroup roles={[...QUALQUER_GRUPO]}><Midia /></RequireGroup>} />
         <Route path="midia/:cultoId" element={<RequireGroup roles={[...QUALQUER_GRUPO]}><MidiaCulto /></RequireGroup>} />

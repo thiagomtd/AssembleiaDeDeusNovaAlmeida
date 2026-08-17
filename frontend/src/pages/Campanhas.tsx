@@ -27,10 +27,10 @@ export function Campanhas() {
 
   return (
     <section>
-      <Eyebrow icon={<IconTarget className="icon w-3 h-3" />}>Campanhas</Eyebrow>
+      <Eyebrow icon={<IconTarget className="icon w-3 h-3" />}>Metas</Eyebrow>
       <h1 className="text-[32px] mb-1.5 text-ink">Metas de Arrecadação</h1>
       <p className="text-inkSecondary text-[14.5px] max-w-[62ch] mb-6">
-        Acompanhe o andamento das campanhas da igreja, como reformas e projetos especiais.
+        Acompanhe o andamento das metas da igreja, como reformas e projetos especiais.
       </p>
 
       <div className="grid sm:grid-cols-2 gap-3.5">
@@ -62,7 +62,7 @@ export function Campanhas() {
           );
         })}
         {!carregando && lista.length === 0 && (
-          <p className="col-span-full text-sm text-muted py-8 text-center">Nenhuma campanha no momento.</p>
+          <p className="col-span-full text-sm text-muted py-8 text-center">Nenhuma meta no momento.</p>
         )}
       </div>
     </section>

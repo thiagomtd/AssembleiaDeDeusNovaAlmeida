@@ -197,13 +197,13 @@ export function EditarLancamento() {
               </Field>
             )}
             {mostrarCampanha && (
-              <Field label="Campanha (opcional)" hint="Soma o valor à meta de arrecadação da campanha.">
+              <Field label="Meta (opcional)" hint="Soma o valor arrecadado desta meta.">
                 <select
                   className={inputCls}
                   value={lancamento.campanhaId ?? ''}
                   onChange={(e) => setLancamento({ ...lancamento, campanhaId: e.target.value })}
                 >
-                  <option value="">— não vincular a uma campanha —</option>
+                  <option value="">— não vincular a uma meta —</option>
                   {campanhas.map((c) => (
                     <option key={c.campanhaId} value={c.campanhaId}>{c.titulo}</option>
                   ))}

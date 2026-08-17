@@ -8,7 +8,7 @@ const tabs = [
   { to: '/admin/membros/novo', label: 'Novo membro', icon: IconPlus, end: true, roles: ['admin'] as Grupo[] },
   { to: '/admin/lancamentos', label: 'Lançamentos', icon: IconShield, end: true, roles: ['admin', 'tesouraria'] as Grupo[] },
   { to: '/admin/lancamentos/novo', label: 'Novo lançamento', icon: IconPlus, end: true, roles: ['admin', 'tesouraria'] as Grupo[] },
-  { to: '/admin/campanhas', label: 'Campanhas', icon: IconTarget, end: true, roles: ['admin', 'tesouraria'] as Grupo[] },
+  { to: '/admin/campanhas', label: 'Metas', icon: IconTarget, end: true, roles: ['admin', 'tesouraria'] as Grupo[] },
   { to: '/admin/cultos', label: 'Cultos', icon: IconImage, end: true, roles: ['admin', 'midia'] as Grupo[] },
   { to: '/admin/info', label: 'Informações', icon: IconInfo, end: true, roles: ['admin'] as Grupo[] },
   { to: '/admin/auditoria', label: 'Auditoria', icon: IconClock, end: true, roles: ['admin'] as Grupo[] },

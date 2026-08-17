@@ -1,11 +1,14 @@
 import type { APIGatewayProxyEventV2WithJWTAuthorizer, APIGatewayProxyHandlerV2WithJWTAuthorizer } from 'aws-lambda';
 import { QueryCommand } from '@aws-sdk/lib-dynamodb';
 import { ddb, Tables } from '../common/ddb';
-import { hasGrupo, QUALQUER_GRUPO } from '../common/auth';
+import { hasGrupo, podeGerenciarFinancas, QUALQUER_GRUPO } from '../common/auth';
 import { ok, badRequest, forbidden, serverError } from '../common/response';
 
-// Transparência com privacidade: devolve só os nomes de quem dizimou no mês,
-// nunca o valor de cada contribuição (isso fica restrito à administração).
+// Transparência com privacidade: a quantidade (agregada) fica disponível para
+// qualquer membro, usada no relatório mensal. Já os NOMES só ficam visíveis
+// para quem gerencia finanças (admin/tesouraria) — a tela de Dizimistas do
+// Mês em si é restrita a esses grupos. Nunca expõe o valor de cada
+// contribuição (isso fica restrito à administração).
 export const handler: APIGatewayProxyHandlerV2WithJWTAuthorizer = async (
   event: APIGatewayProxyEventV2WithJWTAuthorizer,
 ) => {
@@ -28,7 +31,7 @@ export const handler: APIGatewayProxyHandlerV2WithJWTAuthorizer = async (
       a.localeCompare(b, 'pt-BR'),
     );
 
-    return ok({ mes, quantidade: nomes.length, dizimistas: nomes });
+    return ok({ mes, quantidade: nomes.length, dizimistas: podeGerenciarFinancas(event) ? nomes : [] });
   } catch (err) {
     return serverError(err);
   }

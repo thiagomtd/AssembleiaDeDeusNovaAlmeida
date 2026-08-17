@@ -39,7 +39,7 @@ export function EditarCampanha() {
     if (!campanha) return;
     setErro('');
     if (!campanha.titulo.trim()) {
-      setErro('Informe o título da campanha.');
+      setErro('Informe o título da meta.');
       return;
     }
     if (!campanha.meta || campanha.meta <= 0) {
@@ -69,7 +69,7 @@ export function EditarCampanha() {
   };
 
   if (carregando) return <p className="text-sm text-muted text-center py-10">Carregando...</p>;
-  if (!campanha) return <p className="text-sm text-muted text-center py-10">Campanha não encontrada.</p>;
+  if (!campanha) return <p className="text-sm text-muted text-center py-10">Meta não encontrada.</p>;
 
   return (
     <div>
@@ -77,7 +77,7 @@ export function EditarCampanha() {
         onClick={() => navigate('/admin/campanhas')}
         className="inline-flex items-center gap-1 text-[12.5px] text-inkSecondary mb-4"
       >
-        <IconChevronLeft className="icon w-[13px] h-[13px]" /> Voltar para Campanhas
+        <IconChevronLeft className="icon w-[13px] h-[13px]" /> Voltar para Metas
       </button>
 
       <Card>
@@ -150,7 +150,7 @@ export function EditarCampanha() {
       <ConfirmDialog
         aberto={confirmando}
         titulo="Confirmar alteração"
-        mensagem={`Você está prestes a salvar alterações na campanha "${campanha.titulo}".`}
+        mensagem={`Você está prestes a salvar alterações na meta "${campanha.titulo}".`}
         onCancelar={() => setConfirmando(false)}
         onConfirmar={salvar}
       />
