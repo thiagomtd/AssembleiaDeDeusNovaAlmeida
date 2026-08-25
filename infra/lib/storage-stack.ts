@@ -3,6 +3,11 @@ import { Construct } from 'constructs';
 import * as s3 from 'aws-cdk-lib/aws-s3';
 import * as cloudfront from 'aws-cdk-lib/aws-cloudfront';
 import * as origins from 'aws-cdk-lib/aws-cloudfront-origins';
+import * as acm from 'aws-cdk-lib/aws-certificatemanager';
+
+// Domínio próprio (icadna.com.br), registrado no Registro.br. Certificado emitido
+// manualmente via ACM (us-east-1, exigência do CloudFront) e validado por DNS.
+const DOMAIN_CERT_ARN = 'arn:aws:acm:us-east-1:607252889594:certificate/136c777a-3c4b-4539-b9fc-4e283b849bae';
 
 export class StorageStack extends cdk.Stack {
   public readonly frontendBucket: s3.Bucket;
@@ -23,6 +28,8 @@ export class StorageStack extends cdk.Stack {
 
     this.frontendDistribution = new cloudfront.Distribution(this, 'FrontendDistribution', {
       defaultRootObject: 'index.html',
+      domainNames: ['icadna.com.br', 'www.icadna.com.br'],
+      certificate: acm.Certificate.fromCertificateArn(this, 'DomainCertificate', DOMAIN_CERT_ARN),
       defaultBehavior: {
         origin: origins.S3BucketOrigin.withOriginAccessControl(this.frontendBucket),
         viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
@@ -79,6 +86,7 @@ export class StorageStack extends cdk.Stack {
     new cdk.CfnOutput(this, 'FrontendBucketName', { value: this.frontendBucket.bucketName });
     new cdk.CfnOutput(this, 'FrontendDistributionId', { value: this.frontendDistribution.distributionId });
     new cdk.CfnOutput(this, 'FrontendUrl', { value: `https://${this.frontendDistribution.distributionDomainName}` });
+    new cdk.CfnOutput(this, 'FrontendCustomDomainUrl', { value: 'https://icadna.com.br' });
     new cdk.CfnOutput(this, 'CultoMediaBucketName', { value: this.cultoMediaBucket.bucketName });
     new cdk.CfnOutput(this, 'AuditoriaAnexosBucketName', { value: this.auditoriaAnexosBucket.bucketName });
   }

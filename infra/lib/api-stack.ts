@@ -190,7 +190,12 @@ export class ApiStack extends cdk.Stack {
     const httpApi = new apigw.HttpApi(this, 'HttpApi', {
       apiName: 'icadna-api',
       corsPreflight: {
-        allowOrigins: [`https://${props.frontendDistributionDomain}`, 'http://localhost:5173'],
+        allowOrigins: [
+          `https://${props.frontendDistributionDomain}`,
+          'https://icadna.com.br',
+          'https://www.icadna.com.br',
+          'http://localhost:5173',
+        ],
         allowMethods: [
           apigw.CorsHttpMethod.GET,
           apigw.CorsHttpMethod.POST,
