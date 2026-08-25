@@ -54,6 +54,18 @@ h1, h2, h3 {
   text-wrap: balance;
 }
 
+/* Tracking óptico: título grande "respira" menos entre letras (senão
+   parece espaçado demais); títulos menores ficam praticamente neutros. */
+h1 {
+  letter-spacing: -0.02em;
+}
+h2 {
+  letter-spacing: -0.015em;
+}
+h3 {
+  letter-spacing: -0.005em;
+}
+
 .icon {
   width: 16px;
   height: 16px;
@@ -64,4 +76,13 @@ h1, h2, h3 {
   stroke-linejoin: round;
   vertical-align: -3px;
   flex: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

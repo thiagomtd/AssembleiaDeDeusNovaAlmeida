@@ -75,7 +75,7 @@ const pillTones: Record<PillTone, string> = {
 };
 export function Pill({ tone, children }: { tone: PillTone; children: ReactNode }) {
   return (
-    <ShadcnBadge className={cn('h-auto gap-1 px-2.5 py-1 rounded-full text-[11.5px] font-bold', pillTones[tone])}>
+    <ShadcnBadge className={cn('h-auto gap-1 px-2.5 py-1 rounded-full text-[11.5px] font-bold transition-colors duration-150', pillTones[tone])}>
       {children}
     </ShadcnBadge>
   );
