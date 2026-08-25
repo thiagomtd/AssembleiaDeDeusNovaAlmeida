@@ -91,10 +91,6 @@ export function Login() {
               <Button type="submit" variant="info" disabled={carregando} className="w-full justify-center">
                 {carregando ? 'Entrando...' : 'Entrar'}
               </Button>
-              <p className="text-[12px] text-muted leading-relaxed">
-                O acesso é feito com o celular cadastrado pela administração da igreja. Membros e administradores
-                entram pela mesma tela.
-              </p>
             </form>
           </>
         ) : (

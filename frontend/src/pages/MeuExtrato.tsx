@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { api } from '../lib/api';
-import { Card, Eyebrow, Button, PrivacyNote, fmtBRL } from '../components/ui';
-import { IconWallet, IconLock } from '../components/icons';
+import { Card, Eyebrow, Button, fmtBRL } from '../components/ui';
+import { IconWallet } from '../components/icons';
 
 type Contribuicao = { data: string; categoria: string; valor: number; descricao: string };
 
@@ -100,13 +100,6 @@ export function MeuExtrato() {
           </p>
         )}
       </Card>
-
-      <div className="print:hidden">
-        <PrivacyNote icon={<IconLock className="icon w-[17px] h-[17px] text-muted mt-0.5" />}>
-          Este extrato mostra só as suas próprias contribuições. Ninguém além de você e da administração tem acesso a
-          ele.
-        </PrivacyNote>
-      </div>
     </section>
   );
 }

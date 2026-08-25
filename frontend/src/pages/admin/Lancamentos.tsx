@@ -56,8 +56,7 @@ export function Lancamentos() {
           </span>
         </Link>
       </div>
-      <p className="px-4.5 pt-3 text-[12px] text-muted">Visão completa (com o vínculo do dizimista) — só a administração vê esta tela.</p>
-      <div className="overflow-x-auto">
+      <div className="overflow-x-auto mt-1">
         <table className="w-full text-[13.5px]">
           <thead>
             <tr>

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { api } from '../lib/api';
 import { Card, Eyebrow } from '../components/ui';
-import { IconUsers, IconLock, IconCheck } from '../components/icons';
+import { IconUsers, IconCheck } from '../components/icons';
 import { MonthPicker } from '../components/MonthPicker';
 
 export function Dizimistas() {
@@ -48,11 +48,6 @@ export function Dizimistas() {
         {!carregando && nomes.length === 0 && (
           <p className="col-span-full text-sm text-muted py-6 text-center">Nenhum dízimo registrado neste mês.</p>
         )}
-      </div>
-
-      <div className="flex gap-2.5 items-start bg-surface2 border border-border rounded-xl px-4 py-3.5 text-[12.5px] text-inkSecondary">
-        <IconLock className="icon w-[17px] h-[17px] text-muted mt-0.5" />
-        <span>Os valores de cada contribuição ficam visíveis apenas para a administração, na área restrita de lançamentos.</span>
       </div>
     </section>
   );

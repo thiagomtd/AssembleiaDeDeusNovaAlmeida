@@ -1,8 +1,8 @@
 import { useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../../lib/api';
-import { Card, Button, Field, inputCls, PrivacyNote } from '../../components/ui';
-import { IconLock, IconPlus } from '../../components/icons';
+import { Card, Button, Field, inputCls } from '../../components/ui';
+import { IconPlus } from '../../components/icons';
 
 export function NovoMembro() {
   const navigate = useNavigate();
@@ -58,11 +58,6 @@ export function NovoMembro() {
           </Field>
         </div>
         <div className="px-4.5 pb-4.5 flex flex-col gap-3.5">
-          <PrivacyNote icon={<IconLock className="icon w-[17px] h-[17px] text-muted mt-0.5" />}>
-            Ao salvar, uma conta é criada automaticamente no Cognito e um SMS com{' '}
-            <strong className="text-ink">login e senha temporária</strong> é enviado para o celular da pessoa. No
-            primeiro acesso, ela será obrigada a definir uma nova senha.
-          </PrivacyNote>
           {erro && <p className="text-expense text-xs">{erro}</p>}
           <div className="flex flex-col sm:flex-row gap-2.5">
             <Button type="submit" variant="success" disabled={salvando} className="justify-center">

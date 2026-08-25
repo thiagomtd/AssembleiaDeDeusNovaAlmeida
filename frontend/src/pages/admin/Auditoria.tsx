@@ -114,10 +114,6 @@ export function Auditoria() {
           </table>
         </div>
       </Card>
-      <p className="text-[12px] text-muted leading-relaxed mt-3">
-        Registro dos logins e das ações administrativas (criação, edição e remoção de membros, lançamentos,
-        campanhas e informações institucionais), mantido para conformidade com a LGPD.
-      </p>
 
       {anexoAberto && <AttachmentViewer url={anexoAberto} onClose={() => setAnexoAberto(null)} />}
     </div>

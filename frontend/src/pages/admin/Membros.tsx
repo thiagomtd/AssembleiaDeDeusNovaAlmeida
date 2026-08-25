@@ -123,12 +123,6 @@ export function Membros() {
           </table>
         </div>
       </Card>
-      <p className="text-[12px] text-muted leading-relaxed mt-3">
-        O grupo de acesso define o que a pessoa enxerga no sistema: <strong className="text-ink">Membro</strong> tem
-        leitura de finanças, dizimistas, mídia e relatórios; <strong className="text-ink">Mídia</strong> soma a
-        gestão de cultos e fotos/vídeos; <strong className="text-ink">Tesouraria</strong> soma a gestão de
-        lançamentos financeiros; <strong className="text-ink">Administração</strong> (diretoria) tem acesso total.
-      </p>
 
       <ConfirmDialog
         aberto={!!alvoRemover}

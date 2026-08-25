@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { api } from '../lib/api';
 import { Card, Eyebrow } from '../components/ui';
-import { IconGift, IconLock } from '../components/icons';
+import { IconGift } from '../components/icons';
 
 const MESES = [
   'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
@@ -69,11 +69,6 @@ export function Aniversariantes() {
             Nenhum aniversariante em {MESES[mes - 1].toLowerCase()}.
           </p>
         )}
-      </div>
-
-      <div className="flex gap-2.5 items-start bg-surface2 border border-border rounded-xl px-4 py-3.5 text-[12.5px] text-inkSecondary">
-        <IconLock className="icon w-[17px] h-[17px] text-muted mt-0.5" />
-        <span>Por privacidade, apenas o dia é exibido — o ano de nascimento nunca aparece aqui.</span>
       </div>
     </section>
   );
