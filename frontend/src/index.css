@@ -1,6 +1,44 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+/* Paleta "costeira" (Nova Almeida) — ver DESIGN.md. Cada token de cor aqui
+   gera automaticamente as classes de fundo, texto e borda no Tailwind v4. */
+@theme {
+  --color-bg: oklch(0.99 0.003 95);
+  --color-surface: #ffffff;
+  --color-surface2: oklch(0.95 0.012 70);
+  --color-border: oklch(0.22 0.02 60 / 10%);
+  --color-ink: oklch(0.22 0.02 60);
+  --color-inkSecondary: oklch(0.45 0.02 60);
+  --color-muted: oklch(0.6 0.02 60);
+  --color-accent: oklch(0.66 0.14 38);
+  --color-accentStrong: oklch(0.5 0.12 38);
+  --color-accentSoft: oklch(0.93 0.04 45);
+
+  --color-sage: #6f7a52;
+  --color-navy: #1f2740;
+  --color-income: #4f7a56;
+  --color-incomeSoft: #e7ede4;
+  --color-expense: #a1543c;
+  --color-expenseSoft: #f1e4dd;
+  --color-success: #2f8f4e;
+  --color-successSoft: #e3f3e6;
+  --color-info: #2f6fb8;
+  --color-infoSoft: #e5eefa;
+  --color-danger: #d1372f;
+  --color-dangerStrong: #b02c25;
+  --color-dangerSoft: #fbe6e4;
+
+  --color-coastSand: oklch(0.99 0.003 95);
+  --color-coastClay: oklch(0.66 0.14 38);
+  --color-coastOcean: oklch(0.45 0.08 195);
+  --color-coastInk: oklch(0.22 0.02 60);
+  --color-coastMist: oklch(0.93 0.01 175);
+
+  --font-serif: 'Fraunces', Georgia, 'Iowan Old Style', 'Palatino Linotype', serif;
+  --font-sans: 'Outfit', -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+
+  --shadow-card: 0 1px 2px rgba(20, 20, 20, .05), 0 4px 14px rgba(20, 20, 20, .05);
+}
 
 html, body {
   max-width: 100%;
@@ -12,7 +50,7 @@ body {
 }
 
 h1, h2, h3 {
-  font-family: theme('fontFamily.serif');
+  font-family: var(--font-serif);
   text-wrap: balance;
 }
 

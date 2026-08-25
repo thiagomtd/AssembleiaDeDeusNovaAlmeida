@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { api } from '../lib/api';
-import { Card, Button, Field, inputCls } from './ui';
+import { Button, Field, inputCls } from './ui';
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from './ui/dialog';
 import { IconTrash } from './icons';
 
 function extensaoDe(file: File) {
@@ -38,8 +39,6 @@ export function ConfirmDialog({
     }
   }, [aberto]);
 
-  if (!aberto) return null;
-
   const confirmar = async () => {
     if (!motivo.trim()) return;
     setErro('');
@@ -63,57 +62,55 @@ export function ConfirmDialog({
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4" onClick={onCancelar}>
-      <div onClick={(e) => e.stopPropagation()} className="w-full max-w-md">
-        <Card className="p-4.5">
-          <h2 className="font-serif text-lg text-ink mb-1.5">{titulo}</h2>
-          <p className="text-[13px] text-inkSecondary mb-3.5">{mensagem}</p>
-          <div className="flex flex-col gap-3">
-            <Field label="Motivo (obrigatório)" hint="Fica registrado na auditoria.">
-              <textarea
-                autoFocus
-                rows={2}
+    <Dialog open={aberto} onOpenChange={(open) => { if (!open) onCancelar(); }}>
+      <DialogContent>
+        <DialogTitle className="font-serif text-lg text-ink">{titulo}</DialogTitle>
+        <DialogDescription className="text-[13px] text-inkSecondary">{mensagem}</DialogDescription>
+        <div className="flex flex-col gap-3">
+          <Field label="Motivo (obrigatório)" hint="Fica registrado na auditoria.">
+            <textarea
+              autoFocus
+              rows={2}
+              className={inputCls}
+              value={motivo}
+              onChange={(e) => setMotivo(e.target.value)}
+              placeholder="Explique o motivo desta ação"
+            />
+          </Field>
+          <Field label="Anexo (opcional)" hint="Um comprovante ou documento relacionado ao motivo.">
+            {arquivo ? (
+              <div className="flex items-center gap-2 bg-surface2 border border-border rounded-lg px-3 py-2.5">
+                <span className="text-[12.5px] text-ink truncate flex-1 min-w-0">{arquivo.name}</span>
+                <button type="button" onClick={() => setArquivo(null)} className="flex-none text-inkSecondary hover:text-expense" title="Remover anexo">
+                  <IconTrash className="icon w-3.5 h-3.5" />
+                </button>
+              </div>
+            ) : (
+              <input
+                ref={inputRef}
+                type="file"
                 className={inputCls}
-                value={motivo}
-                onChange={(e) => setMotivo(e.target.value)}
-                placeholder="Explique o motivo desta ação"
+                onChange={(e) => setArquivo(e.target.files?.[0] ?? null)}
               />
-            </Field>
-            <Field label="Anexo (opcional)" hint="Um comprovante ou documento relacionado ao motivo.">
-              {arquivo ? (
-                <div className="flex items-center gap-2 bg-surface2 border border-border rounded-lg px-3 py-2.5">
-                  <span className="text-[12.5px] text-ink truncate flex-1 min-w-0">{arquivo.name}</span>
-                  <button type="button" onClick={() => setArquivo(null)} className="flex-none text-inkSecondary hover:text-expense" title="Remover anexo">
-                    <IconTrash className="icon w-3.5 h-3.5" />
-                  </button>
-                </div>
-              ) : (
-                <input
-                  ref={inputRef}
-                  type="file"
-                  className={inputCls}
-                  onChange={(e) => setArquivo(e.target.files?.[0] ?? null)}
-                />
-              )}
-            </Field>
-          </div>
-          {erro && <p className="text-expense text-xs mt-2.5">{erro}</p>}
-          <div className="flex gap-2.5 mt-3.5">
-            <Button type="button" variant="secondary" onClick={onCancelar} className="justify-center flex-1">
-              Cancelar
-            </Button>
-            <Button
-              type="button"
-              variant={perigo ? 'danger' : 'info'}
-              disabled={!motivo.trim() || enviando}
-              onClick={confirmar}
-              className="justify-center flex-1"
-            >
-              {enviando ? 'Enviando...' : 'Confirmar'}
-            </Button>
-          </div>
-        </Card>
-      </div>
-    </div>
+            )}
+          </Field>
+        </div>
+        {erro && <p className="text-danger text-xs">{erro}</p>}
+        <div className="flex gap-2.5">
+          <Button type="button" variant="secondary" onClick={onCancelar} className="justify-center flex-1">
+            Cancelar
+          </Button>
+          <Button
+            type="button"
+            variant={perigo ? 'danger' : 'info'}
+            disabled={!motivo.trim() || enviando}
+            onClick={confirmar}
+            className="justify-center flex-1"
+          >
+            {enviando ? 'Enviando...' : 'Confirmar'}
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 }

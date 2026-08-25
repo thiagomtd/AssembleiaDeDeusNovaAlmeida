@@ -1,5 +1,8 @@
 import { useState, type InputHTMLAttributes, type ReactNode } from 'react';
 import { IconEye, IconEyeOff } from './icons';
+import { Button as ShadcnButton } from './ui/button';
+import { Badge as ShadcnBadge } from './ui/badge';
+import { cn } from '../lib/utils';
 
 export function Card({ children, className = '' }: { children: ReactNode; className?: string }) {
   return <div className={`bg-surface border border-border rounded-2xl shadow-card ${className}`}>{children}</div>;
@@ -53,9 +56,9 @@ export function Button({
                 ? 'bg-danger border border-danger text-white hover:bg-dangerStrong'
                 : 'bg-ink border border-ink text-surface hover:opacity-90';
   return (
-    <button className={`${base} ${sizeCls} ${variantCls} ${className}`} {...props}>
+    <ShadcnButton className={cn(base, sizeCls, variantCls, className)} {...props}>
       {children}
-    </button>
+    </ShadcnButton>
   );
 }
 
@@ -72,9 +75,9 @@ const pillTones: Record<PillTone, string> = {
 };
 export function Pill({ tone, children }: { tone: PillTone; children: ReactNode }) {
   return (
-    <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11.5px] font-bold ${pillTones[tone]}`}>
+    <ShadcnBadge className={cn('h-auto gap-1 px-2.5 py-1 rounded-full text-[11.5px] font-bold', pillTones[tone])}>
       {children}
-    </span>
+    </ShadcnBadge>
   );
 }
 
