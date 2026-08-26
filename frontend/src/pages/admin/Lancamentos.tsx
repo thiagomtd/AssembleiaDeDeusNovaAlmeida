@@ -72,7 +72,71 @@ export function Lancamentos() {
           </Link>
         </div>
       </div>
-      <div className="overflow-x-auto mt-1">
+      <div className="sm:hidden flex flex-col gap-2.5 p-3.5">
+        {visiveis.map((t) => (
+          <div key={t.transactionId} className="rounded-xl bg-surface2 border border-border p-3.5 flex flex-col gap-2">
+            <div className="flex items-start justify-between gap-2.5">
+              <span className="text-[14px] font-semibold text-ink">{t.categoria}</span>
+              <Pill tone={t.tipo === 'entrada' ? 'income' : 'expense'}>{t.tipo === 'entrada' ? 'Entrada' : 'Saída'}</Pill>
+            </div>
+            <div className="flex items-center justify-between gap-2.5">
+              <span className={`text-[16px] font-semibold ${t.tipo === 'entrada' ? 'text-income' : 'text-expense'}`}>
+                {t.tipo === 'entrada' ? '+' : '-'} {fmtBRL(t.valor)}
+              </span>
+              <span className="text-[12px] text-muted">{t.data.split('-').reverse().join('/')}</span>
+            </div>
+            {(t.membroNome || t.campanhaTitulo) && (
+              <div className="flex flex-col gap-1 text-[13px] text-inkSecondary">
+                {t.membroNome && (
+                  <span className="inline-flex items-center gap-1.5">
+                    <IconUsers className="icon w-3 h-3 text-muted" /> {t.membroNome}
+                  </span>
+                )}
+                {t.campanhaTitulo && (
+                  <span className="inline-flex items-center gap-1.5">
+                    <IconTarget className="icon w-3 h-3 text-muted" /> {t.campanhaTitulo}
+                  </span>
+                )}
+              </div>
+            )}
+            <div className="flex items-center justify-between gap-2.5 pt-1">
+              {t.comprovanteUrl ? (
+                <button
+                  type="button"
+                  onClick={() => setComprovanteAberto(t.comprovanteUrl!)}
+                  className="inline-flex items-center gap-1 text-accentStrong hover:underline text-[12.5px]"
+                >
+                  <IconPaperclip className="icon w-3.5 h-3.5" /> Ver comprovante
+                </button>
+              ) : (
+                <span />
+              )}
+              <div className="flex gap-1.5">
+                <button
+                  onClick={() => navigate(`/admin/lancamentos/${t.mesAno}/${t.transactionId}/editar`, { state: { lancamento: t } })}
+                  className="w-[30px] h-[30px] rounded-lg border border-info/30 bg-infoSoft inline-flex items-center justify-center text-info hover:bg-info hover:text-white hover:border-info"
+                  title="Editar"
+                >
+                  <IconEdit className="icon w-[13px] h-[13px]" />
+                </button>
+                <button
+                  onClick={() => setAlvoRemover(t)}
+                  className="w-[30px] h-[30px] rounded-lg border border-danger/30 bg-dangerSoft inline-flex items-center justify-center text-danger hover:bg-danger hover:text-white hover:border-danger"
+                  title="Excluir"
+                >
+                  <IconTrash className="icon w-[13px] h-[13px]" />
+                </button>
+              </div>
+            </div>
+          </div>
+        ))}
+        {filtrados.length === 0 && (
+          <p className="px-3 py-8 text-center text-muted">
+            {itens.length === 0 ? 'Nenhum lançamento neste mês.' : 'Nenhum lançamento encontrado para essa busca.'}
+          </p>
+        )}
+      </div>
+      <div className="hidden sm:block overflow-x-auto mt-1">
         <table className="w-full text-[13.5px]">
           <thead>
             <tr>

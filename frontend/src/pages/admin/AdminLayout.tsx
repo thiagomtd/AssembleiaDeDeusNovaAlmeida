@@ -1,13 +1,11 @@
 import { NavLink, Outlet } from 'react-router-dom';
 import { Eyebrow } from '../../components/ui';
 import { useAuth, type Grupo } from '../../context/AuthContext';
-import { IconLock, IconUsers, IconPlus, IconShield, IconImage, IconInfo, IconTarget, IconClock } from '../../components/icons';
+import { IconLock, IconUsers, IconShield, IconImage, IconInfo, IconTarget, IconClock } from '../../components/icons';
 
 const tabs = [
   { to: '/admin/membros', label: 'Membros', icon: IconUsers, end: true, roles: ['admin'] as Grupo[] },
-  { to: '/admin/membros/novo', label: 'Novo membro', icon: IconPlus, end: true, roles: ['admin'] as Grupo[] },
   { to: '/admin/lancamentos', label: 'Lançamentos', icon: IconShield, end: true, roles: ['admin', 'tesouraria'] as Grupo[] },
-  { to: '/admin/lancamentos/novo', label: 'Novo lançamento', icon: IconPlus, end: true, roles: ['admin', 'tesouraria'] as Grupo[] },
   { to: '/admin/campanhas', label: 'Metas', icon: IconTarget, end: true, roles: ['admin', 'tesouraria'] as Grupo[] },
   { to: '/admin/cultos', label: 'Cultos', icon: IconImage, end: true, roles: ['admin', 'midia'] as Grupo[] },
   { to: '/admin/info', label: 'Informações', icon: IconInfo, end: true, roles: ['admin'] as Grupo[] },
@@ -26,7 +24,7 @@ export function AdminLayout() {
         Cadastro de membros, lançamentos financeiros, cultos e mídia, e informações institucionais.
       </p>
 
-      <div className="flex gap-5 border-b border-border mb-5 overflow-x-auto whitespace-nowrap [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      <div className="flex flex-wrap gap-x-5 gap-y-2 border-b border-border mb-5 pb-0">
         {visiveis.map((t) => (
           <NavLink
             key={t.to}

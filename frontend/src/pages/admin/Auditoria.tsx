@@ -81,7 +81,34 @@ export function Auditoria() {
             <span className="text-[12.5px] text-muted whitespace-nowrap">{filtrados.length} de {itens.length} ações</span>
           </div>
         </div>
-        <div className="overflow-x-auto">
+        <div className="sm:hidden flex flex-col gap-2.5 p-3.5">
+          {visiveis.map((e) => (
+            <div key={e.timestampId} className="rounded-xl bg-surface2 border border-border p-3.5 flex flex-col gap-2">
+              <div className="flex items-start justify-between gap-2.5">
+                <Pill tone={acaoTone(e.acao)}>{ACAO_LABEL[e.acao] ?? e.acao}</Pill>
+                <span className="text-[12px] text-muted whitespace-nowrap">{new Date(e.timestamp).toLocaleString('pt-BR')}</span>
+              </div>
+              <span className="text-[13.5px] font-semibold text-ink">{e.atorNome}</span>
+              <span className="text-[13px] text-inkSecondary">{e.detalhes}</span>
+              {e.motivo && <span className="text-[12.5px] text-inkSecondary">Motivo: {e.motivo}</span>}
+              {e.anexoUrl && (
+                <button
+                  type="button"
+                  onClick={() => setAnexoAberto(e.anexoUrl!)}
+                  className="inline-flex items-center gap-1 text-accentStrong hover:underline text-[12.5px] self-start"
+                >
+                  <IconPaperclip className="icon w-3.5 h-3.5" /> Ver anexo
+                </button>
+              )}
+            </div>
+          ))}
+          {!carregando && filtrados.length === 0 && (
+            <p className="px-3 py-8 text-center text-muted">
+              {itens.length === 0 ? 'Nenhuma ação registrada neste mês.' : 'Nenhuma ação encontrada para essa busca.'}
+            </p>
+          )}
+        </div>
+        <div className="hidden sm:block overflow-x-auto">
           <table className="w-full text-[13.5px]">
             <thead>
               <tr>

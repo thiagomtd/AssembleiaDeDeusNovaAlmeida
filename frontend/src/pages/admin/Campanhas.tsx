@@ -66,7 +66,42 @@ export function Campanhas() {
           </Link>
         </div>
       </div>
-      <div className="overflow-x-auto">
+      <div className="sm:hidden flex flex-col gap-2.5 p-3.5">
+        {visiveis.map((c) => (
+          <div key={c.campanhaId} className="rounded-xl bg-surface2 border border-border p-3.5 flex flex-col gap-2">
+            <div className="flex items-start justify-between gap-2.5">
+              <span className="text-[14px] font-semibold text-ink">{c.titulo}</span>
+              <Pill tone={c.ativa ? 'active' : 'inactive'}>{c.ativa ? 'Ativa' : 'Encerrada'}</Pill>
+            </div>
+            <div className="flex items-center justify-between gap-2.5 text-[13px]">
+              <span className="text-inkSecondary">Meta: {fmtBRL(c.meta)}</span>
+              <span className="font-semibold text-income">Arrecadado: {fmtBRL(c.arrecadado)}</span>
+            </div>
+            <div className="flex gap-1.5 justify-end pt-1">
+              <button
+                onClick={() => navigate(`/admin/campanhas/${c.campanhaId}/editar`, { state: { campanha: c } })}
+                className="w-[30px] h-[30px] rounded-lg border border-info/30 bg-infoSoft inline-flex items-center justify-center text-info hover:bg-info hover:text-white hover:border-info"
+                title="Editar"
+              >
+                <IconEdit className="icon w-[13px] h-[13px]" />
+              </button>
+              <button
+                onClick={() => setAlvoRemover(c)}
+                className="w-[30px] h-[30px] rounded-lg border border-danger/30 bg-dangerSoft inline-flex items-center justify-center text-danger hover:bg-danger hover:text-white hover:border-danger"
+                title="Excluir"
+              >
+                <IconTrash className="icon w-[13px] h-[13px]" />
+              </button>
+            </div>
+          </div>
+        ))}
+        {!carregando && filtrados.length === 0 && (
+          <p className="px-3 py-8 text-center text-muted">
+            {lista.length === 0 ? 'Nenhuma meta cadastrada.' : 'Nenhuma meta encontrada para essa busca.'}
+          </p>
+        )}
+      </div>
+      <div className="hidden sm:block overflow-x-auto">
         <table className="w-full text-[13.5px]">
           <thead>
             <tr>

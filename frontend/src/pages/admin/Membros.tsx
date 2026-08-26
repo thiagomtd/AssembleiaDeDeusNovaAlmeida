@@ -76,7 +76,53 @@ export function Membros() {
             </Link>
           </div>
         </div>
-        <div className="overflow-x-auto">
+        <div className="sm:hidden flex flex-col gap-2.5 p-3.5">
+          {visiveis.map((m) => {
+            const info = GRUPO_INFO[m.grupo];
+            const GrupoIcon = info.Icon;
+            return (
+              <div key={m.memberId} className="rounded-xl bg-surface2 border border-border p-3.5 flex flex-col gap-2">
+                <div className="flex items-start justify-between gap-2.5">
+                  <span className="text-[14px] font-semibold text-ink">{m.nome}</span>
+                  <Pill tone={m.status === 'ativo' ? 'active' : 'inactive'}>
+                    {m.status === 'ativo' ? <IconCheck className="icon w-2.5 h-2.5" /> : <IconLock className="icon w-2.5 h-2.5" />}
+                    {m.status === 'ativo' ? 'Ativo' : 'Inativo'}
+                  </Pill>
+                </div>
+                <span className="text-[13px] text-inkSecondary">{m.telefone}</span>
+                <div className="flex items-center justify-between gap-2.5 flex-wrap">
+                  <Pill tone={info.tone}>
+                    <GrupoIcon className="icon w-2.5 h-2.5" />
+                    {info.label}
+                  </Pill>
+                  <span className="text-[12px] text-muted">Desde {m.dataAssociacao}</span>
+                </div>
+                <div className="flex gap-1.5 justify-end pt-1">
+                  <button
+                    onClick={() => navigate(`/admin/membros/${m.memberId}/editar`, { state: { membro: m } })}
+                    className="w-[30px] h-[30px] rounded-lg border border-info/30 bg-infoSoft inline-flex items-center justify-center text-info hover:bg-info hover:text-white hover:border-info"
+                    title="Editar"
+                  >
+                    <IconEdit className="icon w-[13px] h-[13px]" />
+                  </button>
+                  <button
+                    onClick={() => setAlvoRemover(m)}
+                    className="w-[30px] h-[30px] rounded-lg border border-danger/30 bg-dangerSoft inline-flex items-center justify-center text-danger hover:bg-danger hover:text-white hover:border-danger"
+                    title="Excluir"
+                  >
+                    <IconTrash className="icon w-[13px] h-[13px]" />
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+          {!carregando && filtrados.length === 0 && (
+            <p className="px-3 py-8 text-center text-muted">
+              {membros.length === 0 ? 'Nenhum membro cadastrado.' : 'Nenhum membro encontrado para essa busca.'}
+            </p>
+          )}
+        </div>
+        <div className="hidden sm:block overflow-x-auto">
           <table className="w-full text-[13.5px]">
             <thead>
               <tr>
