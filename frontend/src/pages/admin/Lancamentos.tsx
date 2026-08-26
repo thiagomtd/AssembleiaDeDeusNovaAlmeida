@@ -1,11 +1,13 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { api } from '../../lib/api';
-import { Card, Pill, fmtBRL } from '../../components/ui';
+import { Card, Pill, fmtBRL, Pagination, SearchInput, combina } from '../../components/ui';
 import { ConfirmDialog } from '../../components/ConfirmDialog';
 import { AttachmentViewer } from '../../components/AttachmentViewer';
 import { IconPlus, IconEdit, IconTrash, IconUsers, IconTarget, IconPaperclip } from '../../components/icons';
 import { MonthPicker } from '../../components/MonthPicker';
+
+const POR_PAGINA = 20;
 
 interface Lancamento {
   transactionId: string;
@@ -31,6 +33,8 @@ export function Lancamentos() {
   const [itens, setItens] = useState<Lancamento[]>([]);
   const [alvoRemover, setAlvoRemover] = useState<Lancamento | null>(null);
   const [comprovanteAberto, setComprovanteAberto] = useState<string | null>(null);
+  const [busca, setBusca] = useState('');
+  const [pagina, setPagina] = useState(1);
   const mesAno = `${ano}-${String(mes).padStart(2, '0')}`;
 
   const carregar = () => {
@@ -38,6 +42,15 @@ export function Lancamentos() {
   };
 
   useEffect(carregar, [mesAno]);
+  useEffect(() => setPagina(1), [busca, mesAno]);
+
+  const filtrados = useMemo(
+    () => itens.filter((t) => combina(busca, t.categoria, t.descricao, t.membroNome, t.campanhaTitulo)),
+    [itens, busca],
+  );
+  const totalPaginas = Math.max(1, Math.ceil(filtrados.length / POR_PAGINA));
+  const paginaAtual = Math.min(pagina, totalPaginas);
+  const visiveis = filtrados.slice((paginaAtual - 1) * POR_PAGINA, paginaAtual * POR_PAGINA);
 
   const remover = async (motivo: string, anexoKey?: string) => {
     if (!alvoRemover) return;
@@ -50,11 +63,14 @@ export function Lancamentos() {
     <Card className="overflow-hidden">
       <div className="flex justify-between items-center gap-2.5 flex-wrap px-4.5 py-3.5 border-b border-border">
         <MonthPicker mes={mes} ano={ano} onChange={(m, a) => { setMes(m); setAno(a); }} />
-        <Link to="/admin/lancamentos/novo">
-          <span className="inline-flex items-center gap-1.5 bg-success text-white text-[12.5px] font-semibold rounded-lg px-3 py-1.5 hover:opacity-90">
-            <IconPlus className="icon w-3.5 h-3.5" /> Novo lançamento
-          </span>
-        </Link>
+        <div className="flex items-center gap-2.5 flex-wrap">
+          <SearchInput value={busca} onChange={setBusca} placeholder="Buscar por categoria, pessoa, meta..." />
+          <Link to="/admin/lancamentos/novo">
+            <span className="inline-flex items-center gap-1.5 bg-success text-white text-[12.5px] font-semibold rounded-lg px-3 py-1.5 hover:opacity-90">
+              <IconPlus className="icon w-3.5 h-3.5" /> Novo lançamento
+            </span>
+          </Link>
+        </div>
       </div>
       <div className="overflow-x-auto mt-1">
         <table className="w-full text-[13.5px]">
@@ -73,7 +89,7 @@ export function Lancamentos() {
             </tr>
           </thead>
           <tbody>
-            {itens.map((t) => (
+            {visiveis.map((t) => (
               <tr key={t.transactionId}>
                 <td className="px-3 py-2.5 border-b border-border text-inkSecondary">{t.data.split('-').reverse().join('/')}</td>
                 <td className="px-3 py-2.5 border-b border-border">
@@ -131,16 +147,17 @@ export function Lancamentos() {
                 </td>
               </tr>
             ))}
-            {itens.length === 0 && (
+            {filtrados.length === 0 && (
               <tr>
                 <td colSpan={7} className="px-3 py-8 text-center text-muted">
-                  Nenhum lançamento neste mês.
+                  {itens.length === 0 ? 'Nenhum lançamento neste mês.' : 'Nenhum lançamento encontrado para essa busca.'}
                 </td>
               </tr>
             )}
           </tbody>
         </table>
       </div>
+      <Pagination pagina={paginaAtual} totalPaginas={totalPaginas} onChange={setPagina} />
 
       <ConfirmDialog
         aberto={!!alvoRemover}

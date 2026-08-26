@@ -162,3 +162,74 @@ export function PrivacyNote({ children, icon }: { children: ReactNode; icon?: Re
 export function fmtBRL(v: number) {
   return v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 }
+
+// Compara ignorando maiúsculas/minúsculas e acentos (ex: "sergio" acha "Sérgio").
+export function normalizarBusca(s: string) {
+  return s
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '');
+}
+
+export function combina(busca: string, ...campos: (string | undefined)[]) {
+  const alvo = normalizarBusca(busca.trim());
+  if (!alvo) return true;
+  return campos.some((c) => c && normalizarBusca(c).includes(alvo));
+}
+
+export function Pagination({
+  pagina,
+  totalPaginas,
+  onChange,
+}: {
+  pagina: number;
+  totalPaginas: number;
+  onChange: (pagina: number) => void;
+}) {
+  if (totalPaginas <= 1) return null;
+  return (
+    <div className="flex items-center justify-between gap-2.5 px-4.5 py-3 border-t border-border">
+      <Button
+        type="button"
+        variant="secondary"
+        size="sm"
+        disabled={pagina <= 1}
+        onClick={() => onChange(pagina - 1)}
+      >
+        Anterior
+      </Button>
+      <span className="text-[12px] text-muted">
+        Página {pagina} de {totalPaginas}
+      </span>
+      <Button
+        type="button"
+        variant="secondary"
+        size="sm"
+        disabled={pagina >= totalPaginas}
+        onClick={() => onChange(pagina + 1)}
+      >
+        Próxima
+      </Button>
+    </div>
+  );
+}
+
+export function SearchInput({
+  value,
+  onChange,
+  placeholder,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  placeholder?: string;
+}) {
+  return (
+    <input
+      type="search"
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      placeholder={placeholder ?? 'Buscar...'}
+      className="w-full sm:w-56 bg-surface2 border border-border rounded-lg px-3 py-1.5 text-[13px] text-ink placeholder:text-muted outline-none transition-shadow focus:border-accent focus:ring-2 focus:ring-accent/30"
+    />
+  );
+}

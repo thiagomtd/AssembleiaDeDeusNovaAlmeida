@@ -1,9 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { api } from '../../lib/api';
-import { Card, Pill } from '../../components/ui';
+import { Card, Pill, Pagination, SearchInput, combina } from '../../components/ui';
 import { ConfirmDialog } from '../../components/ConfirmDialog';
 import { IconPlus, IconEdit, IconTrash, IconShield, IconUsers, IconImage, IconCheck, IconLock } from '../../components/icons';
+
+const POR_PAGINA = 15;
 
 interface Membro {
   memberId: string;
@@ -27,6 +29,18 @@ export function Membros() {
   const [membros, setMembros] = useState<Membro[]>([]);
   const [carregando, setCarregando] = useState(true);
   const [alvoRemover, setAlvoRemover] = useState<Membro | null>(null);
+  const [busca, setBusca] = useState('');
+  const [pagina, setPagina] = useState(1);
+
+  const filtrados = useMemo(
+    () => membros.filter((m) => combina(busca, m.nome, m.telefone)),
+    [membros, busca],
+  );
+  const totalPaginas = Math.max(1, Math.ceil(filtrados.length / POR_PAGINA));
+  const paginaAtual = Math.min(pagina, totalPaginas);
+  const visiveis = filtrados.slice((paginaAtual - 1) * POR_PAGINA, paginaAtual * POR_PAGINA);
+
+  useEffect(() => setPagina(1), [busca]);
 
   const carregar = () => {
     setCarregando(true);
@@ -51,13 +65,16 @@ export function Membros() {
       <Card className="overflow-hidden">
         <div className="flex justify-between items-center gap-2.5 flex-wrap px-4.5 py-3.5 border-b border-border">
           <span className="text-[12.5px] text-muted">
-            {membros.length} membros cadastrados · cada membro é também um usuário do sistema
+            {filtrados.length} de {membros.length} membros cadastrados
           </span>
-          <Link to="/admin/membros/novo">
-            <span className="inline-flex items-center gap-1.5 bg-success text-white text-[12.5px] font-semibold rounded-lg px-3 py-1.5 hover:opacity-90">
-              <IconPlus className="icon w-3.5 h-3.5" /> Novo membro
-            </span>
-          </Link>
+          <div className="flex items-center gap-2.5 flex-wrap">
+            <SearchInput value={busca} onChange={setBusca} placeholder="Buscar por nome ou celular..." />
+            <Link to="/admin/membros/novo">
+              <span className="inline-flex items-center gap-1.5 bg-success text-white text-[12.5px] font-semibold rounded-lg px-3 py-1.5 hover:opacity-90">
+                <IconPlus className="icon w-3.5 h-3.5" /> Novo membro
+              </span>
+            </Link>
+          </div>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-[13.5px]">
@@ -71,7 +88,7 @@ export function Membros() {
               </tr>
             </thead>
             <tbody>
-              {membros.map((m) => {
+              {visiveis.map((m) => {
                 const info = GRUPO_INFO[m.grupo];
                 const GrupoIcon = info.Icon;
                 return (
@@ -112,16 +129,17 @@ export function Membros() {
                 </tr>
                 );
               })}
-              {!carregando && membros.length === 0 && (
+              {!carregando && filtrados.length === 0 && (
                 <tr>
                   <td colSpan={6} className="px-3 py-8 text-center text-muted">
-                    Nenhum membro cadastrado.
+                    {membros.length === 0 ? 'Nenhum membro cadastrado.' : 'Nenhum membro encontrado para essa busca.'}
                   </td>
                 </tr>
               )}
             </tbody>
           </table>
         </div>
+        <Pagination pagina={paginaAtual} totalPaginas={totalPaginas} onChange={setPagina} />
       </Card>
 
       <ConfirmDialog

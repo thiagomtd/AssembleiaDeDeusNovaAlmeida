@@ -1,9 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { api } from '../../lib/api';
-import { Card, Pill } from '../../components/ui';
+import { Card, Pill, Pagination, SearchInput, combina } from '../../components/ui';
 import { MonthPicker } from '../../components/MonthPicker';
 import { AttachmentViewer } from '../../components/AttachmentViewer';
 import { IconPaperclip } from '../../components/icons';
+
+const POR_PAGINA = 20;
 
 interface Entrada {
   timestampId: string;
@@ -47,6 +49,8 @@ export function Auditoria() {
   const [itens, setItens] = useState<Entrada[]>([]);
   const [carregando, setCarregando] = useState(true);
   const [anexoAberto, setAnexoAberto] = useState<string | null>(null);
+  const [busca, setBusca] = useState('');
+  const [pagina, setPagina] = useState(1);
   const mesAno = `${ano}-${String(mes).padStart(2, '0')}`;
 
   useEffect(() => {
@@ -57,13 +61,25 @@ export function Auditoria() {
       .catch(() => setItens([]))
       .finally(() => setCarregando(false));
   }, [mesAno]);
+  useEffect(() => setPagina(1), [busca, mesAno]);
+
+  const filtrados = useMemo(
+    () => itens.filter((e) => combina(busca, ACAO_LABEL[e.acao] ?? e.acao, e.atorNome, e.detalhes, e.motivo)),
+    [itens, busca],
+  );
+  const totalPaginas = Math.max(1, Math.ceil(filtrados.length / POR_PAGINA));
+  const paginaAtual = Math.min(pagina, totalPaginas);
+  const visiveis = filtrados.slice((paginaAtual - 1) * POR_PAGINA, paginaAtual * POR_PAGINA);
 
   return (
     <div>
       <Card className="overflow-hidden">
         <div className="flex justify-between items-center gap-2.5 flex-wrap px-4.5 py-3.5 border-b border-border">
           <MonthPicker mes={mes} ano={ano} onChange={(m, a) => { setMes(m); setAno(a); }} />
-          <span className="text-[12.5px] text-muted">{itens.length} ações neste mês</span>
+          <div className="flex items-center gap-2.5 flex-wrap">
+            <SearchInput value={busca} onChange={setBusca} placeholder="Buscar por ação, pessoa, detalhes..." />
+            <span className="text-[12.5px] text-muted whitespace-nowrap">{filtrados.length} de {itens.length} ações</span>
+          </div>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-[13.5px]">
@@ -77,7 +93,7 @@ export function Auditoria() {
               </tr>
             </thead>
             <tbody>
-              {itens.map((e) => (
+              {visiveis.map((e) => (
                 <tr key={e.timestampId}>
                   <td className="px-3 py-2.5 border-b border-border text-inkSecondary whitespace-nowrap">
                     {new Date(e.timestamp).toLocaleString('pt-BR')}
@@ -103,16 +119,17 @@ export function Auditoria() {
                   </td>
                 </tr>
               ))}
-              {!carregando && itens.length === 0 && (
+              {!carregando && filtrados.length === 0 && (
                 <tr>
                   <td colSpan={6} className="px-3 py-8 text-center text-muted">
-                    Nenhuma ação registrada neste mês.
+                    {itens.length === 0 ? 'Nenhuma ação registrada neste mês.' : 'Nenhuma ação encontrada para essa busca.'}
                   </td>
                 </tr>
               )}
             </tbody>
           </table>
         </div>
+        <Pagination pagina={paginaAtual} totalPaginas={totalPaginas} onChange={setPagina} />
       </Card>
 
       {anexoAberto && <AttachmentViewer url={anexoAberto} onClose={() => setAnexoAberto(null)} />}

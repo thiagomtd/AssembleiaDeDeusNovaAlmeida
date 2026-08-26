@@ -1,9 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { api } from '../../lib/api';
-import { Card, Pill, fmtBRL } from '../../components/ui';
+import { Card, Pill, fmtBRL, Pagination, SearchInput, combina } from '../../components/ui';
 import { ConfirmDialog } from '../../components/ConfirmDialog';
 import { IconPlus, IconEdit, IconTrash } from '../../components/icons';
+
+const POR_PAGINA = 15;
 
 interface Campanha {
   campanhaId: string;
@@ -20,6 +22,18 @@ export function Campanhas() {
   const [lista, setLista] = useState<Campanha[]>([]);
   const [carregando, setCarregando] = useState(true);
   const [alvoRemover, setAlvoRemover] = useState<Campanha | null>(null);
+  const [busca, setBusca] = useState('');
+  const [pagina, setPagina] = useState(1);
+
+  const filtrados = useMemo(
+    () => lista.filter((c) => combina(busca, c.titulo, c.descricao)),
+    [lista, busca],
+  );
+  const totalPaginas = Math.max(1, Math.ceil(filtrados.length / POR_PAGINA));
+  const paginaAtual = Math.min(pagina, totalPaginas);
+  const visiveis = filtrados.slice((paginaAtual - 1) * POR_PAGINA, paginaAtual * POR_PAGINA);
+
+  useEffect(() => setPagina(1), [busca]);
 
   const carregar = () => {
     setCarregando(true);
@@ -42,12 +56,15 @@ export function Campanhas() {
   return (
     <Card className="overflow-hidden">
       <div className="flex justify-between items-center gap-2.5 flex-wrap px-4.5 py-3.5 border-b border-border">
-        <span className="text-[12.5px] text-muted">{lista.length} metas cadastradas</span>
-        <Link to="/admin/campanhas/nova">
-          <span className="inline-flex items-center gap-1.5 bg-success text-white text-[12.5px] font-semibold rounded-lg px-3 py-1.5 hover:opacity-90">
-            <IconPlus className="icon w-3.5 h-3.5" /> Nova meta
-          </span>
-        </Link>
+        <span className="text-[12.5px] text-muted">{filtrados.length} de {lista.length} metas cadastradas</span>
+        <div className="flex items-center gap-2.5 flex-wrap">
+          <SearchInput value={busca} onChange={setBusca} placeholder="Buscar por título..." />
+          <Link to="/admin/campanhas/nova">
+            <span className="inline-flex items-center gap-1.5 bg-success text-white text-[12.5px] font-semibold rounded-lg px-3 py-1.5 hover:opacity-90">
+              <IconPlus className="icon w-3.5 h-3.5" /> Nova meta
+            </span>
+          </Link>
+        </div>
       </div>
       <div className="overflow-x-auto">
         <table className="w-full text-[13.5px]">
@@ -66,7 +83,7 @@ export function Campanhas() {
             </tr>
           </thead>
           <tbody>
-            {lista.map((c) => (
+            {visiveis.map((c) => (
               <tr key={c.campanhaId}>
                 <td className="px-3 py-2.5 border-b border-border text-ink">{c.titulo}</td>
                 <td className="px-3 py-2.5 border-b border-border text-right text-inkSecondary">{fmtBRL(c.meta)}</td>
@@ -94,16 +111,17 @@ export function Campanhas() {
                 </td>
               </tr>
             ))}
-            {!carregando && lista.length === 0 && (
+            {!carregando && filtrados.length === 0 && (
               <tr>
                 <td colSpan={5} className="px-3 py-8 text-center text-muted">
-                  Nenhuma meta cadastrada.
+                  {lista.length === 0 ? 'Nenhuma meta cadastrada.' : 'Nenhuma meta encontrada para essa busca.'}
                 </td>
               </tr>
             )}
           </tbody>
         </table>
       </div>
+      <Pagination pagina={paginaAtual} totalPaginas={totalPaginas} onChange={setPagina} />
 
       <ConfirmDialog
         aberto={!!alvoRemover}
