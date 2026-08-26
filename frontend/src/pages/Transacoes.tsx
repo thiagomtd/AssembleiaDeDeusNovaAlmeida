@@ -99,7 +99,45 @@ export function Transacoes() {
             </Link>
           )}
         </div>
-        <div className="overflow-x-auto">
+        <div className="sm:hidden flex flex-col gap-2.5 p-3.5">
+          {itens.map((t) => (
+            <div key={t.transactionId} className="rounded-xl bg-surface2 border border-border p-3.5 flex flex-col gap-2">
+              <div className="flex items-start justify-between gap-2.5">
+                <div className="flex flex-col gap-1 items-start">
+                  <span className="text-[14px] font-semibold text-ink">{t.categoria}</span>
+                  {t.campanhaTitulo && (
+                    <span className="inline-flex items-center gap-1 bg-accentSoft text-accentStrong text-[11px] font-semibold rounded-full px-2 py-0.5">
+                      <IconTarget className="icon w-2.5 h-2.5" /> {t.campanhaTitulo}
+                    </span>
+                  )}
+                </div>
+                <Pill tone={t.tipo === 'entrada' ? 'income' : 'expense'}>
+                  {t.tipo === 'entrada' ? 'Entrada' : 'Saída'}
+                </Pill>
+              </div>
+              <div className="flex items-center justify-between gap-2.5">
+                <span className={`text-[16px] font-semibold ${t.tipo === 'entrada' ? 'text-income' : 'text-expense'}`}>
+                  {t.tipo === 'entrada' ? '+' : '-'} {fmtBRL(t.valor)}
+                </span>
+                <span className="text-[12px] text-muted">{t.data.split('-').reverse().join('/')}</span>
+              </div>
+              {t.descricao && <span className="text-[13px] text-inkSecondary">{t.descricao}</span>}
+              {t.comprovanteUrl && (
+                <button
+                  type="button"
+                  onClick={() => setComprovanteAberto(t.comprovanteUrl!)}
+                  className="inline-flex items-center gap-1 text-accentStrong hover:underline text-[12.5px] self-start"
+                >
+                  <IconPaperclip className="icon w-3.5 h-3.5" /> Ver comprovante
+                </button>
+              )}
+            </div>
+          ))}
+          {!carregando && itens.length === 0 && (
+            <p className="px-3 py-8 text-center text-muted">Nenhum lançamento neste mês.</p>
+          )}
+        </div>
+        <div className="hidden sm:block overflow-x-auto">
           <table className="w-full text-[13.5px] border-collapse">
             <thead>
               <tr>
