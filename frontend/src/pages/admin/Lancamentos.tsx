@@ -7,7 +7,7 @@ import { AttachmentViewer } from '../../components/AttachmentViewer';
 import { IconPlus, IconEdit, IconTrash, IconUsers, IconTarget, IconPaperclip } from '../../components/icons';
 import { MonthPicker } from '../../components/MonthPicker';
 
-const POR_PAGINA = 20;
+const POR_PAGINA = 10;
 
 interface Lancamento {
   transactionId: string;

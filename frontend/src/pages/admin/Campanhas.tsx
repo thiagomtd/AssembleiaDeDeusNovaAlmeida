@@ -5,7 +5,7 @@ import { Card, Pill, fmtBRL, Pagination, SearchInput, combina } from '../../comp
 import { ConfirmDialog } from '../../components/ConfirmDialog';
 import { IconPlus, IconEdit, IconTrash } from '../../components/icons';
 
-const POR_PAGINA = 15;
+const POR_PAGINA = 10;
 
 interface Campanha {
   campanhaId: string;

@@ -5,7 +5,7 @@ import { Card, Pill, Pagination, SearchInput, combina } from '../../components/u
 import { ConfirmDialog } from '../../components/ConfirmDialog';
 import { IconPlus, IconEdit, IconTrash, IconShield, IconUsers, IconImage, IconCheck, IconLock } from '../../components/icons';
 
-const POR_PAGINA = 15;
+const POR_PAGINA = 10;
 
 interface Membro {
   memberId: string;

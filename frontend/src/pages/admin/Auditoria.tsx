@@ -5,7 +5,7 @@ import { MonthPicker } from '../../components/MonthPicker';
 import { AttachmentViewer } from '../../components/AttachmentViewer';
 import { IconPaperclip } from '../../components/icons';
 
-const POR_PAGINA = 20;
+const POR_PAGINA = 10;
 
 interface Entrada {
   timestampId: string;
