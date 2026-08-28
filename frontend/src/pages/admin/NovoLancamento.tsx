@@ -1,7 +1,7 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../../lib/api';
-import { Card, Button, Field, inputCls } from '../../components/ui';
+import { Card, Button, Field, inputCls, ComboBox } from '../../components/ui';
 
 const CATEGORIAS = ['Dízimo', 'Oferta', 'Doação', 'Contas', 'Manutenção', 'Eventos', 'Outros'];
 
@@ -118,12 +118,13 @@ export function NovoLancamento() {
           </Field>
           {mostrarDizimista && (
             <Field label="Dizimista (opcional)" hint="Visível apenas para a administração.">
-              <select className={inputCls} value={form.membroId} onChange={set('membroId')}>
-                <option value="">— não vincular a uma pessoa —</option>
-                {membros.map((m) => (
-                  <option key={m.memberId} value={m.memberId}>{m.nome}</option>
-                ))}
-              </select>
+              <ComboBox
+                value={form.membroId}
+                onChange={(membroId) => setForm((f) => ({ ...f, membroId }))}
+                options={membros.map((m) => ({ id: m.memberId, label: m.nome }))}
+                placeholder="Buscar pessoa..."
+                emptyLabel="— não vincular a uma pessoa —"
+              />
             </Field>
           )}
           {mostrarCampanha && (

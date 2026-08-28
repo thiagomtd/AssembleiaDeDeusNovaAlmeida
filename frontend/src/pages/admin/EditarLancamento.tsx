@@ -1,7 +1,7 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { api } from '../../lib/api';
-import { Card, Button, Field, inputCls } from '../../components/ui';
+import { Card, Button, Field, inputCls, ComboBox } from '../../components/ui';
 import { ConfirmDialog } from '../../components/ConfirmDialog';
 import { AttachmentViewer } from '../../components/AttachmentViewer';
 import { IconChevronLeft, IconPaperclip } from '../../components/icons';
@@ -184,16 +184,13 @@ export function EditarLancamento() {
             </Field>
             {mostrarDizimista && (
               <Field label="Dizimista (opcional)" hint="Visível apenas para a administração.">
-                <select
-                  className={inputCls}
+                <ComboBox
                   value={lancamento.membroId ?? ''}
-                  onChange={(e) => setLancamento({ ...lancamento, membroId: e.target.value })}
-                >
-                  <option value="">— não vincular a uma pessoa —</option>
-                  {membros.map((m) => (
-                    <option key={m.memberId} value={m.memberId}>{m.nome}</option>
-                  ))}
-                </select>
+                  onChange={(membroId) => setLancamento({ ...lancamento, membroId })}
+                  options={membros.map((m) => ({ id: m.memberId, label: m.nome }))}
+                  placeholder="Buscar pessoa..."
+                  emptyLabel="— não vincular a uma pessoa —"
+                />
               </Field>
             )}
             {mostrarCampanha && (

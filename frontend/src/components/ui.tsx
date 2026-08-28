@@ -1,5 +1,5 @@
-import { useState, type InputHTMLAttributes, type ReactNode } from 'react';
-import { IconEye, IconEyeOff } from './icons';
+import { useEffect, useRef, useState, type InputHTMLAttributes, type ReactNode } from 'react';
+import { IconEye, IconEyeOff, IconChevronDown } from './icons';
 import { Button as ShadcnButton } from './ui/button';
 import { Badge as ShadcnBadge } from './ui/badge';
 import { cn } from '../lib/utils';
@@ -231,5 +231,86 @@ export function SearchInput({
       placeholder={placeholder ?? 'Buscar...'}
       className="w-full sm:w-56 bg-surface2 border border-border rounded-lg px-3 py-1.5 text-[13px] text-ink placeholder:text-muted outline-none transition-shadow focus:border-accent focus:ring-2 focus:ring-accent/30"
     />
+  );
+}
+
+// Select com busca: digita pra filtrar as opções em vez de rolar uma lista longa.
+export function ComboBox({
+  value,
+  onChange,
+  options,
+  placeholder,
+  emptyLabel,
+}: {
+  value: string;
+  onChange: (id: string) => void;
+  options: { id: string; label: string }[];
+  placeholder?: string;
+  emptyLabel?: string;
+}) {
+  const [aberto, setAberto] = useState(false);
+  const [busca, setBusca] = useState('');
+  const ref = useRef<HTMLDivElement>(null);
+  const selecionado = options.find((o) => o.id === value);
+  const filtrados = options.filter((o) => combina(busca, o.label));
+
+  useEffect(() => {
+    if (!aberto) return;
+    const onClickOutside = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setAberto(false);
+    };
+    document.addEventListener('mousedown', onClickOutside);
+    return () => document.removeEventListener('mousedown', onClickOutside);
+  }, [aberto]);
+
+  const escolher = (id: string) => {
+    onChange(id);
+    setBusca('');
+    setAberto(false);
+  };
+
+  return (
+    <div ref={ref} className="relative w-full min-w-0">
+      <div className="relative">
+        <input
+          type="text"
+          className={`${inputCls} pr-9`}
+          placeholder={placeholder}
+          value={aberto ? busca : (selecionado?.label ?? '')}
+          onFocus={() => setAberto(true)}
+          onChange={(e) => {
+            setBusca(e.target.value);
+            setAberto(true);
+          }}
+        />
+        <IconChevronDown className="icon w-3.5 h-3.5 text-muted absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+      </div>
+      {aberto && (
+        <div className="absolute left-0 right-0 top-full mt-1 max-h-56 overflow-y-auto bg-surface border border-border rounded-lg shadow-card z-30 py-1">
+          {emptyLabel && (
+            <button
+              type="button"
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={() => escolher('')}
+              className={`block w-full text-left px-3 py-2 text-[13px] ${!value ? 'bg-surface2 text-ink font-semibold' : 'text-inkSecondary hover:bg-surface2 hover:text-ink'}`}
+            >
+              {emptyLabel}
+            </button>
+          )}
+          {filtrados.map((o) => (
+            <button
+              key={o.id}
+              type="button"
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={() => escolher(o.id)}
+              className={`block w-full text-left px-3 py-2 text-[13px] ${o.id === value ? 'bg-surface2 text-ink font-semibold' : 'text-inkSecondary hover:bg-surface2 hover:text-ink'}`}
+            >
+              {o.label}
+            </button>
+          ))}
+          {filtrados.length === 0 && <p className="px-3 py-2 text-[12.5px] text-muted">Nenhum resultado encontrado.</p>}
+        </div>
+      )}
+    </div>
   );
 }
