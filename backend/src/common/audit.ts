@@ -5,7 +5,7 @@ import { ddb, Tables } from './ddb';
 import { getSub, getPhone } from './auth';
 
 export type Acao =
-  | 'membro.criar' | 'membro.editar' | 'membro.remover'
+  | 'membro.criar' | 'membro.editar' | 'membro.remover' | 'membro.resetarSenha'
   | 'lancamento.criar' | 'lancamento.editar' | 'lancamento.remover'
   | 'campanha.criar' | 'campanha.editar' | 'campanha.remover'
   | 'culto.criar' | 'culto.remover'

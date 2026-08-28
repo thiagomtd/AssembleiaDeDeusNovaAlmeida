@@ -73,10 +73,12 @@ export class ApiStack extends cdk.Stack {
     const membersCreate = fn('MembersCreateFn', 'members/create.ts');
     const membersUpdate = fn('MembersUpdateFn', 'members/update.ts');
     const membersRemove = fn('MembersRemoveFn', 'members/remove.ts');
+    const membersResetPassword = fn('MembersResetPasswordFn', 'members/reset-password.ts');
     props.membersTable.grantReadData(membersList);
     props.membersTable.grantWriteData(membersCreate);
     props.membersTable.grantReadWriteData(membersUpdate);
     props.membersTable.grantReadWriteData(membersRemove);
+    props.membersTable.grantReadData(membersResetPassword);
     const cognitoAdminPolicy = new iam.PolicyStatement({
       actions: [
         'cognito-idp:AdminCreateUser',
@@ -86,11 +88,12 @@ export class ApiStack extends cdk.Stack {
         'cognito-idp:AdminEnableUser',
         'cognito-idp:AdminDisableUser',
         'cognito-idp:AdminUserGlobalSignOut',
+        'cognito-idp:AdminSetUserPassword',
       ],
       resources: [props.userPool.userPoolArn],
     });
-    [membersCreate, membersUpdate, membersRemove].forEach((f) => f.addToRolePolicy(cognitoAdminPolicy));
-    [membersCreate, membersUpdate, membersRemove].forEach((f) => props.auditoriaTable.grantWriteData(f));
+    [membersCreate, membersUpdate, membersRemove, membersResetPassword].forEach((f) => f.addToRolePolicy(cognitoAdminPolicy));
+    [membersCreate, membersUpdate, membersRemove, membersResetPassword].forEach((f) => props.auditoriaTable.grantWriteData(f));
 
     // ---------- transactions ----------
     const transactionsList = fn('TransactionsListFn', 'transactions/list.ts');
@@ -230,6 +233,7 @@ export class ApiStack extends cdk.Stack {
     route('/members', [apigw.HttpMethod.POST], priv(membersCreate));
     route('/members/{id}', [apigw.HttpMethod.PUT], priv(membersUpdate));
     route('/members/{id}', [apigw.HttpMethod.DELETE], priv(membersRemove));
+    route('/members/{id}/reset-password', [apigw.HttpMethod.POST], priv(membersResetPassword));
 
     route('/transactions', [apigw.HttpMethod.GET], priv(transactionsList));
     route('/transactions', [apigw.HttpMethod.POST], priv(transactionsCreate));

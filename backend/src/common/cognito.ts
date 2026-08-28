@@ -1,3 +1,4 @@
+import { randomInt } from 'crypto';
 import {
   CognitoIdentityProviderClient,
   AdminCreateUserCommand,
@@ -7,6 +8,7 @@ import {
   AdminDisableUserCommand,
   AdminEnableUserCommand,
   AdminUserGlobalSignOutCommand,
+  AdminSetUserPasswordCommand,
 } from '@aws-sdk/client-cognito-identity-provider';
 import type { Grupo } from './auth';
 
@@ -55,6 +57,35 @@ export async function deleteCognitoUser(username: string) {
 export async function setCognitoUserEnabled(username: string, enabled: boolean) {
   const Command = enabled ? AdminEnableUserCommand : AdminDisableUserCommand;
   await cognito.send(new Command({ UserPoolId, Username: username }));
+}
+
+// Sem I/O/0/1 pra não confundir quem for digitar a senha temporária no celular.
+const MAIUSCULAS = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
+const MINUSCULAS = 'abcdefghijkmnpqrstuvwxyz';
+const DIGITOS = '23456789';
+
+function gerarSenhaTemporaria(tamanho = 10): string {
+  const pool = MAIUSCULAS + MINUSCULAS + DIGITOS;
+  const chars = [
+    MAIUSCULAS[randomInt(MAIUSCULAS.length)],
+    MINUSCULAS[randomInt(MINUSCULAS.length)],
+    DIGITOS[randomInt(DIGITOS.length)],
+  ];
+  while (chars.length < tamanho) chars.push(pool[randomInt(pool.length)]);
+  for (let i = chars.length - 1; i > 0; i--) {
+    const j = randomInt(i + 1);
+    [chars[i], chars[j]] = [chars[j], chars[i]];
+  }
+  return chars.join('');
+}
+
+/** Gera uma senha temporária nova e força a troca no próximo login (FORCE_CHANGE_PASSWORD). */
+export async function resetUserPassword(username: string): Promise<string> {
+  const senha = gerarSenhaTemporaria();
+  await cognito.send(
+    new AdminSetUserPasswordCommand({ UserPoolId, Username: username, Password: senha, Permanent: false }),
+  );
+  return senha;
 }
 
 /**

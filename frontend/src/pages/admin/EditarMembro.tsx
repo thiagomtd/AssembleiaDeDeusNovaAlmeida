@@ -3,7 +3,7 @@ import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { api } from '../../lib/api';
 import { Card, Button, Field, inputCls } from '../../components/ui';
 import { ConfirmDialog } from '../../components/ConfirmDialog';
-import { IconChevronLeft } from '../../components/icons';
+import { IconChevronLeft, IconLock, IconCheck } from '../../components/icons';
 
 interface Membro {
   memberId: string;
@@ -25,6 +25,9 @@ export function EditarMembro() {
   const [carregando, setCarregando] = useState(!membroDoState);
   const [erro, setErro] = useState('');
   const [confirmando, setConfirmando] = useState(false);
+  const [resetandoSenha, setResetandoSenha] = useState(false);
+  const [senhaGerada, setSenhaGerada] = useState('');
+  const [copiado, setCopiado] = useState(false);
 
   useEffect(() => {
     if (membroDoState) return;
@@ -57,6 +60,26 @@ export function EditarMembro() {
     } catch (err: any) {
       setConfirmando(false);
       setErro(err?.message || 'Não foi possível salvar as alterações.');
+    }
+  };
+
+  const resetarSenha = async (motivo: string, anexoKey?: string) => {
+    if (!membro) return;
+    const { senhaTemporaria } = await api.post<{ senhaTemporaria: string }>(
+      `/members/${membro.memberId}/reset-password`,
+      { motivo, anexoKey },
+    );
+    setResetandoSenha(false);
+    setSenhaGerada(senhaTemporaria);
+    setCopiado(false);
+  };
+
+  const copiarSenha = async () => {
+    try {
+      await navigator.clipboard.writeText(senhaGerada);
+      setCopiado(true);
+    } catch {
+      setCopiado(false);
     }
   };
 
@@ -141,6 +164,54 @@ export function EditarMembro() {
           </div>
         </form>
       </Card>
+
+      <Card className="mt-4">
+        <div className="p-4.5 flex flex-col gap-3">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5">
+            <div>
+              <p className="text-[13.5px] font-semibold text-ink">Senha de acesso</p>
+              <p className="text-[12.5px] text-inkSecondary">
+                Gera uma senha temporária nova e obriga a pessoa a trocá-la no próximo login. O envio (SMS) está
+                indisponível — copie e repasse a senha por fora do sistema.
+              </p>
+            </div>
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={() => setResetandoSenha(true)}
+              className="justify-center flex-none"
+            >
+              <IconLock className="icon w-3.5 h-3.5" /> Resetar senha
+            </Button>
+          </div>
+          {senhaGerada && (
+            <div className="flex items-center gap-2 bg-surface2 border border-border rounded-lg px-3 py-2.5">
+              <span className="text-[13px] font-mono text-ink flex-1 min-w-0 truncate">{senhaGerada}</span>
+              <button
+                type="button"
+                onClick={copiarSenha}
+                className="flex-none text-[12px] font-semibold text-info hover:opacity-80 inline-flex items-center gap-1"
+              >
+                {copiado ? (
+                  <>
+                    <IconCheck className="icon w-3.5 h-3.5" /> Copiado
+                  </>
+                ) : (
+                  'Copiar'
+                )}
+              </button>
+            </div>
+          )}
+        </div>
+      </Card>
+
+      <ConfirmDialog
+        aberto={resetandoSenha}
+        titulo="Resetar senha"
+        mensagem={`Uma nova senha temporária será gerada para ${membro.nome}, e o acesso atual (se houver) será encerrado.`}
+        onCancelar={() => setResetandoSenha(false)}
+        onConfirmar={resetarSenha}
+      />
 
       <ConfirmDialog
         aberto={confirmando}
