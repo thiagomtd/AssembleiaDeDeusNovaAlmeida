@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { Suspense, useEffect, useRef, useState } from 'react';
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Emblem, IconMenu, IconX, IconChevronDown } from './icons';
@@ -232,7 +232,9 @@ export function Layout() {
       </header>
 
       <main className="flex-1 max-w-[1180px] mx-auto px-4 sm:px-5 pt-6 sm:pt-7 pb-16 w-full">
-        <Outlet />
+        <Suspense fallback={<p className="text-sm text-muted text-center py-16">Carregando...</p>}>
+          <Outlet />
+        </Suspense>
       </main>
 
       <footer className="mt-10 py-10 px-4 text-center">

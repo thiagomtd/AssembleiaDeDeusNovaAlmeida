@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
 import { Eyebrow } from '../../components/ui';
 import { useAuth, type Grupo } from '../../context/AuthContext';
@@ -42,7 +43,9 @@ export function AdminLayout() {
         ))}
       </div>
 
-      <Outlet />
+      <Suspense fallback={<p className="text-sm text-muted text-center py-16">Carregando...</p>}>
+        <Outlet />
+      </Suspense>
     </section>
   );
 }

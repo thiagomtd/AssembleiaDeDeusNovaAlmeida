@@ -1,32 +1,36 @@
+import { lazy } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { Layout } from './components/Layout';
 import { RequireGroup } from './components/RequireGroup';
 import { useAuth } from './context/AuthContext';
 import { Home } from './pages/Home';
 import { Login } from './pages/Login';
-import { ForgotPassword } from './pages/ForgotPassword';
-import { Transacoes } from './pages/Transacoes';
-import { Dizimistas } from './pages/Dizimistas';
-import { Aniversariantes } from './pages/Aniversariantes';
-import { MeuExtrato } from './pages/MeuExtrato';
-import { Campanhas } from './pages/Campanhas';
-import { Campanhas as AdminCampanhas } from './pages/admin/Campanhas';
-import { NovaCampanha } from './pages/admin/NovaCampanha';
-import { EditarCampanha } from './pages/admin/EditarCampanha';
-import { Auditoria } from './pages/admin/Auditoria';
-import { Privacidade } from './pages/Privacidade';
-import { Midia } from './pages/Midia';
-import { MidiaCulto } from './pages/MidiaCulto';
-import { Relatorios } from './pages/Relatorios';
-import { AdminLayout } from './pages/admin/AdminLayout';
-import { Membros } from './pages/admin/Membros';
-import { NovoMembro } from './pages/admin/NovoMembro';
-import { EditarMembro } from './pages/admin/EditarMembro';
-import { Lancamentos } from './pages/admin/Lancamentos';
-import { NovoLancamento } from './pages/admin/NovoLancamento';
-import { EditarLancamento } from './pages/admin/EditarLancamento';
-import { Cultos } from './pages/admin/Cultos';
-import { Info } from './pages/admin/Info';
+
+// Paginas menos acessadas (admin, relatorios com Recharts, etc.) carregam sob demanda —
+// reduz o bundle inicial, que pesa principalmente pra quem acessa pelo celular.
+const ForgotPassword = lazy(() => import('./pages/ForgotPassword').then((m) => ({ default: m.ForgotPassword })));
+const Transacoes = lazy(() => import('./pages/Transacoes').then((m) => ({ default: m.Transacoes })));
+const Dizimistas = lazy(() => import('./pages/Dizimistas').then((m) => ({ default: m.Dizimistas })));
+const Aniversariantes = lazy(() => import('./pages/Aniversariantes').then((m) => ({ default: m.Aniversariantes })));
+const MeuExtrato = lazy(() => import('./pages/MeuExtrato').then((m) => ({ default: m.MeuExtrato })));
+const Campanhas = lazy(() => import('./pages/Campanhas').then((m) => ({ default: m.Campanhas })));
+const AdminCampanhas = lazy(() => import('./pages/admin/Campanhas').then((m) => ({ default: m.Campanhas })));
+const NovaCampanha = lazy(() => import('./pages/admin/NovaCampanha').then((m) => ({ default: m.NovaCampanha })));
+const EditarCampanha = lazy(() => import('./pages/admin/EditarCampanha').then((m) => ({ default: m.EditarCampanha })));
+const Auditoria = lazy(() => import('./pages/admin/Auditoria').then((m) => ({ default: m.Auditoria })));
+const Privacidade = lazy(() => import('./pages/Privacidade').then((m) => ({ default: m.Privacidade })));
+const Midia = lazy(() => import('./pages/Midia').then((m) => ({ default: m.Midia })));
+const MidiaCulto = lazy(() => import('./pages/MidiaCulto').then((m) => ({ default: m.MidiaCulto })));
+const Relatorios = lazy(() => import('./pages/Relatorios').then((m) => ({ default: m.Relatorios })));
+const AdminLayout = lazy(() => import('./pages/admin/AdminLayout').then((m) => ({ default: m.AdminLayout })));
+const Membros = lazy(() => import('./pages/admin/Membros').then((m) => ({ default: m.Membros })));
+const NovoMembro = lazy(() => import('./pages/admin/NovoMembro').then((m) => ({ default: m.NovoMembro })));
+const EditarMembro = lazy(() => import('./pages/admin/EditarMembro').then((m) => ({ default: m.EditarMembro })));
+const Lancamentos = lazy(() => import('./pages/admin/Lancamentos').then((m) => ({ default: m.Lancamentos })));
+const NovoLancamento = lazy(() => import('./pages/admin/NovoLancamento').then((m) => ({ default: m.NovoLancamento })));
+const EditarLancamento = lazy(() => import('./pages/admin/EditarLancamento').then((m) => ({ default: m.EditarLancamento })));
+const Cultos = lazy(() => import('./pages/admin/Cultos').then((m) => ({ default: m.Cultos })));
+const Info = lazy(() => import('./pages/admin/Info').then((m) => ({ default: m.Info })));
 
 const QUALQUER_GRUPO = ['admin', 'member', 'midia', 'tesouraria'] as const;
 
