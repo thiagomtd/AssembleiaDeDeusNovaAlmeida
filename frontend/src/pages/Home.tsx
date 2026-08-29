@@ -33,7 +33,8 @@ const feelings = [
 ] as const;
 
 export function Home() {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, nome, telefone } = useAuth();
+  const primeiroNome = nome ? nome.split(' ')[0] : telefone;
   const [info, setInfo] = useState<ChurchInfo | null>(null);
 
   useEffect(() => {
@@ -159,36 +160,60 @@ export function Home() {
         </div>
       </section>
 
-      {/* Convite ao portal do membro */}
-      {!isAuthenticated && (
-        <section className="px-4 sm:px-5 pb-16 md:pb-24">
-          <div className="max-w-[1180px] mx-auto bg-coastClay rounded-[2rem] p-8 md:p-16 text-white text-center overflow-hidden relative">
-            <div className="relative z-10 max-w-2xl mx-auto">
-              <h2 className="font-serif text-[30px] md:text-[46px] mb-5">Faça parte da nossa família</h2>
-              <p className="text-white/85 text-[14.5px] md:text-[16px] mb-8 leading-relaxed">
-                Já frequenta a nossa igreja? Acesse o portal para ver aniversariantes, transparência financeira e as
-                fotos dos últimos cultos.
-              </p>
-              <div className="flex flex-col sm:flex-row justify-center gap-3.5">
-                <Link
-                  to="/entrar"
-                  className="inline-block px-9 py-3.5 bg-white text-coastClay font-bold rounded-full hover:scale-105 transition-transform text-[14px] text-center"
-                >
-                  Entrar no Portal do Membro
-                </Link>
-                <a
-                  href="#convite"
-                  className="inline-block px-9 py-3.5 border border-white/40 text-white font-bold rounded-full hover:bg-white/10 transition-colors text-[14px] text-center"
-                >
-                  Quero me envolver
-                </a>
-              </div>
-            </div>
-            <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/3 w-64 h-64 bg-white/10 rounded-full blur-3xl pointer-events-none" />
-            <div className="absolute bottom-0 left-0 translate-y-1/2 -translate-x-1/3 w-64 h-64 bg-black/10 rounded-full blur-3xl pointer-events-none" />
+      {/* Convite ao portal do membro / boas-vindas de volta */}
+      <section className="px-4 sm:px-5 pb-16 md:pb-24">
+        <div className="max-w-[1180px] mx-auto bg-coastClay rounded-[2rem] p-8 md:p-16 text-white text-center overflow-hidden relative">
+          <div className="relative z-10 max-w-2xl mx-auto">
+            {isAuthenticated ? (
+              <>
+                <h2 className="font-serif text-[30px] md:text-[46px] mb-5">Bem-vindo(a), {primeiroNome}!</h2>
+                <p className="text-white/85 text-[14.5px] md:text-[16px] mb-8 leading-relaxed">
+                  Que bom te ver por aqui. Acompanhe aniversariantes, transparência financeira e as fotos dos
+                  últimos cultos no portal do membro.
+                </p>
+                <div className="flex flex-col sm:flex-row justify-center gap-3.5">
+                  <Link
+                    to="/midia"
+                    className="inline-block px-9 py-3.5 bg-white text-coastClay font-bold rounded-full hover:scale-105 transition-transform text-[14px] text-center"
+                  >
+                    Ver Galeria dos Cultos
+                  </Link>
+                  <Link
+                    to="/meu-extrato"
+                    className="inline-block px-9 py-3.5 border border-white/40 text-white font-bold rounded-full hover:bg-white/10 transition-colors text-[14px] text-center"
+                  >
+                    Meu Extrato
+                  </Link>
+                </div>
+              </>
+            ) : (
+              <>
+                <h2 className="font-serif text-[30px] md:text-[46px] mb-5">Faça parte da nossa família</h2>
+                <p className="text-white/85 text-[14.5px] md:text-[16px] mb-8 leading-relaxed">
+                  Já frequenta a nossa igreja? Acesse o portal para ver aniversariantes, transparência financeira e
+                  as fotos dos últimos cultos.
+                </p>
+                <div className="flex flex-col sm:flex-row justify-center gap-3.5">
+                  <Link
+                    to="/entrar"
+                    className="inline-block px-9 py-3.5 bg-white text-coastClay font-bold rounded-full hover:scale-105 transition-transform text-[14px] text-center"
+                  >
+                    Entrar no Portal do Membro
+                  </Link>
+                  <a
+                    href="#convite"
+                    className="inline-block px-9 py-3.5 border border-white/40 text-white font-bold rounded-full hover:bg-white/10 transition-colors text-[14px] text-center"
+                  >
+                    Quero me envolver
+                  </a>
+                </div>
+              </>
+            )}
           </div>
-        </section>
-      )}
+          <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/3 w-64 h-64 bg-white/10 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute bottom-0 left-0 translate-y-1/2 -translate-x-1/3 w-64 h-64 bg-black/10 rounded-full blur-3xl pointer-events-none" />
+        </div>
+      </section>
     </div>
   );
 }

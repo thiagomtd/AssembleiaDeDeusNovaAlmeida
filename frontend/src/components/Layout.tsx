@@ -137,7 +137,7 @@ export function Layout() {
           <div className="hidden md:flex items-center gap-2.5 text-[12.5px] text-muted flex-none">
             {!loading && (isAuthenticated ? (
               <>
-                <span className="max-w-[180px] truncate">{nomeExibido}</span>
+                <span className="max-w-[180px] truncate">Olá, {nomeExibido}</span>
                 <Button variant="secondary" size="sm" onClick={handleSignOut}>
                   Sair
                 </Button>
@@ -153,7 +153,7 @@ export function Layout() {
 
           {!loading && (isAuthenticated ? (
             <>
-              <span className="md:hidden flex-none max-w-[110px] truncate text-[12.5px] text-muted">{nomeExibido}</span>
+              <span className="md:hidden flex-none max-w-[130px] truncate text-[12.5px] text-muted">Olá, {nomeExibido}</span>
               <button
                 className="md:hidden flex-none w-9 h-9 rounded-lg border border-border flex items-center justify-center text-inkSecondary"
                 aria-label={menuOpen ? 'Fechar menu' : 'Abrir menu'}
@@ -212,7 +212,7 @@ export function Layout() {
             <div className="mt-2 pt-3 border-t border-border flex items-center justify-between gap-2.5">
               {isAuthenticated ? (
                 <>
-                  <span className="text-[12.5px] text-muted truncate">{nomeExibido}</span>
+                  <span className="text-[12.5px] text-muted truncate">Olá, {nomeExibido}</span>
                   <Button variant="secondary" size="sm" onClick={handleSignOut}>
                     Sair
                   </Button>
