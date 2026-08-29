@@ -24,6 +24,7 @@ export function Transacoes() {
   const now = new Date();
   const [mes, setMes] = useState(now.getMonth() + 1);
   const [ano, setAno] = useState(now.getFullYear());
+  const [filtroTipo, setFiltroTipo] = useState<'todos' | 'entrada' | 'saida'>('todos');
   const [itens, setItens] = useState<Transacao[]>([]);
   const [saldoCaixa, setSaldoCaixa] = useState<number | null>(null);
   const [carregando, setCarregando] = useState(true);
@@ -49,6 +50,11 @@ export function Transacoes() {
     const saidas = itens.filter((t) => t.tipo === 'saida').reduce((s, t) => s + t.valor, 0);
     return { entradas, saidas, saldo: entradas - saidas };
   }, [itens]);
+
+  const itensFiltrados = useMemo(
+    () => (filtroTipo === 'todos' ? itens : itens.filter((t) => t.tipo === filtroTipo)),
+    [itens, filtroTipo],
+  );
 
   return (
     <section>
@@ -90,7 +96,26 @@ export function Transacoes() {
 
       <Card className="overflow-hidden">
         <div className="flex items-center justify-between gap-2.5 flex-wrap px-4.5 py-3.5 border-b border-border">
-          <MonthPicker mes={mes} ano={ano} onChange={(m, a) => { setMes(m); setAno(a); }} />
+          <div className="flex items-center gap-2.5 flex-wrap">
+            <MonthPicker mes={mes} ano={ano} onChange={(m, a) => { setMes(m); setAno(a); }} />
+            <div className="inline-flex border border-border rounded-lg p-0.5 gap-0.5 bg-surface2">
+              {([
+                { v: 'todos', label: 'Todos' },
+                { v: 'entrada', label: 'Entradas' },
+                { v: 'saida', label: 'Saídas' },
+              ] as const).map((f) => (
+                <button
+                  key={f.v}
+                  onClick={() => setFiltroTipo(f.v)}
+                  className={`px-3 py-1.5 rounded-md text-[12.5px] font-semibold ${
+                    filtroTipo === f.v ? 'bg-surface text-ink shadow-card' : 'text-inkSecondary'
+                  }`}
+                >
+                  {f.label}
+                </button>
+              ))}
+            </div>
+          </div>
           {podeGerenciarFinancas && (
             <Link to="/admin/lancamentos/novo">
               <span className="inline-flex items-center gap-1.5 bg-success text-white text-[12.5px] font-semibold rounded-lg px-3 py-1.5 hover:opacity-90">
@@ -100,7 +125,7 @@ export function Transacoes() {
           )}
         </div>
         <div className="sm:hidden flex flex-col gap-2.5 p-3.5">
-          {itens.map((t) => (
+          {itensFiltrados.map((t) => (
             <div key={t.transactionId} className="rounded-xl bg-surface2 border border-border p-3.5 flex flex-col gap-2">
               <div className="flex items-start justify-between gap-2.5">
                 <div className="flex flex-col gap-1 items-start">
@@ -133,8 +158,8 @@ export function Transacoes() {
               )}
             </div>
           ))}
-          {!carregando && itens.length === 0 && (
-            <p className="px-3 py-8 text-center text-muted">Nenhum lançamento neste mês.</p>
+          {!carregando && itensFiltrados.length === 0 && (
+            <p className="px-3 py-8 text-center text-muted">Nenhum lançamento encontrado.</p>
           )}
         </div>
         <div className="hidden sm:block overflow-x-auto">
@@ -154,7 +179,7 @@ export function Transacoes() {
               </tr>
             </thead>
             <tbody>
-              {itens.map((t) => (
+              {itensFiltrados.map((t) => (
                 <tr key={t.transactionId}>
                   <td className="px-3 py-2.5 border-b border-border text-inkSecondary">
                     {t.data.split('-').reverse().join('/')}
@@ -193,10 +218,10 @@ export function Transacoes() {
                   </td>
                 </tr>
               ))}
-              {!carregando && itens.length === 0 && (
+              {!carregando && itensFiltrados.length === 0 && (
                 <tr>
                   <td colSpan={6} className="px-3 py-8 text-center text-muted">
-                    Nenhum lançamento neste mês.
+                    Nenhum lançamento encontrado.
                   </td>
                 </tr>
               )}
