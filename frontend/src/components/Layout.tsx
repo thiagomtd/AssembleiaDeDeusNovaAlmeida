@@ -83,7 +83,7 @@ function NavDropdown({ group, openLabel, setOpenLabel }: { group: NavGroup; open
 
 export function Layout() {
   const { isMember, isAdmin, isMidia, isTesouraria, isAuthenticated, loading, telefone, nome, signOut } = useAuth();
-  const nomeExibido = nome || telefone;
+  const nomeExibido = nome ? nome.split(' ')[0] : telefone;
   const navigate = useNavigate();
   const location = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
@@ -152,13 +152,16 @@ export function Layout() {
           </div>
 
           {!loading && (isAuthenticated ? (
-            <button
-              className="md:hidden flex-none w-9 h-9 rounded-lg border border-border flex items-center justify-center text-inkSecondary"
-              aria-label={menuOpen ? 'Fechar menu' : 'Abrir menu'}
-              onClick={() => setMenuOpen((o) => !o)}
-            >
-              {menuOpen ? <IconX className="icon w-[18px] h-[18px]" /> : <IconMenu className="icon w-[18px] h-[18px]" />}
-            </button>
+            <>
+              <span className="md:hidden flex-none max-w-[110px] truncate text-[12.5px] text-muted">{nomeExibido}</span>
+              <button
+                className="md:hidden flex-none w-9 h-9 rounded-lg border border-border flex items-center justify-center text-inkSecondary"
+                aria-label={menuOpen ? 'Fechar menu' : 'Abrir menu'}
+                onClick={() => setMenuOpen((o) => !o)}
+              >
+                {menuOpen ? <IconX className="icon w-[18px] h-[18px]" /> : <IconMenu className="icon w-[18px] h-[18px]" />}
+              </button>
+            </>
           ) : (
             <NavLink to="/entrar" className="md:hidden flex-none">
               <Button variant="info" size="sm">
