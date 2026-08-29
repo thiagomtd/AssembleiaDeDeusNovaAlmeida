@@ -151,16 +151,24 @@ export function Layout() {
             )}
           </div>
 
-          <button
-            className="md:hidden flex-none w-9 h-9 rounded-lg border border-border flex items-center justify-center text-inkSecondary"
-            aria-label={menuOpen ? 'Fechar menu' : 'Abrir menu'}
-            onClick={() => setMenuOpen((o) => !o)}
-          >
-            {menuOpen ? <IconX className="icon w-[18px] h-[18px]" /> : <IconMenu className="icon w-[18px] h-[18px]" />}
-          </button>
+          {isAuthenticated ? (
+            <button
+              className="md:hidden flex-none w-9 h-9 rounded-lg border border-border flex items-center justify-center text-inkSecondary"
+              aria-label={menuOpen ? 'Fechar menu' : 'Abrir menu'}
+              onClick={() => setMenuOpen((o) => !o)}
+            >
+              {menuOpen ? <IconX className="icon w-[18px] h-[18px]" /> : <IconMenu className="icon w-[18px] h-[18px]" />}
+            </button>
+          ) : (
+            <NavLink to="/entrar" className="md:hidden flex-none">
+              <Button variant="info" size="sm">
+                Entrar
+              </Button>
+            </NavLink>
+          )}
         </div>
 
-        {menuOpen && (
+        {menuOpen && isAuthenticated && (
           <div className="md:hidden border-t border-border bg-surface px-4 sm:px-5 py-3 flex flex-col gap-0.5 max-h-[calc(100vh-56px)] overflow-y-auto">
             <NavLink
               to="/"
