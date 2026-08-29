@@ -12,14 +12,6 @@ function formatEixo(v: number) {
   return String(Math.round(v));
 }
 
-function formatBarra(v: number) {
-  if (v >= 1000) {
-    const milhares = v / 1000;
-    return `${milhares % 1 === 0 ? milhares : milhares.toFixed(1)}k`;
-  }
-  return v % 1 === 0 ? String(v) : v.toFixed(2);
-}
-
 export function BarChart({ porMes }: { porMes: Record<string, { ent: number; sai: number }> }) {
   const meses = Object.keys(porMes).sort();
   if (meses.length === 0) return <p className="text-sm text-muted py-10 text-center">Sem dados neste ano.</p>;
@@ -57,7 +49,7 @@ export function BarChart({ porMes }: { porMes: Record<string, { ent: number; sai
             </rect>
             {porMes[m].ent > 0 && (
               <text x={xEnt + barW / 2} y={padT + chartH - hEnt - 4} fontSize={8} textAnchor="middle" fill="#4f7a56" fontWeight={700}>
-                {formatBarra(porMes[m].ent)}
+                {fmtBRL(porMes[m].ent)}
               </text>
             )}
             <rect x={xSai} y={padT + chartH - hSai} width={barW} height={hSai} rx={3} fill="#a1543c">
@@ -65,7 +57,7 @@ export function BarChart({ porMes }: { porMes: Record<string, { ent: number; sai
             </rect>
             {porMes[m].sai > 0 && (
               <text x={xSai + barW / 2} y={padT + chartH - hSai - 4} fontSize={8} textAnchor="middle" fill="#a1543c" fontWeight={700}>
-                {formatBarra(porMes[m].sai)}
+                {fmtBRL(porMes[m].sai)}
               </text>
             )}
             <text x={gx} y={H - 6} fontSize={10.5} textAnchor="middle" fill="#96958a">
@@ -105,7 +97,7 @@ export function TrendSparkline({ porMes }: { porMes: Record<string, { ent: numbe
               <title>{`${MESES_ABREV[idx]}: saldo ${fmtBRL(data[i].saldo)}`}</title>
             </circle>
             <text x={p[0]} y={p[1] - 7} fontSize={8} textAnchor="middle" fill="#a4762e" fontWeight={700}>
-              {formatBarra(data[i].saldo)}
+              {fmtBRL(data[i].saldo)}
             </text>
             <text x={p[0]} y={H} fontSize={9.5} textAnchor="middle" fill="#96958a">
               {MESES_ABREV[idx]}
