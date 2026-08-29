@@ -184,8 +184,10 @@ export function Layout() {
             </NavLink>
             {isMember &&
               memberGroups.map((g) => (
-                <div key={g.label} className="pt-2">
-                  <span className="block px-3 pb-1 text-[10.5px] uppercase tracking-wider text-muted font-bold">{g.label}</span>
+                <div key={g.label} className="mt-2.5 pt-2.5 border-t border-border first:mt-0 first:pt-0 first:border-t-0">
+                  <span className="block mb-1 pl-2.5 border-l-2 border-accent text-[12px] uppercase tracking-wider text-ink font-extrabold">
+                    {g.label}
+                  </span>
                   {g.items.map((item) => (
                     <NavLink
                       key={item.to}
