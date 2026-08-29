@@ -82,7 +82,7 @@ function NavDropdown({ group, openLabel, setOpenLabel }: { group: NavGroup; open
 }
 
 export function Layout() {
-  const { isMember, isAdmin, isMidia, isTesouraria, isAuthenticated, telefone, nome, signOut } = useAuth();
+  const { isMember, isAdmin, isMidia, isTesouraria, isAuthenticated, loading, telefone, nome, signOut } = useAuth();
   const nomeExibido = nome || telefone;
   const navigate = useNavigate();
   const location = useLocation();
@@ -135,7 +135,7 @@ export function Layout() {
           </nav>
 
           <div className="hidden md:flex items-center gap-2.5 text-[12.5px] text-muted flex-none">
-            {isAuthenticated ? (
+            {!loading && (isAuthenticated ? (
               <>
                 <span className="max-w-[180px] truncate">{nomeExibido}</span>
                 <Button variant="secondary" size="sm" onClick={handleSignOut}>
@@ -148,10 +148,10 @@ export function Layout() {
                   Entrar
                 </Button>
               </NavLink>
-            )}
+            ))}
           </div>
 
-          {isAuthenticated ? (
+          {!loading && (isAuthenticated ? (
             <button
               className="md:hidden flex-none w-9 h-9 rounded-lg border border-border flex items-center justify-center text-inkSecondary"
               aria-label={menuOpen ? 'Fechar menu' : 'Abrir menu'}
@@ -165,7 +165,7 @@ export function Layout() {
                 Entrar
               </Button>
             </NavLink>
-          )}
+          ))}
         </div>
 
         {menuOpen && isAuthenticated && (

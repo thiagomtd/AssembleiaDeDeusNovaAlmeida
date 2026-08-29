@@ -33,6 +33,11 @@ export function Login() {
         navigate(destino, { replace: true });
       }
     } catch (err: any) {
+      if (err?.name === 'UserAlreadyAuthenticatedException') {
+        await refresh();
+        navigate(destino, { replace: true });
+        return;
+      }
       setErro(err?.message || 'Não foi possível entrar. Confira o celular e a senha.');
     } finally {
       setCarregando(false);
