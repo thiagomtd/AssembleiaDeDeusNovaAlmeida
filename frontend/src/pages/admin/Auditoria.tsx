@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { api } from '../../lib/api';
-import { Card, Pill, Pagination, SearchInput, combina } from '../../components/ui';
+import { Card, Pill, Pagination, SearchInput, FilterSelect, combina } from '../../components/ui';
 import { MonthPicker } from '../../components/MonthPicker';
 import { AttachmentViewer } from '../../components/AttachmentViewer';
 import { IconPaperclip } from '../../components/icons';
@@ -50,6 +50,7 @@ export function Auditoria() {
   const [carregando, setCarregando] = useState(true);
   const [anexoAberto, setAnexoAberto] = useState<string | null>(null);
   const [busca, setBusca] = useState('');
+  const [filtroAcao, setFiltroAcao] = useState('');
   const [pagina, setPagina] = useState(1);
   const mesAno = `${ano}-${String(mes).padStart(2, '0')}`;
 
@@ -61,11 +62,19 @@ export function Auditoria() {
       .catch(() => setItens([]))
       .finally(() => setCarregando(false));
   }, [mesAno]);
-  useEffect(() => setPagina(1), [busca, mesAno]);
+  useEffect(() => setPagina(1), [busca, filtroAcao, mesAno]);
+
+  const acoes = useMemo(
+    () => Array.from(new Set(itens.map((e) => e.acao))).sort((a, b) => (ACAO_LABEL[a] ?? a).localeCompare(ACAO_LABEL[b] ?? b, 'pt-BR')),
+    [itens],
+  );
 
   const filtrados = useMemo(
-    () => itens.filter((e) => combina(busca, ACAO_LABEL[e.acao] ?? e.acao, e.atorNome, e.detalhes, e.motivo)),
-    [itens, busca],
+    () =>
+      itens
+        .filter((e) => !filtroAcao || e.acao === filtroAcao)
+        .filter((e) => combina(busca, ACAO_LABEL[e.acao] ?? e.acao, e.atorNome, e.detalhes, e.motivo)),
+    [itens, busca, filtroAcao],
   );
   const totalPaginas = Math.max(1, Math.ceil(filtrados.length / POR_PAGINA));
   const paginaAtual = Math.min(pagina, totalPaginas);
@@ -75,7 +84,15 @@ export function Auditoria() {
     <div>
       <Card className="overflow-hidden">
         <div className="flex justify-between items-center gap-2.5 flex-wrap px-4.5 py-3.5 border-b border-border">
-          <MonthPicker mes={mes} ano={ano} onChange={(m, a) => { setMes(m); setAno(a); }} />
+          <div className="flex items-center gap-2.5 flex-wrap">
+            <MonthPicker mes={mes} ano={ano} onChange={(m, a) => { setMes(m); setAno(a); }} />
+            <FilterSelect
+              value={filtroAcao}
+              onChange={setFiltroAcao}
+              options={acoes.map((a) => ({ value: a, label: ACAO_LABEL[a] ?? a }))}
+              allLabel="Todas as ações"
+            />
+          </div>
           <div className="flex items-center gap-2.5 flex-wrap">
             <SearchInput value={busca} onChange={setBusca} placeholder="Buscar por ação, pessoa, detalhes..." />
             <span className="text-[12.5px] text-muted whitespace-nowrap">{filtrados.length} de {itens.length} ações</span>

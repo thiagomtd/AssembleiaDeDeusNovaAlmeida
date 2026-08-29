@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { api } from '../../lib/api';
-import { Card, Pill, fmtBRL, Pagination, SearchInput, combina } from '../../components/ui';
+import { Card, Pill, fmtBRL, Pagination, SearchInput, FilterSelect, combina } from '../../components/ui';
 import { ConfirmDialog } from '../../components/ConfirmDialog';
 import { IconPlus, IconEdit, IconTrash } from '../../components/icons';
 
@@ -23,17 +23,21 @@ export function Campanhas() {
   const [carregando, setCarregando] = useState(true);
   const [alvoRemover, setAlvoRemover] = useState<Campanha | null>(null);
   const [busca, setBusca] = useState('');
+  const [filtroStatus, setFiltroStatus] = useState('');
   const [pagina, setPagina] = useState(1);
 
   const filtrados = useMemo(
-    () => lista.filter((c) => combina(busca, c.titulo, c.descricao)),
-    [lista, busca],
+    () =>
+      lista
+        .filter((c) => !filtroStatus || (filtroStatus === 'ativa') === c.ativa)
+        .filter((c) => combina(busca, c.titulo, c.descricao)),
+    [lista, busca, filtroStatus],
   );
   const totalPaginas = Math.max(1, Math.ceil(filtrados.length / POR_PAGINA));
   const paginaAtual = Math.min(pagina, totalPaginas);
   const visiveis = filtrados.slice((paginaAtual - 1) * POR_PAGINA, paginaAtual * POR_PAGINA);
 
-  useEffect(() => setPagina(1), [busca]);
+  useEffect(() => setPagina(1), [busca, filtroStatus]);
 
   const carregar = () => {
     setCarregando(true);
@@ -56,7 +60,18 @@ export function Campanhas() {
   return (
     <Card className="overflow-hidden">
       <div className="flex justify-between items-center gap-2.5 flex-wrap px-4.5 py-3.5 border-b border-border">
-        <span className="text-[12.5px] text-muted">{filtrados.length} de {lista.length} metas cadastradas</span>
+        <div className="flex items-center gap-2.5 flex-wrap">
+          <span className="text-[12.5px] text-muted whitespace-nowrap">{filtrados.length} de {lista.length} metas</span>
+          <FilterSelect
+            value={filtroStatus}
+            onChange={setFiltroStatus}
+            options={[
+              { value: 'ativa', label: 'Ativa' },
+              { value: 'encerrada', label: 'Encerrada' },
+            ]}
+            allLabel="Todos os status"
+          />
+        </div>
         <div className="flex items-center gap-2.5 flex-wrap">
           <SearchInput value={busca} onChange={setBusca} placeholder="Buscar por título..." />
           <Link to="/admin/campanhas/nova">

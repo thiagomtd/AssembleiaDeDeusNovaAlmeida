@@ -234,6 +234,34 @@ export function SearchInput({
   );
 }
 
+// Filtro por coluna: select com opção "todos" (value vazio) + as opções da coluna.
+export function FilterSelect({
+  value,
+  onChange,
+  options,
+  allLabel = 'Todos',
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  options: { value: string; label: string }[];
+  allLabel?: string;
+}) {
+  return (
+    <select
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      className="min-w-0 max-w-full bg-surface2 border border-border rounded-lg px-2.5 py-1.5 text-[13px] text-ink"
+    >
+      <option value="">{allLabel}</option>
+      {options.map((o) => (
+        <option key={o.value} value={o.value}>
+          {o.label}
+        </option>
+      ))}
+    </select>
+  );
+}
+
 // Select com busca: digita pra filtrar as opções em vez de rolar uma lista longa.
 export function ComboBox({
   value,

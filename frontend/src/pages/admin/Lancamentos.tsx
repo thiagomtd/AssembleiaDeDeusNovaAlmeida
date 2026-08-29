@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { api } from '../../lib/api';
-import { Card, Pill, fmtBRL, Pagination, SearchInput, combina } from '../../components/ui';
+import { Card, Pill, fmtBRL, Pagination, SearchInput, FilterSelect, combina } from '../../components/ui';
 import { ConfirmDialog } from '../../components/ConfirmDialog';
 import { AttachmentViewer } from '../../components/AttachmentViewer';
 import { IconPlus, IconEdit, IconTrash, IconUsers, IconTarget, IconPaperclip } from '../../components/icons';
@@ -35,6 +35,7 @@ export function Lancamentos() {
   const [comprovanteAberto, setComprovanteAberto] = useState<string | null>(null);
   const [busca, setBusca] = useState('');
   const [filtroTipo, setFiltroTipo] = useState<'todos' | 'entrada' | 'saida'>('todos');
+  const [filtroCategoria, setFiltroCategoria] = useState('');
   const [pagina, setPagina] = useState(1);
   const mesAno = `${ano}-${String(mes).padStart(2, '0')}`;
 
@@ -43,14 +44,20 @@ export function Lancamentos() {
   };
 
   useEffect(carregar, [mesAno]);
-  useEffect(() => setPagina(1), [busca, filtroTipo, mesAno]);
+  useEffect(() => setPagina(1), [busca, filtroTipo, filtroCategoria, mesAno]);
+
+  const categorias = useMemo(
+    () => Array.from(new Set(itens.map((t) => t.categoria))).sort((a, b) => a.localeCompare(b, 'pt-BR')),
+    [itens],
+  );
 
   const filtrados = useMemo(
     () =>
       itens
         .filter((t) => filtroTipo === 'todos' || t.tipo === filtroTipo)
+        .filter((t) => !filtroCategoria || t.categoria === filtroCategoria)
         .filter((t) => combina(busca, t.categoria, t.descricao, t.membroNome, t.campanhaTitulo)),
-    [itens, busca, filtroTipo],
+    [itens, busca, filtroTipo, filtroCategoria],
   );
   const totalPaginas = Math.max(1, Math.ceil(filtrados.length / POR_PAGINA));
   const paginaAtual = Math.min(pagina, totalPaginas);
@@ -85,6 +92,12 @@ export function Lancamentos() {
               </button>
             ))}
           </div>
+          <FilterSelect
+            value={filtroCategoria}
+            onChange={setFiltroCategoria}
+            options={categorias.map((c) => ({ value: c, label: c }))}
+            allLabel="Todas as categorias"
+          />
         </div>
         <div className="flex items-center gap-2.5 flex-wrap">
           <SearchInput value={busca} onChange={setBusca} placeholder="Buscar por categoria, pessoa, meta..." />

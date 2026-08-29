@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../lib/api';
-import { Card, Eyebrow, Pill, fmtBRL } from '../components/ui';
+import { Card, Eyebrow, Pill, FilterSelect, fmtBRL } from '../components/ui';
 import { IconShield, IconWallet, IconPlus, IconPaperclip, IconTarget } from '../components/icons';
 import { MonthPicker } from '../components/MonthPicker';
 import { AttachmentViewer } from '../components/AttachmentViewer';
@@ -25,6 +25,7 @@ export function Transacoes() {
   const [mes, setMes] = useState(now.getMonth() + 1);
   const [ano, setAno] = useState(now.getFullYear());
   const [filtroTipo, setFiltroTipo] = useState<'todos' | 'entrada' | 'saida'>('todos');
+  const [filtroCategoria, setFiltroCategoria] = useState('');
   const [itens, setItens] = useState<Transacao[]>([]);
   const [saldoCaixa, setSaldoCaixa] = useState<number | null>(null);
   const [carregando, setCarregando] = useState(true);
@@ -51,9 +52,17 @@ export function Transacoes() {
     return { entradas, saidas, saldo: entradas - saidas };
   }, [itens]);
 
+  const categorias = useMemo(
+    () => Array.from(new Set(itens.map((t) => t.categoria))).sort((a, b) => a.localeCompare(b, 'pt-BR')),
+    [itens],
+  );
+
   const itensFiltrados = useMemo(
-    () => (filtroTipo === 'todos' ? itens : itens.filter((t) => t.tipo === filtroTipo)),
-    [itens, filtroTipo],
+    () =>
+      itens
+        .filter((t) => filtroTipo === 'todos' || t.tipo === filtroTipo)
+        .filter((t) => !filtroCategoria || t.categoria === filtroCategoria),
+    [itens, filtroTipo, filtroCategoria],
   );
 
   return (
@@ -115,6 +124,12 @@ export function Transacoes() {
                 </button>
               ))}
             </div>
+            <FilterSelect
+              value={filtroCategoria}
+              onChange={setFiltroCategoria}
+              options={categorias.map((c) => ({ value: c, label: c }))}
+              allLabel="Todas as categorias"
+            />
           </div>
           {podeGerenciarFinancas && (
             <Link to="/admin/lancamentos/novo">

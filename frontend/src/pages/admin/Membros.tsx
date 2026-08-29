@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { api } from '../../lib/api';
-import { Card, Pill, Pagination, SearchInput, combina } from '../../components/ui';
+import { Card, Pill, Pagination, SearchInput, FilterSelect, combina } from '../../components/ui';
 import { ConfirmDialog } from '../../components/ConfirmDialog';
 import { IconPlus, IconEdit, IconTrash, IconShield, IconUsers, IconImage, IconCheck, IconLock } from '../../components/icons';
 
@@ -30,17 +30,23 @@ export function Membros() {
   const [carregando, setCarregando] = useState(true);
   const [alvoRemover, setAlvoRemover] = useState<Membro | null>(null);
   const [busca, setBusca] = useState('');
+  const [filtroGrupo, setFiltroGrupo] = useState('');
+  const [filtroStatus, setFiltroStatus] = useState('');
   const [pagina, setPagina] = useState(1);
 
   const filtrados = useMemo(
-    () => membros.filter((m) => combina(busca, m.nome, m.telefone)),
-    [membros, busca],
+    () =>
+      membros
+        .filter((m) => !filtroGrupo || m.grupo === filtroGrupo)
+        .filter((m) => !filtroStatus || m.status === filtroStatus)
+        .filter((m) => combina(busca, m.nome, m.telefone)),
+    [membros, busca, filtroGrupo, filtroStatus],
   );
   const totalPaginas = Math.max(1, Math.ceil(filtrados.length / POR_PAGINA));
   const paginaAtual = Math.min(pagina, totalPaginas);
   const visiveis = filtrados.slice((paginaAtual - 1) * POR_PAGINA, paginaAtual * POR_PAGINA);
 
-  useEffect(() => setPagina(1), [busca]);
+  useEffect(() => setPagina(1), [busca, filtroGrupo, filtroStatus]);
 
   const carregar = () => {
     setCarregando(true);
@@ -64,9 +70,26 @@ export function Membros() {
     <div>
       <Card className="overflow-hidden">
         <div className="flex justify-between items-center gap-2.5 flex-wrap px-4.5 py-3.5 border-b border-border">
-          <span className="text-[12.5px] text-muted">
-            {filtrados.length} de {membros.length} membros cadastrados
-          </span>
+          <div className="flex items-center gap-2.5 flex-wrap">
+            <span className="text-[12.5px] text-muted whitespace-nowrap">
+              {filtrados.length} de {membros.length} membros
+            </span>
+            <FilterSelect
+              value={filtroGrupo}
+              onChange={setFiltroGrupo}
+              options={Object.entries(GRUPO_INFO).map(([value, info]) => ({ value, label: info.label }))}
+              allLabel="Todos os grupos"
+            />
+            <FilterSelect
+              value={filtroStatus}
+              onChange={setFiltroStatus}
+              options={[
+                { value: 'ativo', label: 'Ativo' },
+                { value: 'inativo', label: 'Inativo' },
+              ]}
+              allLabel="Todos os status"
+            />
+          </div>
           <div className="flex items-center gap-2.5 flex-wrap">
             <SearchInput value={busca} onChange={setBusca} placeholder="Buscar por nome ou celular..." />
             <Link to="/admin/membros/novo">
