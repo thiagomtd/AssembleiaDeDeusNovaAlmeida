@@ -2,14 +2,8 @@ import { fmtBRL } from './ui';
 
 const MESES_ABREV = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
 
-// Eixo compacto: só usa "k" (milhares) quando o valor realmente chega lá — evita
-// mostrar "0k" pra valores pequenos, comuns numa igreja pequena.
 function formatEixo(v: number) {
-  if (v >= 1000) {
-    const milhares = v / 1000;
-    return `${milhares % 1 === 0 ? milhares : milhares.toFixed(1)}k`;
-  }
-  return String(Math.round(v));
+  return Math.round(v).toLocaleString('pt-BR');
 }
 
 export function BarChart({ porMes }: { porMes: Record<string, { ent: number; sai: number }> }) {
@@ -29,7 +23,7 @@ export function BarChart({ porMes }: { porMes: Record<string, { ent: number; sai
         return (
           <g key={f}>
             <line x1={padL} y1={y} x2={W - 6} y2={y} stroke="#e4e1d5" strokeWidth={1} />
-            <text x={padL - 8} y={y + 3} fontSize={9.5} textAnchor="end" fill="#96958a">
+            <text x={padL - 8} y={y + 3} fontSize={10.5} textAnchor="end" fill="#96958a">
               {formatEixo(maxV * f)}
             </text>
           </g>
@@ -48,7 +42,7 @@ export function BarChart({ porMes }: { porMes: Record<string, { ent: number; sai
               <title>{`${MESES_ABREV[idx]}: Entradas ${fmtBRL(porMes[m].ent)}`}</title>
             </rect>
             {porMes[m].ent > 0 && (
-              <text x={xEnt + barW / 2} y={padT + chartH - hEnt - 4} fontSize={8} textAnchor="middle" fill="#4f7a56" fontWeight={700}>
+              <text x={xEnt + barW / 2} y={padT + chartH - hEnt - 4} fontSize={9} textAnchor="middle" fill="#4f7a56" fontWeight={700}>
                 {fmtBRL(porMes[m].ent)}
               </text>
             )}
@@ -56,7 +50,7 @@ export function BarChart({ porMes }: { porMes: Record<string, { ent: number; sai
               <title>{`${MESES_ABREV[idx]}: Saídas ${fmtBRL(porMes[m].sai)}`}</title>
             </rect>
             {porMes[m].sai > 0 && (
-              <text x={xSai + barW / 2} y={padT + chartH - hSai - 4} fontSize={8} textAnchor="middle" fill="#a1543c" fontWeight={700}>
+              <text x={xSai + barW / 2} y={padT + chartH - hSai - 4} fontSize={9} textAnchor="middle" fill="#a1543c" fontWeight={700}>
                 {fmtBRL(porMes[m].sai)}
               </text>
             )}
@@ -96,7 +90,7 @@ export function TrendSparkline({ porMes }: { porMes: Record<string, { ent: numbe
             <circle cx={p[0]} cy={p[1]} r={isLast ? 3.5 : 2} fill={isLast ? '#a4762e' : '#fff'} stroke="#a4762e" strokeWidth={1.5}>
               <title>{`${MESES_ABREV[idx]}: saldo ${fmtBRL(data[i].saldo)}`}</title>
             </circle>
-            <text x={p[0]} y={p[1] - 7} fontSize={8} textAnchor="middle" fill="#a4762e" fontWeight={700}>
+            <text x={p[0]} y={p[1] - 7} fontSize={9} textAnchor="middle" fill="#a4762e" fontWeight={700}>
               {fmtBRL(data[i].saldo)}
             </text>
             <text x={p[0]} y={H} fontSize={9.5} textAnchor="middle" fill="#96958a">
