@@ -34,6 +34,7 @@ export function Lancamentos() {
   const [alvoRemover, setAlvoRemover] = useState<Lancamento | null>(null);
   const [comprovanteAberto, setComprovanteAberto] = useState<string | null>(null);
   const [busca, setBusca] = useState('');
+  const [filtroTipo, setFiltroTipo] = useState<'todos' | 'entrada' | 'saida'>('todos');
   const [pagina, setPagina] = useState(1);
   const mesAno = `${ano}-${String(mes).padStart(2, '0')}`;
 
@@ -42,11 +43,14 @@ export function Lancamentos() {
   };
 
   useEffect(carregar, [mesAno]);
-  useEffect(() => setPagina(1), [busca, mesAno]);
+  useEffect(() => setPagina(1), [busca, filtroTipo, mesAno]);
 
   const filtrados = useMemo(
-    () => itens.filter((t) => combina(busca, t.categoria, t.descricao, t.membroNome, t.campanhaTitulo)),
-    [itens, busca],
+    () =>
+      itens
+        .filter((t) => filtroTipo === 'todos' || t.tipo === filtroTipo)
+        .filter((t) => combina(busca, t.categoria, t.descricao, t.membroNome, t.campanhaTitulo)),
+    [itens, busca, filtroTipo],
   );
   const totalPaginas = Math.max(1, Math.ceil(filtrados.length / POR_PAGINA));
   const paginaAtual = Math.min(pagina, totalPaginas);
@@ -62,7 +66,26 @@ export function Lancamentos() {
   return (
     <Card className="overflow-hidden">
       <div className="flex justify-between items-center gap-2.5 flex-wrap px-4.5 py-3.5 border-b border-border">
-        <MonthPicker mes={mes} ano={ano} onChange={(m, a) => { setMes(m); setAno(a); }} />
+        <div className="flex items-center gap-2.5 flex-wrap">
+          <MonthPicker mes={mes} ano={ano} onChange={(m, a) => { setMes(m); setAno(a); }} />
+          <div className="inline-flex border border-border rounded-lg p-0.5 gap-0.5 bg-surface2">
+            {([
+              { v: 'todos', label: 'Todos' },
+              { v: 'entrada', label: 'Entradas' },
+              { v: 'saida', label: 'Saídas' },
+            ] as const).map((f) => (
+              <button
+                key={f.v}
+                onClick={() => setFiltroTipo(f.v)}
+                className={`px-3 py-1.5 rounded-md text-[12.5px] font-semibold ${
+                  filtroTipo === f.v ? 'bg-surface text-ink shadow-card' : 'text-inkSecondary'
+                }`}
+              >
+                {f.label}
+              </button>
+            ))}
+          </div>
+        </div>
         <div className="flex items-center gap-2.5 flex-wrap">
           <SearchInput value={busca} onChange={setBusca} placeholder="Buscar por categoria, pessoa, meta..." />
           <Link to="/admin/lancamentos/novo">
