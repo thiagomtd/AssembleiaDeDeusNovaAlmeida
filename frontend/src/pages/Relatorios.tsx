@@ -1,9 +1,14 @@
 import { useEffect, useMemo, useState } from 'react';
 import { api } from '../lib/api';
-import { Card, Eyebrow, fmtBRL } from '../components/ui';
-import { IconShield, IconDownload } from '../components/icons';
+import { Card, Eyebrow, Button, fmtBRL } from '../components/ui';
+import { IconShield } from '../components/icons';
 import { MonthPicker } from '../components/MonthPicker';
 import { BarChart, TrendSparkline, CategoryBars } from '../components/BarChart';
+
+const MESES = [
+  'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+  'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro',
+];
 
 interface AnualResp {
   porMes: Record<string, { ent: number; sai: number }>;
@@ -69,12 +74,21 @@ export function Relatorios() {
   const mediaMensal = (v: number) => (dadosAno ? v / Math.max(Object.keys(dadosAno.porMes).length, 1) : 0);
 
   return (
-    <section>
-      <Eyebrow icon={<IconShield className="icon w-3 h-3" />}>Área de membros</Eyebrow>
-      <h1 className="text-[32px] mb-1.5 text-ink">Relatórios Financeiros</h1>
-      <p className="text-inkSecondary text-[14.5px] max-w-[62ch] mb-6">
-        Visão mensal e anual das finanças da igreja, com detalhamento por categoria — sempre em valores agregados.
-      </p>
+    <section className="print:max-w-none">
+      <div className="print:hidden">
+        <Eyebrow icon={<IconShield className="icon w-3 h-3" />}>Área de membros</Eyebrow>
+        <h1 className="text-[32px] mb-1.5 text-ink">Relatórios Financeiros</h1>
+        <p className="text-inkSecondary text-[14.5px] max-w-[62ch] mb-6">
+          Visão mensal e anual das finanças da igreja, com detalhamento por categoria — sempre em valores agregados.
+        </p>
+      </div>
+
+      <div className="hidden print:block mb-6">
+        <h1 className="text-xl font-serif">
+          Relatório Financeiro — {visao === 'anual' ? `Ano de ${ano}` : `${MESES[mes - 1]} de ${mesAnoSel}`}
+        </h1>
+        <p className="text-sm text-muted">Assembleia de Deus de Nova Almeida</p>
+      </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5 mb-5">
         <Card className="p-4">
@@ -95,7 +109,7 @@ export function Relatorios() {
         </Card>
       </div>
 
-      <div className="flex justify-between items-center mb-4 flex-wrap gap-2.5">
+      <div className="flex justify-between items-center mb-4 flex-wrap gap-2.5 print:hidden">
         <span className="text-[12.5px] text-muted">Escolha como visualizar o período</span>
         <div className="inline-flex border border-border rounded-lg p-0.5 gap-0.5 bg-surface2">
           {(['anual', 'mensal'] as const).map((v) => (
@@ -160,9 +174,9 @@ export function Relatorios() {
                 </tr>
               </tbody>
             </table>
-            <button className="mt-3.5 inline-flex items-center gap-1.5 border border-border rounded-lg px-3 py-1.5 text-[12.5px] font-semibold text-ink">
-              <IconDownload className="icon w-3.5 h-3.5" /> Exportar CSV
-            </button>
+            <Button variant="secondary" size="sm" className="mt-3.5 print:hidden" onClick={() => window.print()}>
+              Imprimir / Salvar PDF
+            </Button>
           </Card>
         </div>
       )}
