@@ -18,7 +18,15 @@ export const UserPoolId = process.env.USER_POOL_ID as string;
 
 const TODOS_OS_GRUPOS: Grupo[] = ['admin', 'member', 'midia', 'tesouraria'];
 
+/**
+ * Cria o usuário já com senha temporária gerada por nós (em vez de deixar o Cognito
+ * gerar e tentar enviar por SMS): o SNS dessa conta AWS está em sandbox, sem Production
+ * Access, então o SMS automático falha silenciosamente e a pessoa nunca recebe a senha.
+ * MessageAction 'SUPPRESS' evita essa tentativa; a senha volta pra administração copiar
+ * e repassar por fora do sistema, igual já era feito no reset de senha.
+ */
 export async function createCognitoUser(telefoneE164: string, nomeCompleto: string) {
+  const senhaTemporaria = gerarSenhaTemporaria();
   const res = await cognito.send(
     new AdminCreateUserCommand({
       UserPoolId,
@@ -28,10 +36,11 @@ export async function createCognitoUser(telefoneE164: string, nomeCompleto: stri
         { Name: 'phone_number_verified', Value: 'true' },
         { Name: 'name', Value: nomeCompleto },
       ],
-      DesiredDeliveryMediums: ['SMS'],
+      TemporaryPassword: senhaTemporaria,
+      MessageAction: 'SUPPRESS',
     }),
   );
-  return res.User?.Username as string;
+  return { cognitoSub: res.User?.Username as string, senhaTemporaria };
 }
 
 export async function setUserGroup(username: string, grupo: Grupo) {

@@ -2,7 +2,7 @@ import { useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../../lib/api';
 import { Card, Button, Field, inputCls } from '../../components/ui';
-import { IconPlus } from '../../components/icons';
+import { IconPlus, IconCheck } from '../../components/icons';
 
 export function NovoMembro() {
   const navigate = useNavigate();
@@ -11,6 +11,8 @@ export function NovoMembro() {
   });
   const [erro, setErro] = useState('');
   const [salvando, setSalvando] = useState(false);
+  const [membroCriado, setMembroCriado] = useState<{ nome: string; senhaTemporaria: string } | null>(null);
+  const [copiado, setCopiado] = useState(false);
 
   const set = (k: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
     setForm((f) => ({ ...f, [k]: e.target.value }));
@@ -20,14 +22,71 @@ export function NovoMembro() {
     setErro('');
     setSalvando(true);
     try {
-      await api.post('/members', form);
-      navigate('/admin/membros');
+      const { senhaTemporaria } = await api.post<{ senhaTemporaria: string }>('/members', form);
+      setMembroCriado({ nome: form.nome, senhaTemporaria });
     } catch (err: any) {
       setErro(err?.message || 'Não foi possível criar o membro.');
     } finally {
       setSalvando(false);
     }
   };
+
+  const copiarSenha = async () => {
+    if (!membroCriado) return;
+    try {
+      await navigator.clipboard.writeText(membroCriado.senhaTemporaria);
+      setCopiado(true);
+    } catch {
+      setCopiado(false);
+    }
+  };
+
+  if (membroCriado) {
+    return (
+      <Card className="p-4.5 flex flex-col gap-3.5">
+        <div>
+          <p className="text-[13.5px] font-semibold text-ink">Membro criado: {membroCriado.nome}</p>
+          <p className="text-[12.5px] text-inkSecondary">
+            O envio por SMS está indisponível — copie a senha temporária abaixo e repasse pra pessoa por fora do
+            sistema. No primeiro login, ela será obrigada a trocar por uma senha definitiva.
+          </p>
+        </div>
+        <div className="flex items-center gap-2 bg-surface2 border border-border rounded-lg px-3 py-2.5">
+          <span className="text-[13px] font-mono text-ink flex-1 min-w-0 truncate">{membroCriado.senhaTemporaria}</span>
+          <button
+            type="button"
+            onClick={copiarSenha}
+            className="flex-none text-[12px] font-semibold text-info hover:opacity-80 inline-flex items-center gap-1"
+          >
+            {copiado ? (
+              <>
+                <IconCheck className="icon w-3.5 h-3.5" /> Copiado
+              </>
+            ) : (
+              'Copiar'
+            )}
+          </button>
+        </div>
+        <div className="flex flex-col sm:flex-row gap-2.5">
+          <Button type="button" variant="info" onClick={() => navigate('/admin/membros')} className="justify-center">
+            Ir para Membros
+          </Button>
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={() => {
+              setForm({ nome: '', telefone: '', dataNascimento: '', dataAssociacao: '', grupo: 'member' });
+              setMembroCriado(null);
+              setCopiado(false);
+            }}
+            className="justify-center"
+          >
+            Cadastrar outro membro
+          </Button>
+        </div>
+      </Card>
+    );
+  }
 
   return (
     <Card>
@@ -61,7 +120,7 @@ export function NovoMembro() {
           {erro && <p className="text-expense text-xs">{erro}</p>}
           <div className="flex flex-col sm:flex-row gap-2.5">
             <Button type="submit" variant="success" disabled={salvando} className="justify-center">
-              <IconPlus className="icon w-3.5 h-3.5" /> {salvando ? 'Criando...' : 'Criar membro e enviar acesso'}
+              <IconPlus className="icon w-3.5 h-3.5" /> {salvando ? 'Criando...' : 'Criar membro'}
             </Button>
             <Button type="button" variant="secondary" onClick={() => navigate('/admin/membros')} className="justify-center">
               Cancelar

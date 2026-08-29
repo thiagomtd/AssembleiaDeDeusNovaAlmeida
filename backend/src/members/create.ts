@@ -24,9 +24,10 @@ export const handler: APIGatewayProxyHandlerV2WithJWTAuthorizer = async (
     const gruposValidos: Grupo[] = ['admin', 'member', 'midia', 'tesouraria'];
     const grupoFinal: Grupo = gruposValidos.includes(grupo) ? grupo : 'member';
 
-    // Cria a conta no Cognito com senha temporária (enviada por SMS automaticamente)
-    // e vincula ao grupo de acesso escolhido pela administração.
-    const cognitoSub = await createCognitoUser(telefone, nome);
+    // Cria a conta no Cognito com senha temporária gerada por nós — o SMS automático
+    // não é usado (SNS dessa conta ainda sem Production Access) — e vincula ao grupo
+    // de acesso escolhido pela administração.
+    const { cognitoSub, senhaTemporaria } = await createCognitoUser(telefone, nome);
     await setUserGroup(telefone, grupoFinal);
 
     const memberId = randomUUID();
@@ -45,7 +46,7 @@ export const handler: APIGatewayProxyHandlerV2WithJWTAuthorizer = async (
 
     await registrarAuditoria(event, { acao: 'membro.criar', entidadeId: memberId, detalhes: `${nome} (${grupoFinal})` });
 
-    return ok(item, 201);
+    return ok({ ...item, senhaTemporaria }, 201);
   } catch (err: any) {
     if (err?.name === 'UsernameExistsException') {
       return badRequest('Já existe uma conta cadastrada com esse celular.');
