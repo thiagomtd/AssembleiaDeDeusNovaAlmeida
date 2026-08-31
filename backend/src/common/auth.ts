@@ -1,13 +1,14 @@
 import type { APIGatewayProxyEventV2WithJWTAuthorizer } from 'aws-lambda';
 
-export type Grupo = 'admin' | 'member' | 'midia' | 'tesouraria';
+export type Grupo = 'admin' | 'member' | 'midia' | 'tesouraria' | 'secretario';
 
 // Todo grupo autenticado tem a base de leitura de "member" (financeiro, dizimistas,
-// mídia, relatórios). midia/tesouraria somam uma responsabilidade específica; admin
-// (diretoria) tem acesso total. Ver [[grupos-cumulativos]] no README.
-export const QUALQUER_GRUPO: Grupo[] = ['admin', 'member', 'midia', 'tesouraria'];
+// mídia, relatórios). midia/tesouraria/secretario somam uma responsabilidade específica
+// a essa base; admin (diretoria) tem acesso total. Ver [[grupos-cumulativos]] no README.
+export const QUALQUER_GRUPO: Grupo[] = ['admin', 'member', 'midia', 'tesouraria', 'secretario'];
 export const GRUPOS_FINANCEIRO: Grupo[] = ['admin', 'tesouraria'];
 export const GRUPOS_MIDIA: Grupo[] = ['admin', 'midia'];
+export const GRUPOS_SECRETARIA: Grupo[] = ['admin', 'secretario'];
 
 /**
  * O frontend envia o ID token (não o access token) como Bearer, pois é o ID token
@@ -52,4 +53,9 @@ export function podeGerenciarFinancas(event: APIGatewayProxyEventV2WithJWTAuthor
 /** admin (diretoria) ou mídia: CRUD de cultos e mídia (fotos/vídeos). */
 export function podeGerenciarMidia(event: APIGatewayProxyEventV2WithJWTAuthorizer): boolean {
   return hasGrupo(event, GRUPOS_MIDIA);
+}
+
+/** admin (diretoria) ou secretário: CRUD de membros e edição das informações institucionais. */
+export function podeGerenciarSecretaria(event: APIGatewayProxyEventV2WithJWTAuthorizer): boolean {
+  return hasGrupo(event, GRUPOS_SECRETARIA);
 }

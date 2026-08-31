@@ -16,7 +16,7 @@ export const cognito = new CognitoIdentityProviderClient({});
 
 export const UserPoolId = process.env.USER_POOL_ID as string;
 
-const TODOS_OS_GRUPOS: Grupo[] = ['admin', 'member', 'midia', 'tesouraria'];
+const TODOS_OS_GRUPOS: Grupo[] = ['admin', 'member', 'midia', 'tesouraria', 'secretario'];
 
 /**
  * Cria o usuário já com senha temporária gerada por nós (em vez de deixar o Cognito

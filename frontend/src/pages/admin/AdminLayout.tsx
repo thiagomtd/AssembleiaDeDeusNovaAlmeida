@@ -5,11 +5,11 @@ import { useAuth, type Grupo } from '../../context/AuthContext';
 import { IconLock, IconUsers, IconShield, IconImage, IconInfo, IconTarget, IconClock } from '../../components/icons';
 
 const tabs = [
-  { to: '/admin/membros', label: 'Membros', icon: IconUsers, end: true, roles: ['admin'] as Grupo[] },
+  { to: '/admin/membros', label: 'Membros', icon: IconUsers, end: true, roles: ['admin', 'secretario'] as Grupo[] },
   { to: '/admin/lancamentos', label: 'Lançamentos', icon: IconShield, end: true, roles: ['admin', 'tesouraria'] as Grupo[] },
   { to: '/admin/campanhas', label: 'Metas', icon: IconTarget, end: true, roles: ['admin', 'tesouraria'] as Grupo[] },
   { to: '/admin/cultos', label: 'Cultos', icon: IconImage, end: true, roles: ['admin', 'midia'] as Grupo[] },
-  { to: '/admin/info', label: 'Informações', icon: IconInfo, end: true, roles: ['admin'] as Grupo[] },
+  { to: '/admin/info', label: 'Informações', icon: IconInfo, end: true, roles: ['admin', 'secretario'] as Grupo[] },
   { to: '/admin/auditoria', label: 'Auditoria', icon: IconClock, end: true, roles: ['admin'] as Grupo[] },
 ];
 

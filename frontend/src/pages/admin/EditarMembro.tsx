@@ -11,7 +11,7 @@ interface Membro {
   telefone: string;
   dataNascimento: string;
   dataAssociacao: string;
-  grupo: 'admin' | 'member' | 'midia' | 'tesouraria';
+  grupo: 'admin' | 'member' | 'midia' | 'tesouraria' | 'secretario';
   status: 'ativo' | 'inativo';
 }
 
@@ -127,7 +127,7 @@ export function EditarMembro() {
             </Field>
             <Field
               label="Grupo de acesso"
-              hint="Membro: leitura. Mídia: + gerencia cultos/fotos/vídeos. Tesouraria: + gerencia lançamentos financeiros. Administração: acesso total."
+              hint="Membro: leitura. Mídia: + gerencia cultos/fotos/vídeos. Tesouraria: + gerencia lançamentos financeiros. Secretaria: + gerencia membros e informações institucionais. Administração: acesso total."
             >
               <select
                 className={inputCls}
@@ -137,6 +137,7 @@ export function EditarMembro() {
                 <option value="member">Membro</option>
                 <option value="midia">Mídia</option>
                 <option value="tesouraria">Tesouraria</option>
+                <option value="secretario">Secretaria</option>
                 <option value="admin">Administração (diretoria)</option>
               </select>
             </Field>

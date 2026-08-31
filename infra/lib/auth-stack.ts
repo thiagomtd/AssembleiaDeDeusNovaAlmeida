@@ -19,6 +19,7 @@ export class AuthStack extends cdk.Stack {
   public readonly memberGroupName = 'member';
   public readonly midiaGroupName = 'midia';
   public readonly tesourariaGroupName = 'tesouraria';
+  public readonly secretarioGroupName = 'secretario';
 
   constructor(scope: Construct, id: string, props: AuthStackProps) {
     super(scope, id, props);
@@ -91,8 +92,8 @@ export class AuthStack extends cdk.Stack {
     });
 
     // Grupos com permissão cumulativa: todo mundo autenticado tem a base de "member"
-    // (leitura de financeiro, dizimistas, mídia e relatórios). midia/tesouraria somam
-    // uma responsabilidade específica sobre essa base; admin (diretoria) tem tudo.
+    // (leitura de financeiro, dizimistas, mídia e relatórios). midia/tesouraria/secretario
+    // somam uma responsabilidade específica sobre essa base; admin (diretoria) tem tudo.
     new cognito.CfnUserPoolGroup(this, 'MemberGroup', {
       userPoolId: this.userPool.userPoolId,
       groupName: this.memberGroupName,
@@ -112,6 +113,13 @@ export class AuthStack extends cdk.Stack {
       groupName: this.tesourariaGroupName,
       description: 'Responsável pelas finanças (lançamentos), além do acesso base de membro',
       precedence: 10,
+    });
+
+    new cognito.CfnUserPoolGroup(this, 'SecretarioGroup', {
+      userPoolId: this.userPool.userPoolId,
+      groupName: this.secretarioGroupName,
+      description: 'Responsável pelo cadastro de membros e informações institucionais, além do acesso base de membro',
+      precedence: 15,
     });
 
     // Identity Pool provisionado conforme especificação; a autorização de API é feita

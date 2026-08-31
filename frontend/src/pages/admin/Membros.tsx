@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { api } from '../../lib/api';
 import { Card, Pill, Pagination, SearchInput, FilterSelect, combina } from '../../components/ui';
 import { ConfirmDialog } from '../../components/ConfirmDialog';
-import { IconPlus, IconEdit, IconTrash, IconShield, IconUsers, IconImage, IconCheck, IconLock } from '../../components/icons';
+import { IconPlus, IconEdit, IconTrash, IconShield, IconUsers, IconImage, IconInfo, IconCheck, IconLock } from '../../components/icons';
 
 const POR_PAGINA = 10;
 
@@ -13,13 +13,14 @@ interface Membro {
   telefone: string;
   dataNascimento: string;
   dataAssociacao: string;
-  grupo: 'admin' | 'member' | 'midia' | 'tesouraria';
+  grupo: 'admin' | 'member' | 'midia' | 'tesouraria' | 'secretario';
   status: 'ativo' | 'inativo';
 }
 
-const GRUPO_INFO: Record<Membro['grupo'], { label: string; tone: 'role-admin' | 'role-member' | 'role-midia' | 'role-tesouraria'; Icon: typeof IconShield }> = {
+const GRUPO_INFO: Record<Membro['grupo'], { label: string; tone: 'role-admin' | 'role-member' | 'role-midia' | 'role-tesouraria' | 'role-secretario'; Icon: typeof IconShield }> = {
   admin: { label: 'Administração', tone: 'role-admin', Icon: IconShield },
   tesouraria: { label: 'Tesouraria', tone: 'role-tesouraria', Icon: IconShield },
+  secretario: { label: 'Secretaria', tone: 'role-secretario', Icon: IconInfo },
   midia: { label: 'Mídia', tone: 'role-midia', Icon: IconImage },
   member: { label: 'Membro', tone: 'role-member', Icon: IconUsers },
 };

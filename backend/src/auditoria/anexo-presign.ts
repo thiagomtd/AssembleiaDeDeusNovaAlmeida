@@ -4,12 +4,13 @@ import { hasGrupo } from '../common/auth';
 import { presignPut, Buckets } from '../common/s3';
 import { badRequest, forbidden, ok, serverError } from '../common/response';
 
-// Só quem chega até uma tela de edição/exclusão (admin, mídia ou tesouraria) pode
-// anexar um comprovante ao motivo — visitante/member nunca alteram nada no sistema.
+// Só quem chega até uma tela de edição/exclusão (admin, mídia, tesouraria ou
+// secretário) pode anexar um comprovante ao motivo — visitante/member nunca alteram
+// nada no sistema.
 export const handler: APIGatewayProxyHandlerV2WithJWTAuthorizer = async (
   event: APIGatewayProxyEventV2WithJWTAuthorizer,
 ) => {
-  if (!hasGrupo(event, ['admin', 'midia', 'tesouraria'])) return forbidden();
+  if (!hasGrupo(event, ['admin', 'midia', 'tesouraria', 'secretario'])) return forbidden();
 
   try {
     const body = JSON.parse(event.body || '{}');

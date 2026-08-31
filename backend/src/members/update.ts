@@ -1,7 +1,7 @@
 import type { APIGatewayProxyEventV2WithJWTAuthorizer, APIGatewayProxyHandlerV2WithJWTAuthorizer } from 'aws-lambda';
 import { GetCommand, UpdateCommand } from '@aws-sdk/lib-dynamodb';
 import { ddb, Tables } from '../common/ddb';
-import { isAdmin, type Grupo } from '../common/auth';
+import { podeGerenciarSecretaria, type Grupo } from '../common/auth';
 import { setUserGroupExclusive, setCognitoUserEnabled, globalSignOutUser } from '../common/cognito';
 import { registrarAuditoria } from '../common/audit';
 import { ok, badRequest, forbidden, notFound, serverError } from '../common/response';
@@ -9,7 +9,7 @@ import { ok, badRequest, forbidden, notFound, serverError } from '../common/resp
 export const handler: APIGatewayProxyHandlerV2WithJWTAuthorizer = async (
   event: APIGatewayProxyEventV2WithJWTAuthorizer,
 ) => {
-  if (!isAdmin(event)) return forbidden();
+  if (!podeGerenciarSecretaria(event)) return forbidden();
   const memberId = event.pathParameters?.id;
   if (!memberId) return badRequest('Parâmetro id ausente na URL.');
 
@@ -22,7 +22,7 @@ export const handler: APIGatewayProxyHandlerV2WithJWTAuthorizer = async (
     if (!motivo || typeof motivo !== 'string' || !motivo.trim()) {
       return badRequest('Informe o motivo desta alteração.');
     }
-    const gruposValidos: Grupo[] = ['admin', 'member', 'midia', 'tesouraria'];
+    const gruposValidos: Grupo[] = ['admin', 'member', 'midia', 'tesouraria', 'secretario'];
     const grupoFinal: Grupo = gruposValidos.includes(grupo) ? grupo : 'member';
     const statusFinal: 'ativo' | 'inativo' = status === 'inativo' ? 'inativo' : 'ativo';
 

@@ -62,7 +62,7 @@ export function Button({
   );
 }
 
-type PillTone = 'active' | 'inactive' | 'income' | 'expense' | 'role-admin' | 'role-member' | 'role-midia' | 'role-tesouraria';
+type PillTone = 'active' | 'inactive' | 'income' | 'expense' | 'role-admin' | 'role-member' | 'role-midia' | 'role-tesouraria' | 'role-secretario';
 const pillTones: Record<PillTone, string> = {
   active: 'bg-incomeSoft text-income',
   inactive: 'bg-surface2 text-muted',
@@ -72,6 +72,7 @@ const pillTones: Record<PillTone, string> = {
   'role-member': 'bg-surface2 text-inkSecondary border border-border',
   'role-midia': 'bg-sage/15 text-sage',
   'role-tesouraria': 'bg-incomeSoft text-income',
+  'role-secretario': 'bg-infoSoft text-info',
 };
 export function Pill({ tone, children }: { tone: PillTone; children: ReactNode }) {
   return (

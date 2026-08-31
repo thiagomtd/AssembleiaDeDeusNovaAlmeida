@@ -16,6 +16,7 @@ interface MeusDados {
 const GRUPO_LABEL: Record<string, string> = {
   admin: 'Administração (diretoria)',
   tesouraria: 'Tesouraria',
+  secretario: 'Secretaria',
   midia: 'Mídia',
   member: 'Membro',
 };

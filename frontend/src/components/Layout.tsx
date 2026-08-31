@@ -82,7 +82,7 @@ function NavDropdown({ group, openLabel, setOpenLabel }: { group: NavGroup; open
 }
 
 export function Layout() {
-  const { isMember, isAdmin, isMidia, isTesouraria, isAuthenticated, loading, telefone, nome, signOut } = useAuth();
+  const { isMember, isAdmin, isMidia, isTesouraria, isSecretario, isAuthenticated, loading, telefone, nome, signOut } = useAuth();
   const nomeExibido = nome ? nome.split(' ')[0] : telefone;
   const navigate = useNavigate();
   const location = useLocation();
@@ -94,7 +94,7 @@ export function Layout() {
     setOpenGroup(null);
   }, [location.pathname]);
 
-  const podeVerAdmin = isAdmin || isMidia || isTesouraria;
+  const podeVerAdmin = isAdmin || isMidia || isTesouraria || isSecretario;
   const memberGroups = [financeiroPara(isAdmin || isTesouraria), comunidade];
 
   const handleSignOut = async () => {

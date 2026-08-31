@@ -106,12 +106,13 @@ export function NovoMembro() {
           </Field>
           <Field
             label="Grupo de acesso"
-            hint="Membro: leitura. Mídia: + gerencia cultos/fotos/vídeos. Tesouraria: + gerencia lançamentos financeiros. Administração: acesso total."
+            hint="Membro: leitura. Mídia: + gerencia cultos/fotos/vídeos. Tesouraria: + gerencia lançamentos financeiros. Secretaria: + gerencia membros e informações institucionais. Administração: acesso total."
           >
             <select className={inputCls} value={form.grupo} onChange={set('grupo')}>
               <option value="member">Membro</option>
               <option value="midia">Mídia</option>
               <option value="tesouraria">Tesouraria</option>
+              <option value="secretario">Secretaria</option>
               <option value="admin">Administração (diretoria)</option>
             </select>
           </Field>

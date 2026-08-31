@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 import { fetchAuthSession, signOut as amplifySignOut } from 'aws-amplify/auth';
 
-export type Grupo = 'admin' | 'member' | 'midia' | 'tesouraria';
+export type Grupo = 'admin' | 'member' | 'midia' | 'tesouraria' | 'secretario';
 
 interface AuthState {
   loading: boolean;
@@ -13,6 +13,7 @@ interface AuthState {
   isMember: boolean;
   isMidia: boolean;
   isTesouraria: boolean;
+  isSecretario: boolean;
   refresh: () => Promise<void>;
   signOut: () => Promise<void>;
 }
@@ -69,6 +70,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const isAdmin = grupos.includes('admin');
   const isMidia = grupos.includes('midia');
   const isTesouraria = grupos.includes('tesouraria');
+  const isSecretario = grupos.includes('secretario');
   // Todo grupo autenticado tem a base de acesso de "member" (permissões cumulativas).
   const isMember = grupos.length > 0;
 
@@ -82,6 +84,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     isMember,
     isMidia,
     isTesouraria,
+    isSecretario,
     refresh,
     signOut,
   };

@@ -1,14 +1,14 @@
 import type { APIGatewayProxyEventV2WithJWTAuthorizer, APIGatewayProxyHandlerV2WithJWTAuthorizer } from 'aws-lambda';
 import { PutCommand, GetCommand } from '@aws-sdk/lib-dynamodb';
 import { ddb, Tables } from '../common/ddb';
-import { isAdmin } from '../common/auth';
+import { podeGerenciarSecretaria } from '../common/auth';
 import { registrarAuditoria } from '../common/audit';
 import { ok, badRequest, forbidden, serverError } from '../common/response';
 
 export const handler: APIGatewayProxyHandlerV2WithJWTAuthorizer = async (
   event: APIGatewayProxyEventV2WithJWTAuthorizer,
 ) => {
-  if (!isAdmin(event)) return forbidden();
+  if (!podeGerenciarSecretaria(event)) return forbidden();
   try {
     const body = JSON.parse(event.body || '{}');
     const { textoInstitucional, endereco, mapaEmbedUrl, horarios, motivo, anexoKey } = body;

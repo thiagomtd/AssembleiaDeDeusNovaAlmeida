@@ -32,11 +32,12 @@ const EditarLancamento = lazy(() => import('./pages/admin/EditarLancamento').the
 const Cultos = lazy(() => import('./pages/admin/Cultos').then((m) => ({ default: m.Cultos })));
 const Info = lazy(() => import('./pages/admin/Info').then((m) => ({ default: m.Info })));
 
-const QUALQUER_GRUPO = ['admin', 'member', 'midia', 'tesouraria'] as const;
+const QUALQUER_GRUPO = ['admin', 'member', 'midia', 'tesouraria', 'secretario'] as const;
 
 function AdminIndex() {
-  const { isAdmin, isTesouraria, isMidia } = useAuth();
+  const { isAdmin, isTesouraria, isMidia, isSecretario } = useAuth();
   if (isAdmin) return <Navigate to="membros" replace />;
+  if (isSecretario) return <Navigate to="membros" replace />;
   if (isTesouraria) return <Navigate to="lancamentos" replace />;
   if (isMidia) return <Navigate to="cultos" replace />;
   return <Navigate to="/" replace />;
@@ -63,15 +64,15 @@ export function App() {
         <Route
           path="admin"
           element={
-            <RequireGroup roles={['admin', 'midia', 'tesouraria']}>
+            <RequireGroup roles={['admin', 'midia', 'tesouraria', 'secretario']}>
               <AdminLayout />
             </RequireGroup>
           }
         >
           <Route index element={<AdminIndex />} />
-          <Route path="membros" element={<RequireGroup roles={['admin']}><Membros /></RequireGroup>} />
-          <Route path="membros/novo" element={<RequireGroup roles={['admin']}><NovoMembro /></RequireGroup>} />
-          <Route path="membros/:id/editar" element={<RequireGroup roles={['admin']}><EditarMembro /></RequireGroup>} />
+          <Route path="membros" element={<RequireGroup roles={['admin', 'secretario']}><Membros /></RequireGroup>} />
+          <Route path="membros/novo" element={<RequireGroup roles={['admin', 'secretario']}><NovoMembro /></RequireGroup>} />
+          <Route path="membros/:id/editar" element={<RequireGroup roles={['admin', 'secretario']}><EditarMembro /></RequireGroup>} />
           <Route path="lancamentos" element={<RequireGroup roles={['admin', 'tesouraria']}><Lancamentos /></RequireGroup>} />
           <Route path="lancamentos/novo" element={<RequireGroup roles={['admin', 'tesouraria']}><NovoLancamento /></RequireGroup>} />
           <Route path="lancamentos/:mes/:id/editar" element={<RequireGroup roles={['admin', 'tesouraria']}><EditarLancamento /></RequireGroup>} />
@@ -79,7 +80,7 @@ export function App() {
           <Route path="campanhas/nova" element={<RequireGroup roles={['admin', 'tesouraria']}><NovaCampanha /></RequireGroup>} />
           <Route path="campanhas/:id/editar" element={<RequireGroup roles={['admin', 'tesouraria']}><EditarCampanha /></RequireGroup>} />
           <Route path="cultos" element={<RequireGroup roles={['admin', 'midia']}><Cultos /></RequireGroup>} />
-          <Route path="info" element={<RequireGroup roles={['admin']}><Info /></RequireGroup>} />
+          <Route path="info" element={<RequireGroup roles={['admin', 'secretario']}><Info /></RequireGroup>} />
           <Route path="auditoria" element={<RequireGroup roles={['admin']}><Auditoria /></RequireGroup>} />
         </Route>
 

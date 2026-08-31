@@ -2,7 +2,7 @@ import type { APIGatewayProxyEventV2WithJWTAuthorizer, APIGatewayProxyHandlerV2W
 import { randomUUID } from 'crypto';
 import { PutCommand } from '@aws-sdk/lib-dynamodb';
 import { ddb, Tables } from '../common/ddb';
-import { isAdmin, type Grupo } from '../common/auth';
+import { podeGerenciarSecretaria, type Grupo } from '../common/auth';
 import { createCognitoUser, setUserGroup } from '../common/cognito';
 import { normalizePhoneBR, isValidE164 } from '../common/phone';
 import { registrarAuditoria } from '../common/audit';
@@ -11,7 +11,7 @@ import { ok, badRequest, forbidden, serverError } from '../common/response';
 export const handler: APIGatewayProxyHandlerV2WithJWTAuthorizer = async (
   event: APIGatewayProxyEventV2WithJWTAuthorizer,
 ) => {
-  if (!isAdmin(event)) return forbidden();
+  if (!podeGerenciarSecretaria(event)) return forbidden();
   try {
     const body = JSON.parse(event.body || '{}');
     const { nome, dataNascimento, dataAssociacao, grupo } = body;
@@ -21,7 +21,7 @@ export const handler: APIGatewayProxyHandlerV2WithJWTAuthorizer = async (
     const telefone = normalizePhoneBR(String(body.telefone));
     if (!isValidE164(telefone)) return badRequest('Telefone inválido. Use um número de celular com DDD.');
 
-    const gruposValidos: Grupo[] = ['admin', 'member', 'midia', 'tesouraria'];
+    const gruposValidos: Grupo[] = ['admin', 'member', 'midia', 'tesouraria', 'secretario'];
     const grupoFinal: Grupo = gruposValidos.includes(grupo) ? grupo : 'member';
 
     // Cria a conta no Cognito com senha temporária gerada por nós — o SMS automático
