@@ -2,7 +2,7 @@ import type { APIGatewayProxyEventV2WithJWTAuthorizer, APIGatewayProxyHandlerV2W
 import { randomUUID } from 'crypto';
 import { PutCommand } from '@aws-sdk/lib-dynamodb';
 import { ddb, Tables } from '../common/ddb';
-import { podeGerenciarSecretaria, type Grupo } from '../common/auth';
+import { podeGerenciarSecretaria, isAdmin, GRUPOS_ADMINISTRATIVOS, type Grupo } from '../common/auth';
 import { createCognitoUser, setUserGroup } from '../common/cognito';
 import { normalizePhoneBR, isValidE164 } from '../common/phone';
 import { registrarAuditoria } from '../common/audit';
@@ -23,6 +23,10 @@ export const handler: APIGatewayProxyHandlerV2WithJWTAuthorizer = async (
 
     const gruposValidos: Grupo[] = ['admin', 'member', 'midia', 'tesouraria', 'secretario'];
     const grupoFinal: Grupo = gruposValidos.includes(grupo) ? grupo : 'member';
+
+    // Secretário gerencia usuários, mas nunca escala privilégio: só admin pode criar
+    // uma conta com grupo administrativo (admin/tesouraria/secretario).
+    if (!isAdmin(event) && GRUPOS_ADMINISTRATIVOS.includes(grupoFinal)) return forbidden();
 
     // Cria a conta no Cognito com senha temporária gerada por nós — o SMS automático
     // não é usado (SNS dessa conta ainda sem Production Access) — e vincula ao grupo

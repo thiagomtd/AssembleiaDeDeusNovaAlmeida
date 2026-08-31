@@ -1,11 +1,13 @@
 import { useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../../lib/api';
+import { useAuth } from '../../context/AuthContext';
 import { Card, Button, Field, inputCls } from '../../components/ui';
 import { IconPlus, IconCheck } from '../../components/icons';
 
 export function NovoMembro() {
   const navigate = useNavigate();
+  const { isAdmin } = useAuth();
   const [form, setForm] = useState({
     nome: '', telefone: '', dataNascimento: '', dataAssociacao: '', grupo: 'member',
   });
@@ -106,14 +108,22 @@ export function NovoMembro() {
           </Field>
           <Field
             label="Grupo de acesso"
-            hint="Membro: leitura. Mídia: + gerencia cultos/fotos/vídeos. Tesouraria: + gerencia lançamentos financeiros. Secretaria: + gerencia membros e informações institucionais. Administração: acesso total."
+            hint={
+              isAdmin
+                ? 'Membro: leitura. Mídia: + gerencia cultos/fotos/vídeos. Tesouraria: + gerencia lançamentos financeiros. Secretaria: + gerencia membros e informações institucionais. Administração: acesso total.'
+                : 'Membro: leitura. Mídia: + gerencia cultos/fotos/vídeos. Grupos administrativos só podem ser atribuídos pela diretoria.'
+            }
           >
             <select className={inputCls} value={form.grupo} onChange={set('grupo')}>
               <option value="member">Membro</option>
               <option value="midia">Mídia</option>
-              <option value="tesouraria">Tesouraria</option>
-              <option value="secretario">Secretaria</option>
-              <option value="admin">Administração (diretoria)</option>
+              {isAdmin && (
+                <>
+                  <option value="tesouraria">Tesouraria</option>
+                  <option value="secretario">Secretaria</option>
+                  <option value="admin">Administração (diretoria)</option>
+                </>
+              )}
             </select>
           </Field>
         </div>

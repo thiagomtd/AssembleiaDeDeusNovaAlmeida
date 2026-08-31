@@ -22,6 +22,16 @@ async function enviarComprovante(file: File): Promise<string> {
 interface Membro {
   memberId: string;
   nome: string;
+  dependentes?: { dependenteId: string; nome: string }[];
+}
+
+// Achata cada membro + seus dependentes (pessoas sem login próprio, ex: filho, que
+// dão dízimo em nome próprio) numa lista única de opções pro campo de dizimista.
+function opcoesDizimista(membros: Membro[]) {
+  return membros.flatMap((m) => [
+    { id: m.memberId, nome: m.nome, label: m.nome },
+    ...(m.dependentes ?? []).map((d) => ({ id: d.dependenteId, nome: d.nome, label: `${d.nome} (dependente de ${m.nome})` })),
+  ]);
 }
 
 interface Campanha {
@@ -70,7 +80,7 @@ export function NovoLancamento() {
     }
     setSalvando(true);
     try {
-      const membro = membros.find((m) => m.memberId === form.membroId);
+      const nomeDizimista = opcoesDizimista(membros).find((o) => o.id === form.membroId);
       const campanha = campanhas.find((c) => c.campanhaId === form.campanhaId);
       const comprovanteKey = form.tipo === 'saida' && comprovante ? await enviarComprovante(comprovante) : undefined;
       await api.post('/transactions', {
@@ -80,7 +90,7 @@ export function NovoLancamento() {
         data: form.data,
         descricao: form.descricao,
         membroId: mostrarDizimista && form.membroId ? form.membroId : undefined,
-        membroNome: mostrarDizimista && membro ? membro.nome : undefined,
+        membroNome: mostrarDizimista && nomeDizimista ? nomeDizimista.nome : undefined,
         campanhaId: mostrarCampanha && form.campanhaId ? form.campanhaId : undefined,
         campanhaTitulo: mostrarCampanha && campanha ? campanha.titulo : undefined,
         comprovanteKey,
@@ -121,7 +131,7 @@ export function NovoLancamento() {
               <ComboBox
                 value={form.membroId}
                 onChange={(membroId) => setForm((f) => ({ ...f, membroId }))}
-                options={membros.map((m) => ({ id: m.memberId, label: m.nome }))}
+                options={opcoesDizimista(membros)}
                 placeholder="Buscar pessoa..."
                 emptyLabel="— não vincular a uma pessoa —"
               />

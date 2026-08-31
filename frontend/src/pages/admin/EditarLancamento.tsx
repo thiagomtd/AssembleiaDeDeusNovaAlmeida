@@ -25,7 +25,18 @@ async function enviarComprovante(file: File): Promise<string> {
 interface Membro {
   memberId: string;
   nome: string;
+  dependentes?: { dependenteId: string; nome: string }[];
 }
+
+// Achata cada membro + seus dependentes (pessoas sem login próprio, ex: filho, que
+// dão dízimo em nome próprio) numa lista única de opções pro campo de dizimista.
+function opcoesDizimista(membros: Membro[]) {
+  return membros.flatMap((m) => [
+    { id: m.memberId, nome: m.nome, label: m.nome },
+    ...(m.dependentes ?? []).map((d) => ({ id: d.dependenteId, nome: d.nome, label: `${d.nome} (dependente de ${m.nome})` })),
+  ]);
+}
+
 interface Campanha {
   campanhaId: string;
   titulo: string;
@@ -100,7 +111,7 @@ export function EditarLancamento() {
   const salvar = async (motivo: string, anexoKey?: string) => {
     if (!lancamento) return;
     try {
-      const membro = membros.find((m) => m.memberId === lancamento.membroId);
+      const nomeDizimista = opcoesDizimista(membros).find((o) => o.id === lancamento.membroId);
       const campanha = campanhas.find((c) => c.campanhaId === lancamento.campanhaId);
       const comprovanteKey =
         lancamento.tipo === 'saida'
@@ -115,7 +126,7 @@ export function EditarLancamento() {
         data: lancamento.data,
         descricao: lancamento.descricao ?? '',
         membroId: mostrarDizimista && lancamento.membroId ? lancamento.membroId : undefined,
-        membroNome: mostrarDizimista && membro ? membro.nome : undefined,
+        membroNome: mostrarDizimista && nomeDizimista ? nomeDizimista.nome : undefined,
         campanhaId: mostrarCampanha && lancamento.campanhaId ? lancamento.campanhaId : undefined,
         campanhaTitulo: mostrarCampanha && campanha ? campanha.titulo : undefined,
         comprovanteKey,
@@ -187,7 +198,7 @@ export function EditarLancamento() {
                 <ComboBox
                   value={lancamento.membroId ?? ''}
                   onChange={(membroId) => setLancamento({ ...lancamento, membroId })}
-                  options={membros.map((m) => ({ id: m.memberId, label: m.nome }))}
+                  options={opcoesDizimista(membros)}
                   placeholder="Buscar pessoa..."
                   emptyLabel="— não vincular a uma pessoa —"
                 />

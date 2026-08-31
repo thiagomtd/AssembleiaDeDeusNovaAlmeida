@@ -9,6 +9,12 @@ export const QUALQUER_GRUPO: Grupo[] = ['admin', 'member', 'midia', 'tesouraria'
 export const GRUPOS_FINANCEIRO: Grupo[] = ['admin', 'tesouraria'];
 export const GRUPOS_MIDIA: Grupo[] = ['admin', 'midia'];
 export const GRUPOS_SECRETARIA: Grupo[] = ['admin', 'secretario'];
+// Grupos com poder administrativo (acesso financeiro, ao cadastro de usuários ou
+// total). Só o próprio admin (diretoria) pode conceder esses grupos ou mexer em quem
+// já os tem — secretário gerencia usuários, mas nunca escala privilégio: não pode
+// criar/editar/remover/resetar senha de admin, tesouraria ou outro secretário
+// (nem de si mesmo).
+export const GRUPOS_ADMINISTRATIVOS: Grupo[] = ['admin', 'tesouraria', 'secretario'];
 
 /**
  * O frontend envia o ID token (não o access token) como Bearer, pois é o ID token

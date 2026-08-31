@@ -31,19 +31,32 @@ export const handler: APIGatewayProxyHandlerV2WithJWTAuthorizer = async (
     const meuMembro = membro.Items?.[0];
     if (!meuMembro) return ok({ ano, nome: null, total: 0, contribuicoes: [] });
 
-    const res = await ddb.send(
-      new QueryCommand({
-        TableName: Tables.transactions,
-        IndexName: 'membroId-index',
-        KeyConditionExpression: 'membroId = :id AND begins_with(#data, :ano)',
-        ExpressionAttributeNames: { '#data': 'data' },
-        ExpressionAttributeValues: { ':id': meuMembro.memberId, ':ano': ano },
-      }),
+    // Dependentes (ex: filho sem celular/login) dão dízimo em nome próprio, mas o
+    // extrato aparece pra quem é responsável por eles — busca o histórico de cada um
+    // do mesmo jeito que o do titular e junta tudo, marcando de quem é cada linha.
+    const dependentes: { dependenteId: string; nome: string }[] = meuMembro.dependentes ?? [];
+    const pessoas = [{ id: meuMembro.memberId, nome: meuMembro.nome }, ...dependentes.map((d) => ({ id: d.dependenteId, nome: d.nome }))];
+
+    const resultados = await Promise.all(
+      pessoas.map((p) =>
+        ddb.send(
+          new QueryCommand({
+            TableName: Tables.transactions,
+            IndexName: 'membroId-index',
+            KeyConditionExpression: 'membroId = :id AND begins_with(#data, :ano)',
+            ExpressionAttributeNames: { '#data': 'data' },
+            ExpressionAttributeValues: { ':id': p.id, ':ano': ano },
+          }),
+        ),
+      ),
     );
 
-    const contribuicoes = (res.Items ?? [])
-      .filter((t) => t.tipo === 'entrada')
-      .map((t) => ({ data: t.data, categoria: t.categoria, valor: t.valor, descricao: t.descricao ?? '' }))
+    const contribuicoes = resultados
+      .flatMap((res, i) =>
+        (res.Items ?? [])
+          .filter((t) => t.tipo === 'entrada')
+          .map((t) => ({ data: t.data, categoria: t.categoria, valor: t.valor, descricao: t.descricao ?? '', pessoa: pessoas[i].nome })),
+      )
       .sort((a, b) => a.data.localeCompare(b.data));
 
     const total = contribuicoes.reduce((acc, c) => acc + c.valor, 0);

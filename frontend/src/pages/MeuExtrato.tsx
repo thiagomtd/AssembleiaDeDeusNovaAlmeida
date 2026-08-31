@@ -3,7 +3,7 @@ import { api } from '../lib/api';
 import { Card, Eyebrow, Button, fmtBRL } from '../components/ui';
 import { IconWallet } from '../components/icons';
 
-type Contribuicao = { data: string; categoria: string; valor: number; descricao: string };
+type Contribuicao = { data: string; categoria: string; valor: number; descricao: string; pessoa: string };
 
 export function MeuExtrato() {
   const anoAtual = new Date().getFullYear();
@@ -31,6 +31,9 @@ export function MeuExtrato() {
   }, [ano]);
 
   const anos = Array.from({ length: 6 }, (_, i) => anoAtual - i);
+  // Só mostra a coluna "Pessoa" quando há contribuição de mais de uma pessoa (ex: um
+  // dependente) — pra quem não tem dependente a tela fica exatamente como já era.
+  const mostrarPessoa = new Set(lista.map((c) => c.pessoa)).size > 1;
 
   return (
     <section className="print:max-w-none">
@@ -76,6 +79,7 @@ export function MeuExtrato() {
           <thead>
             <tr className="text-left text-muted border-b border-border">
               <th className="px-3.5 py-2.5 font-semibold">Data</th>
+              {mostrarPessoa && <th className="px-3.5 py-2.5 font-semibold">Pessoa</th>}
               <th className="px-3.5 py-2.5 font-semibold">Categoria</th>
               <th className="px-3.5 py-2.5 font-semibold text-right">Valor</th>
             </tr>
@@ -86,6 +90,7 @@ export function MeuExtrato() {
                 <td className="px-3.5 py-2.5 text-inkSecondary">
                   {new Date(c.data + 'T00:00:00').toLocaleDateString('pt-BR')}
                 </td>
+                {mostrarPessoa && <td className="px-3.5 py-2.5 text-inkSecondary">{c.pessoa}</td>}
                 <td className="px-3.5 py-2.5 text-ink">{c.categoria}</td>
                 <td className="px-3.5 py-2.5 text-right font-semibold text-income">{fmtBRL(c.valor)}</td>
               </tr>
