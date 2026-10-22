@@ -2,10 +2,15 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../lib/api';
-import { Card, Eyebrow, Pill, FilterSelect, fmtBRL } from '../components/ui';
-import { IconShield, IconWallet, IconPlus, IconPaperclip, IconTarget } from '../components/icons';
+import { Card, Eyebrow, Pill, FilterSelect, Button, fmtBRL } from '../components/ui';
+import { IconShield, IconWallet, IconPlus, IconPaperclip, IconTarget, IconDownload } from '../components/icons';
 import { MonthPicker } from '../components/MonthPicker';
 import { AttachmentViewer } from '../components/AttachmentViewer';
+
+const MESES = [
+  'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+  'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro',
+];
 
 interface Transacao {
   transactionId: string;
@@ -65,14 +70,27 @@ export function Transacoes() {
     [itens, filtroTipo, filtroCategoria],
   );
 
+  const filtroLabel = filtroTipo === 'todos' ? 'Entradas e Saídas' : filtroTipo === 'entrada' ? 'Entradas' : 'Saídas';
+
   return (
-    <section>
-      <Eyebrow icon={<IconShield className="icon w-3 h-3" />}>Financeiro</Eyebrow>
-      <h1 className="text-[32px] mb-1.5 text-ink">Entradas e Saídas</h1>
-      <p className="text-inkSecondary text-[14.5px] max-w-[62ch] mb-6">
-        Acompanhe os lançamentos financeiros do mês. Acesso de leitura para membros; a edição é exclusiva da
-        administração.
-      </p>
+    <section className="print:max-w-none">
+      <div className="print:hidden">
+        <Eyebrow icon={<IconShield className="icon w-3 h-3" />}>Financeiro</Eyebrow>
+        <h1 className="text-[32px] mb-1.5 text-ink">Entradas e Saídas</h1>
+        <p className="text-inkSecondary text-[14.5px] max-w-[62ch] mb-6">
+          Acompanhe os lançamentos financeiros do mês. Acesso de leitura para membros; a edição é exclusiva da
+          administração.
+        </p>
+      </div>
+
+      <div className="hidden print:block mb-6">
+        <h1 className="text-xl font-serif">
+          {filtroLabel} — {MESES[mes - 1]} de {ano}
+        </h1>
+        <p className="text-sm text-muted">
+          Assembleia de Deus de Nova Almeida{filtroCategoria ? ` · ${filtroCategoria}` : ''}
+        </p>
+      </div>
 
       <Card className="p-5 flex items-center justify-between gap-5 flex-wrap mb-5">
         <div className="flex items-center gap-3.5">
@@ -104,7 +122,7 @@ export function Transacoes() {
       </div>
 
       <Card className="overflow-hidden">
-        <div className="flex items-center justify-between gap-2.5 flex-wrap px-4.5 py-3.5 border-b border-border">
+        <div className="flex items-center justify-between gap-2.5 flex-wrap px-4.5 py-3.5 border-b border-border print:hidden">
           <div className="flex items-center gap-2.5 flex-wrap">
             <MonthPicker mes={mes} ano={ano} onChange={(m, a) => { setMes(m); setAno(a); }} />
             <div className="inline-flex border border-border rounded-lg p-0.5 gap-0.5 bg-surface2">
@@ -131,15 +149,22 @@ export function Transacoes() {
               allLabel="Todas as categorias"
             />
           </div>
-          {podeGerenciarFinancas && (
-            <Link to="/admin/lancamentos/novo">
-              <span className="inline-flex items-center gap-1.5 bg-success text-white text-[12.5px] font-semibold rounded-lg px-3 py-1.5 hover:opacity-90">
-                <IconPlus className="icon w-3.5 h-3.5" /> Novo lançamento
-              </span>
-            </Link>
-          )}
+          <div className="flex items-center gap-2.5">
+            {podeGerenciarFinancas && (
+              <Button variant="secondary" size="sm" onClick={() => window.print()}>
+                <IconDownload className="icon w-3.5 h-3.5" /> Gerar PDF
+              </Button>
+            )}
+            {podeGerenciarFinancas && (
+              <Link to="/admin/lancamentos/novo">
+                <span className="inline-flex items-center gap-1.5 bg-success text-white text-[12.5px] font-semibold rounded-lg px-3 py-1.5 hover:opacity-90">
+                  <IconPlus className="icon w-3.5 h-3.5" /> Novo lançamento
+                </span>
+              </Link>
+            )}
+          </div>
         </div>
-        <div className="sm:hidden flex flex-col gap-2.5 p-3.5">
+        <div className="sm:hidden print:hidden flex flex-col gap-2.5 p-3.5">
           {itensFiltrados.map((t) => (
             <div key={t.transactionId} className="rounded-xl bg-surface2 border border-border p-3.5 flex flex-col gap-2">
               <div className="flex items-start justify-between gap-2.5">
@@ -177,7 +202,7 @@ export function Transacoes() {
             <p className="px-3 py-8 text-center text-muted">Nenhum lançamento encontrado.</p>
           )}
         </div>
-        <div className="hidden sm:block overflow-x-auto">
+        <div className="hidden sm:block print:hidden overflow-x-auto">
           <table className="w-full text-[13.5px] border-collapse">
             <thead>
               <tr>
@@ -241,6 +266,56 @@ export function Transacoes() {
                 </tr>
               )}
             </tbody>
+          </table>
+        </div>
+        <div className="hidden print:block">
+          <table className="w-full text-[12px] border-collapse">
+            <thead>
+              <tr>
+                {['Data', 'Tipo', 'Categoria', 'Descrição', 'Valor'].map((h) => (
+                  <th
+                    key={h}
+                    className={`text-[10px] uppercase tracking-wider text-muted font-bold px-2 py-2 border-b border-border whitespace-nowrap ${
+                      h === 'Valor' ? 'text-right' : 'text-left'
+                    }`}
+                  >
+                    {h}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {itensFiltrados.map((t) => (
+                <tr key={t.transactionId}>
+                  <td className="px-2 py-1.5 border-b border-border text-inkSecondary">
+                    {t.data.split('-').reverse().join('/')}
+                  </td>
+                  <td className="px-2 py-1.5 border-b border-border text-inkSecondary">
+                    {t.tipo === 'entrada' ? 'Entrada' : 'Saída'}
+                  </td>
+                  <td className="px-2 py-1.5 border-b border-border text-inkSecondary">{t.categoria}</td>
+                  <td className="px-2 py-1.5 border-b border-border text-inkSecondary">{t.descricao}</td>
+                  <td className="px-2 py-1.5 border-b border-border text-right font-semibold text-ink">
+                    {t.tipo === 'entrada' ? '+' : '-'} {fmtBRL(t.valor)}
+                  </td>
+                </tr>
+              ))}
+              {itensFiltrados.length === 0 && (
+                <tr>
+                  <td colSpan={5} className="px-2 py-6 text-center text-muted">
+                    Nenhum lançamento encontrado.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+            <tfoot>
+              <tr>
+                <td colSpan={4} className="px-2 py-2 text-right font-bold text-ink">Total do período</td>
+                <td className="px-2 py-2 text-right font-bold text-ink">
+                  {fmtBRL(itensFiltrados.reduce((s, t) => s + (t.tipo === 'entrada' ? t.valor : -t.valor), 0))}
+                </td>
+              </tr>
+            </tfoot>
           </table>
         </div>
       </Card>
