@@ -72,6 +72,19 @@ export function Transacoes() {
 
   const filtroLabel = filtroTipo === 'todos' ? 'Entradas e Saídas' : filtroTipo === 'entrada' ? 'Entradas' : 'Saídas';
 
+  const gerarPdf = () => {
+    const filtroSlug = filtroTipo === 'todos' ? 'entradas-e-saidas' : filtroTipo === 'entrada' ? 'entradas' : 'saidas';
+    const nomeArquivo = `icadna_${filtroSlug}_${ano}-${String(mes).padStart(2, '0')}`;
+    const tituloOriginal = document.title;
+    const restaurar = () => {
+      document.title = tituloOriginal;
+      window.removeEventListener('afterprint', restaurar);
+    };
+    document.title = nomeArquivo;
+    window.addEventListener('afterprint', restaurar);
+    window.print();
+  };
+
   return (
     <section className="print:max-w-none">
       <div className="print:hidden">
@@ -87,12 +100,17 @@ export function Transacoes() {
         <h1 className="text-xl font-serif">
           {filtroLabel} — {MESES[mes - 1]} de {ano}
         </h1>
-        <p className="text-sm text-muted">
+        <p className="text-sm text-muted mb-3">
           Assembleia de Deus de Nova Almeida{filtroCategoria ? ` · ${filtroCategoria}` : ''}
         </p>
+        <div className="flex gap-6 text-[13px]">
+          <span>Entradas no mês: <strong>{fmtBRL(totais.entradas)}</strong></span>
+          <span>Saídas no mês: <strong>{fmtBRL(totais.saidas)}</strong></span>
+          <span>Saldo do mês: <strong>{fmtBRL(totais.saldo)}</strong></span>
+        </div>
       </div>
 
-      <Card className="p-5 flex items-center justify-between gap-5 flex-wrap mb-5">
+      <Card className="p-5 flex items-center justify-between gap-5 flex-wrap mb-5 print:hidden">
         <div className="flex items-center gap-3.5">
           <div className="w-11 h-11 rounded-full bg-accentSoft flex items-center justify-center flex-none">
             <IconWallet className="icon w-5 h-5 text-accentStrong" />
@@ -106,7 +124,7 @@ export function Transacoes() {
         </div>
       </Card>
 
-      <div className="grid sm:grid-cols-3 gap-3.5 mb-5">
+      <div className="grid sm:grid-cols-3 gap-3.5 mb-5 print:hidden">
         <Card className="p-4">
           <Eyebrow>Entradas no mês</Eyebrow>
           <div className="font-serif text-[23px] text-income">{fmtBRL(totais.entradas)}</div>
@@ -121,7 +139,7 @@ export function Transacoes() {
         </Card>
       </div>
 
-      <Card className="overflow-hidden">
+      <Card className="overflow-hidden print:border-0 print:shadow-none print:rounded-none print:bg-transparent">
         <div className="flex items-center justify-between gap-2.5 flex-wrap px-4.5 py-3.5 border-b border-border print:hidden">
           <div className="flex items-center gap-2.5 flex-wrap">
             <MonthPicker mes={mes} ano={ano} onChange={(m, a) => { setMes(m); setAno(a); }} />
@@ -151,7 +169,7 @@ export function Transacoes() {
           </div>
           <div className="flex items-center gap-2.5">
             {podeGerenciarFinancas && (
-              <Button variant="secondary" size="sm" onClick={() => window.print()}>
+              <Button variant="secondary" size="sm" onClick={gerarPdf}>
                 <IconDownload className="icon w-3.5 h-3.5" /> Gerar PDF
               </Button>
             )}

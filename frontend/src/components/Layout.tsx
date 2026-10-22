@@ -119,7 +119,7 @@ export function Layout() {
             </div>
           </NavLink>
 
-          <nav className="hidden md:flex items-center gap-0.5">
+          <nav className="hidden md:flex items-center gap-0.5 print:hidden">
             <NavLink to="/" end className={navLinkCls}>
               Início
             </NavLink>
@@ -134,7 +134,7 @@ export function Layout() {
             )}
           </nav>
 
-          <div className="hidden md:flex items-center gap-2.5 text-[12.5px] text-muted flex-none">
+          <div className="hidden md:flex items-center gap-2.5 text-[12.5px] text-muted flex-none print:hidden">
             {!loading && (isAuthenticated ? (
               <>
                 <span className="max-w-[180px] truncate">Olá, {nomeExibido}</span>
@@ -153,9 +153,9 @@ export function Layout() {
 
           {!loading && (isAuthenticated ? (
             <>
-              <span className="md:hidden flex-none max-w-[130px] truncate text-[12.5px] text-muted">Olá, {nomeExibido}</span>
+              <span className="md:hidden print:hidden flex-none max-w-[130px] truncate text-[12.5px] text-muted">Olá, {nomeExibido}</span>
               <button
-                className="md:hidden flex-none w-9 h-9 rounded-lg border border-border flex items-center justify-center text-inkSecondary"
+                className="md:hidden print:hidden flex-none w-9 h-9 rounded-lg border border-border flex items-center justify-center text-inkSecondary"
                 aria-label={menuOpen ? 'Fechar menu' : 'Abrir menu'}
                 onClick={() => setMenuOpen((o) => !o)}
               >
@@ -163,7 +163,7 @@ export function Layout() {
               </button>
             </>
           ) : (
-            <NavLink to="/entrar" className="md:hidden flex-none">
+            <NavLink to="/entrar" className="md:hidden print:hidden flex-none">
               <Button variant="info" size="sm">
                 Entrar
               </Button>
@@ -172,7 +172,7 @@ export function Layout() {
         </div>
 
         {menuOpen && isAuthenticated && (
-          <div className="md:hidden border-t border-border bg-surface px-4 sm:px-5 py-3 flex flex-col gap-0.5 max-h-[calc(100vh-56px)] overflow-y-auto">
+          <div className="md:hidden print:hidden border-t border-border bg-surface px-4 sm:px-5 py-3 flex flex-col gap-0.5 max-h-[calc(100vh-56px)] overflow-y-auto">
             <NavLink
               to="/"
               end
@@ -231,13 +231,13 @@ export function Layout() {
         )}
       </header>
 
-      <main className="flex-1 max-w-[1180px] mx-auto px-4 sm:px-5 pt-6 sm:pt-7 pb-16 w-full">
+      <main className="flex-1 max-w-[1180px] mx-auto px-4 sm:px-5 pt-6 sm:pt-7 pb-16 w-full print:p-0 print:max-w-none">
         <Suspense fallback={<p className="text-sm text-muted text-center py-16">Carregando...</p>}>
           <Outlet />
         </Suspense>
       </main>
 
-      <footer className="mt-10 py-10 px-4 text-center">
+      <footer className="mt-10 py-10 px-4 text-center print:hidden">
         <p className="text-[11px] tracking-[0.18em] uppercase text-muted">
           © {new Date().getFullYear()} Assembleia de Deus de Nova Almeida — Fé, Família e Esperança
         </p>
