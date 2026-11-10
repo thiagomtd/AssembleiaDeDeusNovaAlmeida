@@ -74,8 +74,8 @@ export const handler: APIGatewayProxyHandlerV2WithJWTAuthorizer = async (
         ExpressionAttributeNames: { '#st': 'status' },
         ExpressionAttributeValues: {
           ':nome': nome ?? existing.Item.nome,
-          ':nasc': dataNascimento ?? existing.Item.dataNascimento,
-          ':assoc': dataAssociacao ?? existing.Item.dataAssociacao,
+          ':nasc': dataNascimento ?? existing.Item.dataNascimento ?? '',
+          ':assoc': dataAssociacao ?? existing.Item.dataAssociacao ?? '',
           ':status': statusFinal,
           ':grupo': grupoFinal,
           ':dependentes': dependentesFinal,
